@@ -1,0 +1,46 @@
+<%- include('partials/headerAdmin'); -%>
+
+<head>
+    <title>User Management</title>
+</head>
+<body>
+    <h1>User Management</h1>
+    <div class="usermanagment">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Birthday</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(function(user) { %>
+                    <tr>
+                        <td><%= user.username %></td>
+                        <td><%= user.firstname %></td>
+                        <td><%= user.lastname %></td>
+                        <td><%= user.email %></td>
+                        <td><%= user.birthday %></td>
+                        <td><%= user.isBlocked ? 'Blocked' : 'Active' %></td>
+                        <td>
+                            <form class="blockForm" method="POST" action="/admin/usermanagment/block-user/<%= user._id %>">
+                                <button type="submit"><%= user.isBlocked ? 'Unblock' : 'Block' %></button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+    
+
+    <!-- Table to display all users -->
+    
+</body>
+
+<%- include('partials/footer'); -%>

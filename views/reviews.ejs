@@ -1,0 +1,22 @@
+<%- include('partials/header'); -%>
+
+<head>
+    <title>Reviews</title>
+</head>
+<body>
+    <h1>Reviews</h1>
+
+    <ul>
+        <% reviews.forEach(function(review) { %>
+            <li>
+                <h2><%= review.title %></h2>
+                <p>Rating: <%= review.rating %></p>
+                <p>Author: <%= review.author %></p>
+                <p>Date: <%= review.date %></p>
+                <p><%= review.body %></p>
+            </li>
+        <% }); %>
+    </ul>
+
+    <a href="/">Back to Home</a>
+    <%- include('partials/footer'); -%>

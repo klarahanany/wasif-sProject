@@ -1,0 +1,160 @@
+<%- include('partials/header'); -%>
+    <header>
+        <div class="topnav">
+            <a href="/">Home</a>
+            <a href="/order">Order Now</a>
+            <input type="text" placeholder="Search..">
+            <a href="/order/cart" class="icon"><i class="fa fa-cart-shopping">
+
+                </i></a>
+            <a class="icon" href="/profile"><i class="fa-regular fa-user"></i></a>
+        </div>
+    </header>
+    <main class="cartContentPage">
+        <h2>Shopping List</h2>
+        <ul class="cartContent">
+            <% if (cartItems.length===0) { %>
+                <p>Your cart is empty.</p>
+                <% } else { %>
+                    <hr>
+                    <% cartItems.forEach((item)=> { %>
+                        <li class="cartItem">
+                            <span>
+                                <%= item.name %>
+                            </span>
+                            <br>
+                            <span>
+                                Price: $<%= item.price %>
+                            </span>
+                            <br>
+                            <input type="number" class="quantity" id="quantity" name="quantity" min="1"
+                                data-id='<%= item.productId %>' value=<%=item.quantity %>
+                            required>
+                            <button class="DeleteFromCart" data-id='<%= item.productId %>' data-userid='<%= userId %>'
+                                onclick="removeItem( '<%= item.name %>')"><i data-id='<%= item.productId %>'
+                                    data-userid='<%= userId %>' onclick="removeItem( '<%= item.name %>')"
+                                    class="fa-solid fa-trash-can"></i></button>
+                            <!-- Add functionality to remove items from the cart -->
+                        </li>
+                        <hr>
+                        <% }); %>
+
+                            <p class="total">Total: $<%= total %>
+                            </p>
+                            <button id="payButton" herf>Checkout</button>
+
+                            <% } %>
+        </ul>
+    </main>
+
+    <%- include('partials/footer'); -%>
+
+        <script>
+            var cartItems1 = `<%- JSON.stringify(cartItems) %>`;
+            var cartItems = JSON.parse(cartItems1);
+            document.getElementById("payButton").addEventListener("click", function() {
+            window.location.href = "/order/cart/payment"; // Navigate to the desired URL
+        });
+            async function removeItem(nameItem) {
+                var ItemId = event.target.getAttribute('data-id')
+                var userId = event.target.getAttribute('data-userid')
+
+                // Find the index of the item to be removed in the cartItems array
+                const itemIndex = cartItems.findIndex(item => item.name === nameItem);
+                // If the item was found in the cartItems array, remove it
+                if (itemIndex !== -1) {
+                    cartItems.splice(itemIndex, 1);
+                }
+                console.log(ItemId)
+                var body = { "itemID": ItemId, "userId": userId }
+                const rawResponse = await fetch('http://localhost:3000/order/cart/deleteItem', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                const content = await rawResponse.json();
+                // Re-render the cart to reflect the updated cartItems
+                renderCart();
+            }
+            // Function to render the cart after an item is removed
+            function renderCart() {
+                // Select the <ul> element in your HTML where cart items are displayed
+                const cartList = document.querySelector('.cartContent');
+                // Clear the cart items currently displayed
+                cartList.innerHTML = '';
+                // Iterate through the updated cartItems and re-render them
+                if (cartItems.length === 0) {
+                    const p = document.createElement('p');
+                    p.textContent = "Your cart is empty."
+                    cartList.appendChild(p)
+                }
+                else {
+                    cartItems.forEach(item => {
+                        var userId = '<%= userId %>'
+                        const listItem = document.createElement('li');
+                        listItem.className = "cartItem"
+                        listItem.innerHTML = `
+                        <span>${item.name}</span>
+                        <br>
+                        <span>  Price:$${item.price}</span>
+                        <input type="number" data-userid = '${userId}'  data-id='${item.productId}' class="quantity" id="quantity" name="quantity" min="1" value=${item.quantity} 
+                            required>
+                        <button class="DeleteFromCart" data-id='${item.productId}' data-userid = '${userId}' onclick="removeItem('${item.name}')"><i data-id='${item.productId}' data-userid='${userId}'
+                                    onclick="removeItem( '${item.name}')"  class="fa-solid fa-trash-can"></i></button>
+                         `;
+                        cartList.appendChild(listItem);
+                    });
+                    const hr = document.createElement('hr');
+                    const p = document.createElement('p');
+                    p.className = "total"
+                    p.textContent = calculateTotal();
+                    const checkout = document.createElement('button');
+                    checkout.textContent = "Checkout"
+                    cartList.appendChild(hr)
+                    cartList.appendChild(p)
+                    cartList.appendChild(checkout)
+                    // Update the total price if needed
+                    const totalElement = document.querySelector('.total');
+                    totalElement.textContent = `Total: $${calculateTotal(cartItems)}`;
+                    const quantity = document.querySelectorAll('.quantity');
+                    onchangeQuantity()
+                }
+            }
+            // Function to calculate the total price of items in the cart
+            function calculateTotal() {
+                return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+            }
+            function onchangeQuantity() {
+                var userId = '<%= userId %>'
+                const quantity = document.querySelectorAll('.quantity');
+                quantity.forEach(quan => {
+                    quan.addEventListener('change', async () => {
+                        var productId = quan.getAttribute('data-id')
+                        for (let index = 0; index < cartItems.length; index++) {
+                            const element = cartItems[index];
+                            if (element.productId === (productId)) {
+                                element.quantity = quan.value;
+                                var body = { "cartItems": cartItems, "userId": userId, "productId": productId, "newQuan": quan.value }
+                                const rawResponse = await fetch('http://localhost:3000/order/cart/changeQuan', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Accept': 'application/json',
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(body)
+                                });
+                                const content = await rawResponse.json();
+                            }
+                        }
+
+                        const totalElement = document.querySelector('.total');
+                        totalElement.textContent = `Total: $${calculateTotal()}`;
+                    })
+                })
+            }
+            onchangeQuantity()
+
+        </script>

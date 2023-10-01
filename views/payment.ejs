@@ -1,0 +1,99 @@
+<%- include('partials/header'); -%>
+
+
+    <head>
+        <title>Payment Page</title>
+    </head>
+
+    <body>
+        <h1>Payment Information</h1>
+
+        <form>
+            <p>Payment Method:</p>
+            <label>
+                <input class="radio" type="radio" name="paymentMethod" value="creditCard" onchange="radioChange()"
+                    checked> Credit Card (Visa)
+            </label>
+
+            <label>
+                <input class="radio" type="radio" name="paymentMethod" value="cash" onchange="radioChange()"> Cash
+            </label>
+            <br>
+            <hr class="visaPayment">
+            <!-- Visa Card Details -->
+            <label for="cardNumber" class="visaPayment">Card Number:</label>
+            <input type="text" id="cardNumber" name="cardNumber" class="visaPayment" placeholder="1234 5678 9012 3456"
+                >
+
+            <label for="cardHolder" class="visaPayment">Card Holder:</label>
+            <input type="text" id="cardHolder" name="cardHolder" class="visaPayment" placeholder="John Doe" >
+
+            <label for="expirationDate" class="visaPayment">Expiration Date:</label>
+            <input type="text" id="expirationDate" name="expirationDate" class="visaPayment" placeholder="MM/YY">
+
+            <label for="cvv" class="visaPayment">CVV:</label>
+            <input type="text" id="cvv" name="cvv" placeholder="123" class="visaPayment" >
+            <!-- Payment Method -->
+            <button type="submit">Finish The Order</button>
+            <div class="status error"></div>
+        </form>
+        <script>
+            const form = document.querySelector('form')
+            const visaPayment = document.getElementsByClassName("visaPayment")
+            const statusError = document.querySelector('.status.error')
+            var user1 = `<%- JSON.stringify(user) %>`;
+            var user = JSON.parse(user1);
+            console.log(user)
+            // const usernameError = document.querySelector('.username.error')
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                //reset errors
+                statusError.textContent = ''
+                // usernameError.textContent = ''
+                if (form.paymentMethod.value == 'creditCard') {
+                    // get values
+                    const cardNumber = form.cardNumber.value;
+                    const cardHolder = form.cardHolder.value;
+                    const expirationDate = form.expirationDate.value;
+                    const cvv = form.cvv.value;
+                    var paymentMethod = 'creditCard'
+                    if (cardNumber == '' || cardHolder == '' || expirationDate == '' || cvv == '') {
+                        statusError.textContent = 'Please Fill All Data'
+
+                    }
+                    else {
+                        //api call from frontend to server, sending data from form to server to save in db
+                        const res = await fetch('/order/cart/payment', {
+                            method: 'POST',
+                            body: JSON.stringify({ cardNumber, cardHolder, expirationDate, cvv,paymentMethod ,user}),
+                            headers: { 'Content-type': 'application/json' }
+                        })
+
+                        //after getting response from the server
+                        const data = await res.json()
+                        if(data.status){
+                            statusError.textContent = data.status
+                        }
+                    }
+                }
+                else {
+
+                }
+            })
+            function radioChange() {
+                if (form.paymentMethod.value == 'cash') {
+                    for (let index = 0; index < visaPayment.length; index++) {
+                        const element = visaPayment[index];
+                        element.style.display = 'none'
+                    }
+                }
+                else {
+                    for (let index = 0; index < visaPayment.length; index++) {
+                        const element = visaPayment[index];
+                        element.style.display = 'block'
+                    }
+                }
+            }
+
+        </script>
+        <%- include('partials/footer'); -%>

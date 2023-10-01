@@ -1,0 +1,149 @@
+<%- include('partials/header'); -%>
+
+    <head>
+        <title>User Profile</title>
+    </head>
+
+    <header>
+        <div class="topnav">
+            <a href="/">Home</a>
+            <a href="/order">Order Now</a>
+            <input type="text" placeholder="Search..">
+            <a href="/order/cart" class="icon"><i class="fa fa-cart-shopping"></i></a>
+            <a class="icon" href="/profile"><i class="fa-regular fa-user"></i></a>
+        </div>
+
+
+    </header>
+
+    <body>
+        <h1>User Profile</h1>
+
+        <% if (user) { %>
+
+            <h2 style="text-align: center;">Your Information</h2>
+            <form action="/update-profile">
+                <label for="username">Username: <label id="username"><%= user.username %></label></label>
+                <!-- <label type="text" id="username" name="username" ><%= user.username %></label> -->
+
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" value="<%= user.firstname %>" required>
+
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" value="<%= user.lastname %>" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="<%= user.email %>" required>
+                <div class="email error"></div>
+
+                <!-- <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="<%= user.username %>" required> -->
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password">
+
+                <label for="birthday">Birthday:</label>
+                <input type="date" id="birthday" name="birthday" onchange="isDateBeforeToday()"
+                    value="<%= user.birthday %>" required>
+                <div class="birthday error"></div>
+
+                <button type="submit">Update Profile</button>
+                <p id="status" style="color: green; font-weight: bold;"></p>
+
+            </form>
+            <% } else { %>
+                <p>User not found.</p>
+                <% } %>
+                    <%- include('partials/footer'); -%>
+                        <script>
+                            var user1 = `<%- JSON.stringify(user) %>`;
+                            var user = JSON.parse(user1);
+                            var birthdayDate = user.birthday
+                            const formattedDate = birthdayDate.toString().split('T')[0];
+                            // Set the value of the date input
+                            document.getElementById('birthday').value = formattedDate;
+                            const form = document.querySelector('form');
+                            form.addEventListener('submit', async (e) => {
+                                e.preventDefault();
+                                //reset errors
+                                // passwordError.textContent = ''
+                                // usernameError.textContent = ''
+                                // get values
+                                const username = document.getElementById('username').textContent
+                                const password = form.password.value;
+                                const firstname = form.firstName.value;
+                                const lastName = form.lastName.value;
+                                const birthday = form.birthday.value;
+                                const email = form.email.value;
+                                const birthdayError = document.querySelector('.birthday.error')
+                                const emailError = document.querySelector('.email.error')
+
+                                if (!isDateBeforeToday(birthday)) {
+                                    birthdayError.textContent = 'Choose Relevant Birthday'
+                                    document.getElementById("status").textContent = ""
+                                    emailError.textContent = ''
+                                }
+                                else if (!isOver21(birthday)) {
+                                    birthdayError.textContent = 'You Are Under Age'
+                                    document.getElementById("status").textContent = ""
+                                    emailError.textContent = ''
+
+                                }
+                                else {
+                                    const res = await fetch('/profile', {
+                                        method: 'POST',
+                                        body: JSON.stringify({ username, password, firstname, lastName, birthday, email }),
+                                        headers: { 'Content-type': 'application/json' }
+                                    })
+
+                                    //after getting response from the server
+                                    const data = await res.json()
+                                    if (data.status == 'done') {
+                                        document.getElementById("status").textContent = "Your Data Has Been Updated"
+                                        birthdayError.textContent = ''
+                                        emailError.textContent = ''
+
+                                    }
+                                    else if (data.status = 'emailAlreadyExist') {
+                                        document.getElementById("status").textContent = ""
+                                        birthdayError.textContent = ''
+                                        emailError.textContent = 'This Email Already Exist'
+                                    }
+                                }
+
+                            })
+                            function isDateBeforeToday(dateString) {
+                                // Parse the provided date string into a Date object
+                                const providedDate = new Date(dateString);
+                                // Get the current date
+                                const currentDate = new Date();
+                                // Set hours, minutes, seconds, and milliseconds to 0 for both dates
+                                providedDate.setHours(0, 0, 0, 0);
+                                currentDate.setHours(0, 0, 0, 0);
+                                // Compare the two dates
+                                return providedDate <= currentDate;
+                            }
+                            function isOver21(birthdate) {
+                                // Parse the birthdate string into a Date object
+                                const birthDateObject = new Date(birthdate);
+
+                                // Get the current date
+                                const currentDate = new Date();
+
+                                // Calculate the age
+                                const age = currentDate.getFullYear() - birthDateObject.getFullYear();
+
+                                // Check if the birthday has occurred for this year
+                                const hasBirthdayOccurred = (
+                                    currentDate.getMonth() > birthDateObject.getMonth() ||
+                                    (currentDate.getMonth() === birthDateObject.getMonth() &&
+                                        currentDate.getDate() >= birthDateObject.getDate())
+                                );
+
+                                // If the birthday has not occurred yet, subtract 1 from the age
+                                const finalAge = hasBirthdayOccurred ? age : age - 1;
+
+                                // Check if the age is greater than or equal to 21
+                                return finalAge >= 21;
+                            }
+                        </script>
