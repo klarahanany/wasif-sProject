@@ -70,7 +70,8 @@ router.get('/cart', requireAuth, async (req, res) => {
                         "productId": product._id,
                         "name": product.name,
                         "price": product.price,
-                        "quantity": item.quantity
+                        "quantity": item.quantity,
+                        "image":product.image
                     })
                 }
 
@@ -130,28 +131,28 @@ router.get('/cart/payment', requireAuth, async (req, res) => {
 router.post('/cart/payment', async (req, res) => {
     const { cardNumber, cardHolder, expirationDate, cvv, paymentMethod, user } = req.body
     if (paymentMethod == 'creditCard') {
-        // if (!validatecardNumber(cardNumber)) {
-        //     res.status(400).json({ status: "cardNumber not valid" })
-        // }
-        // else if (!validatecardHolder(cardHolder)) {
-        //     res.status(400).json({ status: "cardHolder not valid" })
-        // }
-        // else if (!validateexpirationDate(expirationDate)) {
-        //     res.status(400).json({ status: "expirationDate not valid" })
-        // }
-        // else if (!validatecvv(cvv)) {
-        //     res.status(400).json({ status: "cvv not valid" })
-        // }
+        if (!validatecardNumber(cardNumber)) {
+            res.status(400).json({ status: "cardNumber not valid" })
+        }
+        else if (!validatecardHolder(cardHolder)) {
+            res.status(400).json({ status: "cardHolder not valid" })
+        }
+        else if (!validateexpirationDate(expirationDate)) {
+            res.status(400).json({ status: "expirationDate not valid" })
+        }
+        else if (!validatecvv(cvv)) {
+            res.status(400).json({ status: "cvv not valid" })
+        }
         // else{
-            var total = 0 ;
+        var total = 0;
         console.log(user._id)
         const cartForCurrentUser = await cartModel.findOne({ userId: user._id })
-        var items =cartForCurrentUser.items
+        var items = cartForCurrentUser.items
         for (let index = 0; index < items.length; index++) {
             const element = items[index];
-            const product = await productModel.findOne({_id:element.productId})
-            total+=product.price*element.quantity
-            
+            const product = await productModel.findOne({ _id: element.productId })
+            total += product.price * element.quantity
+
         }
         console.log(cartForCurrentUser.items)
         const newOrder = new orderModel({
@@ -175,7 +176,7 @@ router.post('/cart/payment', async (req, res) => {
                 console.error('Error saving order:', error);
             })
         cartModel.updateOne(
-            { userId:cartForCurrentUser.userId },
+            { userId: cartForCurrentUser.userId },
             { $set: { items: [] } },
         )
             .then(result => {
@@ -190,8 +191,8 @@ router.post('/cart/payment', async (req, res) => {
             })
 
 
-        // }
-    } else {
+    }
+    else {
 
     }
 })
