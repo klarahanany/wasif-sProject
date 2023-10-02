@@ -4,6 +4,7 @@
         <title>Product Management</title>
     </head>
     <main>
+
         <h1>Product Management</h1>
 
         <!-- Buttons for Update, Delete, and Add -->
@@ -79,11 +80,16 @@
 
         <div id="addForm" style="display: none;">
             <h2>Add Product</h2>
-            <form>
+            <form id="addingForm" action="/admin/inventory/add-product" method="post" enctype="multipart/form-data">
+                <!-- <input id="img" type="file" name="image" required>
+                 -->
+                <input type="file" name="image">
+
                 <!-- Input fields for new product -->
                 <!-- Replace with your specific fields (e.g., name, price, description) -->
                 <label for="newProductName">Product Name:</label>
-                <input type="text" id="newProductName" name="newProductName" required><br>
+                <input type="text" id="newProductName" name="newProductName" placeholder="enter product name"
+                    required><br>
                 <label for="description">Product Description:</label>
                 <input type="text" id="descriptionForProductAdd" name="description" required><br>
                 <label for="category">Product Category:</label>
@@ -96,9 +102,9 @@
                 </select>
                 <br>
                 <label for="price">Product Price:</label>
-                <input type="number" min="0" id="priceForProductAdd" name="price" required><br>
+                <input type="text" id="priceForProductAdd" name="price" required><br>
                 <label for="quantity">Product Quantity:</label>
-                <input type="number" min="0" id="quantityForProductAdd" name="quantity" required><br>
+                <input type="number" min="0.0" id="quantityForProductAdd" name="quantity" required><br>
 
                 <!-- Add more fields as needed -->
                 <p id="statusAdd" style="color: red; font-weight: bold;">
@@ -108,8 +114,9 @@
 
                 </p>
                 <!-- Add more fields as needed -->
+                <input type="submit" id="addButton" value="submit">
 
-                <button type="submit" id="addButton">Add</button>
+                <!-- <button type="submit" id="addButton">Add</button> -->
             </form>
         </div>
 
@@ -246,66 +253,42 @@
 
             }
         })
-        const addButton = document.getElementById('addButton');
-        addButton.addEventListener('click', async (e) => {
+        const form = document.getElementById('addingForm');
+        form.addEventListener('submit', async (e) => {
             e.preventDefault()
-            var flag = 0;
+            const image = document.getElementById("img")
             const name = document.getElementById('newProductName');
             const description = document.getElementById("descriptionForProductAdd")
             const price = document.getElementById("priceForProductAdd")
             const quantity = document.getElementById("quantityForProductAdd")
             const category = document.getElementById("categoryForProductAdd")
-            var statusUpdate = document.getElementById("statusAdd")
-            for (let index = 0; index < products.length; index++) {
-                const currentName = products[index].name;
+            var statusAdd = document.getElementById("statusAdd")
 
-                if (name.value === currentName) {
-                    flag = 1;
-                    statusUpdate.textContent = 'this name already exist'
-                    document.getElementById('statusSuccessForAdd').textContent = ''
-                }
+            const formData = new FormData(form);
+            const rawResponse = await fetch(form.action, {
+                method: form.method,
+                body: formData,
 
+            });
+
+            const content = await rawResponse.json();
+
+            if (content.error) {
+                statusAdd.textContent = content.error
+                document.getElementById('statusSuccessForAdd').textContent = ''
             }
-            if (flag == 0) {
-                if (category.value == 'selectCategory') {
-                    statusUpdate.textContent = 'please choose category'
-                    document.getElementById('statusSuccess').textContent = ''
-
-                }
-                else if (price.value <= 0) {
-                    statusUpdate.textContent = 'please choose relevante price'
-                    document.getElementById('statusSuccess').textContent = ''
-
-                }
-                else if (quantity.value < 0) {
-                    statusUpdate.textContent = 'please choose relevante quantity'
-                    document.getElementById('statusSuccess').textContent = ''
-
-                }
-                else {
-                    var body = { "name": name.value, "description": description.value, "price": price.value, "quantity": quantity.value, "category": category.value }
-                    const rawResponse = await fetch('http://localhost:3000/admin/inventory/add-product', {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(body)
-                    });
-                    const content = await rawResponse.json();
-
-                    if (content == "done") {
-                        description.value = '';
-                        quantity.value = '';
-                        price.value = '';
-                        category.value = 'selectCategory'
-                        name.value = 'selectProduct'
-                        statusUpdate.textContent = ''
-                        document.getElementById('statusSuccessForAdd').textContent = 'Product has been added'
-                    }
-
-                }
+            else if (content.status) {
+                description.value = '';
+                quantity.value = '';
+                price.value = '';
+                category.value = 'selectCategory'
+                name.value = 'selectProduct'
+                statusAdd.textContent = ''
+                document.getElementById('statusSuccessForAdd').textContent = content.status
             }
+
+            // }
+            // }
         })
         function showUpdateForm() {
             document.getElementById('updateForm').style.display = 'block';

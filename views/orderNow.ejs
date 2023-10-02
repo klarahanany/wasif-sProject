@@ -1,20 +1,19 @@
 <%- include('partials/header'); -%>
 
     <header>
-        <div class="topnav">
+        <!-- <div class="topnav">
             <a href="/">Home</a>
             <a href="/order">Order Now</a>
             <input type="text" placeholder="Search..">
             <a href="/order/cart" class="icon"><i class="fa fa-cart-shopping"></i></a>
             <a class="icon" href="/profile"><i class="fa-regular fa-user"></i></a>
-        </div>
+        </div> -->
 
 
     </header>
-    <h1 style="text-align: center;">Spiritual Drinks Menu</h1>
+    <h1>Spiritual Drinks Menu</h1>
 
     <div class="filters">
-
         <label class="filterLabel" for="filter">Filter by price:</label>
         <select id="filter">
             <option value="all">All</option>
@@ -22,6 +21,8 @@
             <option value="10">Under $10</option>
             <option value="20">Under $20</option>
             <option value="30">Under $30</option>
+            <option value="40">Under $40</option>
+
         </select>
         <label class="filterLabel">Filter by Categories:</label>
         <form id="categoryFilterForm" dir="ltr" class="filter-form">
@@ -43,13 +44,11 @@
         </form>
     </div>
     <main class="contentPage">
-        
-
-
-        <h2>Menu</h2>
+        <h2>Our Products</h2>
         <ul class="productsContainer" id="productsContainer">
             <% drinks.forEach((drink)=> { %>
                 <li class="product-card" data-category="<%= drink.category %>">
+                    <img src="/<%= drink.image %>" alt="Example Image">
                     <h3 class="product-title">
                         <%= drink.name %>
                     </h3>
@@ -71,7 +70,19 @@
 
     </main>
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.addEventListener("scroll", function () {
+                var scrollPosition = window.scrollY;
+                var scrollRange = 40; // Set your scroll range here
 
+                // Check if the scroll position is beyond the scroll range
+                if (scrollPosition > scrollRange) {
+                    document.body.classList.add("scrolled");
+                } else {
+                    document.body.classList.remove("scrolled");
+                }
+            });
+        })
         async function addToCart(event) {
             const allQuantity = document.querySelectorAll('.quantity')
             const drinkId = event.target.getAttribute('data-item-id')

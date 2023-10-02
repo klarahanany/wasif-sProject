@@ -1,4 +1,5 @@
 const Router = require('express')
+const express = require('express');
 const router = Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -8,7 +9,20 @@ const productModel = require('../models/productModel.js');
 const userModel = require('../models/userModel.js')
 const orderModel = require('../models/orderModel.js')
 const cartModel = require('../models/cartModel.js')
-
+const multer = require('multer');
+const path = require('path')
+// Set up Multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public'); // Specify the directory where files should be saved
+    },
+    filename: function (req, file, cb) {
+        // Use the original name of the file
+        console.log(file)
+        cb(null, Date.now() + path.extname(file.originalname));
+    },
+});
+const upload = multer({ storage: storage });
 const maxAge = 3 * 24 * 60 * 60;
 //takes user id from database
 const createToken = (id) => {
@@ -116,7 +130,6 @@ router.post('/inventory/update-product', async (req, res) => {
     res.json('done')
 });
 router.post('/inventory/delete-product', async (req, res) => {
-    console.log(req.body)
     const { selectedValue } = req.body
     try {
         const deletedDocument = await productModel.findOneAndDelete({ name: selectedValue });
@@ -131,27 +144,54 @@ router.post('/inventory/delete-product', async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-router.post('/inventory/add-product', async (req, res) => {
-    console.log(req.body)
-    const { name, description, price, quantity, category } = req.body
-    const newProduct = new productModel({
-        name: name,
-        description: description,
-        price: price,
-        quantity: quantity,
-        category: category,
+// router.use('/images', express.static(path.join(__dirname, 'images')));
 
-    });
+router.post('/inventory/add-product', upload.single("image"), async (req, res) => {
+    var flag = 0;
+    const { newProductName, description, selectOption, price, quantity } = req.body
+    const products = await productModel.find()
+    for (let index = 0; index < products.length; index++) {
+        const currentName = products[index].name;
 
-    // Save the new product to the database
-    newProduct.save()
-        .then(() => {
-            console.log('Product saved successfully.');
-        })
-        .catch((error) => {
-            console.error('Error saving product:', error);
-        });
-    res.json('done')
+        if (newProductName === currentName) {
+            flag = 1;
+            res.status(400).json({ error: "product name already exist" })
+        }
+
+    }
+    if (flag == 0) {
+        if (selectOption == 'selectCategory') {
+            res.status(400).json({ error: "please select category" })
+        }
+        else if (price <= 0) {
+            res.status(400).json({ error: "enter valid price" })
+        }
+        else if (quantity < 0) {
+            res.status(400).json({ error: "please choose relevante quantity" })
+
+        }
+        else {
+            const newProduct = new productModel({
+                image: req.file.filename,
+                name: newProductName,
+                description: description,
+                price: price,
+                quantity: quantity,
+                category: selectOption,
+            });
+
+            // // Save the new product to the database
+            newProduct.save()
+                .then(() => {
+                    console.log('Product saved successfully.');
+                    res.status(201).json({status:"product has been added"})
+                })
+                .catch((error) => {
+                    console.error('Error saving product:', error);
+                });
+           
+        }
+    }
 });
 
 router.get('/usermanagment', requireAuthAdmin, async (req, res) => {

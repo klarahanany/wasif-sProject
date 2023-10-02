@@ -11,11 +11,18 @@
 
 <body>
   <nav class="nav">
-    <h1><a href="/">Spiritual Drinks Shop</a></h1>
+    <h2><a href="/">Spiritual Drinks Shop</a></h2>
     <ul>
       <% if (user) { %>
-        <li>Welcome, <%= user.firstname %> <%= user.lastname %>
-        </li>
+       <li><a href="/">Home</a></li>
+       <li><a href="/order">Order Now</a></li> 
+        <input type="text" placeholder="Search..">
+        <li><a href="/order/cart"><i class="fa fa-cart-shopping"></i></a></li>
+        <li><a href="/profile"><i class="fa-regular fa-user"></i></a></li>
+
+        <p>Welcome, <%= user.firstname %>
+            <%= user.lastname %>
+      </p>
         <li><a href="/logout">Log out</a></li>
         <% } else { %>
           <li><a href="/login">Log in</a></li>

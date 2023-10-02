@@ -1,12 +1,16 @@
 const mongoose = require('mongoose')
 
 const productSchema = new mongoose.Schema({
+    image: {
+        type: String, // Assuming you store the URL of the image
+        required: true,
+    },
     name: {
         type: String,
         required: true,
         trim: true,
         unique: true,
-         // Removes leading/trailing whitespace
+        // Removes leading/trailing whitespace
     },
     description: {
         type: String,
