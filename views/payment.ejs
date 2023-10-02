@@ -22,17 +22,16 @@
             <hr class="visaPayment">
             <!-- Visa Card Details -->
             <label for="cardNumber" class="visaPayment">Card Number:</label>
-            <input type="text" id="cardNumber" name="cardNumber" class="visaPayment" placeholder="1234 5678 9012 3456"
-                >
+            <input type="text" id="cardNumber" name="cardNumber" class="visaPayment" placeholder="1234 5678 9012 3456">
 
             <label for="cardHolder" class="visaPayment">Card Holder:</label>
-            <input type="text" id="cardHolder" name="cardHolder" class="visaPayment" placeholder="John Doe" >
+            <input type="text" id="cardHolder" name="cardHolder" class="visaPayment" placeholder="John Doe">
 
             <label for="expirationDate" class="visaPayment">Expiration Date:</label>
             <input type="text" id="expirationDate" name="expirationDate" class="visaPayment" placeholder="MM/YY">
 
             <label for="cvv" class="visaPayment">CVV:</label>
-            <input type="text" id="cvv" name="cvv" placeholder="123" class="visaPayment" >
+            <input type="text" id="cvv" name="cvv" placeholder="123" class="visaPayment">
             <!-- Payment Method -->
             <button type="submit">Finish The Order</button>
             <div class="status error"></div>
@@ -65,20 +64,44 @@
                         //api call from frontend to server, sending data from form to server to save in db
                         const res = await fetch('/order/cart/payment', {
                             method: 'POST',
-                            body: JSON.stringify({ cardNumber, cardHolder, expirationDate, cvv,paymentMethod ,user}),
+                            body: JSON.stringify({ cardNumber, cardHolder, expirationDate, cvv, paymentMethod, user }),
                             headers: { 'Content-type': 'application/json' }
                         })
 
                         //after getting response from the server
                         const data = await res.json()
-                        if(data.status){
+                        if (data.status) {
                             statusError.textContent = data.status
+                        }
+                        else {
+                            alert("your order has been placed")
+
+                            window.location.pathname = '/order/cart';
                         }
                     }
                 }
                 else {
+                    var paymentMethod = 'cash'
 
+                    //api call from frontend to server, sending data from form to server to save in db
+                    const res = await fetch('/order/cart/payment', {
+                        method: 'POST',
+                        body: JSON.stringify({ paymentMethod, user }),
+                        headers: { 'Content-type': 'application/json' }
+                    })
+
+                    //after getting response from the server
+                    const data = await res.json()
+                    if (data.status) {
+                        statusError.textContent = data.status
+                    }
+                    else {
+                        alert("your order has been placed")
+
+                        window.location.pathname = '/order/cart';
+                    }
                 }
+
             })
             function radioChange() {
                 if (form.paymentMethod.value == 'cash') {

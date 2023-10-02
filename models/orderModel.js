@@ -33,11 +33,9 @@ const orderSchema = new Schema({
     payment: {
         card_number: {
             type: String,
-            required: true
         },
         expiration_date: {
             type: String,
-            required: true
         },
         payment_method: {
             type: String,

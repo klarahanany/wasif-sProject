@@ -71,7 +71,7 @@ router.get('/cart', requireAuth, async (req, res) => {
                         "name": product.name,
                         "price": product.price,
                         "quantity": item.quantity,
-                        "image":product.image
+                        "image": product.image
                     })
                 }
 
@@ -129,8 +129,16 @@ router.get('/cart/payment', requireAuth, async (req, res) => {
     res.render('payment')
 })
 router.post('/cart/payment', async (req, res) => {
-    const { cardNumber, cardHolder, expirationDate, cvv, paymentMethod, user } = req.body
-    if (paymentMethod == 'creditCard') {
+      const { cardNumber, cardHolder, expirationDate, cvv, paymentMethod, user } = req.body
+      var total = 0;
+      const cartForCurrentUser = await cartModel.findOne({ userId: user._id })
+      var items = cartForCurrentUser.items
+      for (let index = 0; index < items.length; index++) {
+          const element = items[index];
+          const product = await productModel.findOne({ _id: element.productId })
+          total += product.price * element.quantity
+      }
+      if (paymentMethod == 'creditCard') {
         if (!validatecardNumber(cardNumber)) {
             res.status(400).json({ status: "cardNumber not valid" })
         }
@@ -143,26 +151,57 @@ router.post('/cart/payment', async (req, res) => {
         else if (!validatecvv(cvv)) {
             res.status(400).json({ status: "cvv not valid" })
         }
-        // else{
-        var total = 0;
-        console.log(user._id)
-        const cartForCurrentUser = await cartModel.findOne({ userId: user._id })
-        var items = cartForCurrentUser.items
-        for (let index = 0; index < items.length; index++) {
-            const element = items[index];
-            const product = await productModel.findOne({ _id: element.productId })
-            total += product.price * element.quantity
+        else {
+            console.log(cartForCurrentUser.items)
+            const newOrder = new orderModel({
+                userId: cartForCurrentUser.userId, // Replace with a valid user ID from your UserModel
+                items: cartForCurrentUser.items,
+                total_amount: total, // Replace with the actual total amount
+                payment: {
+                    card_number: cardNumber, // Replace with a valid card number
+                    expiration_date: expirationDate, // Replace with a valid expiration date
+                    payment_method: 'Visa', // Replace with the actual payment method
+                },
+                status: 'pending', // Default status is 'pending', you can change it if needed
+            });
 
+            // Save the new order to the database
+            newOrder.save()
+                .then(savedOrder => {
+                    console.log('Order saved successfully:', savedOrder);
+                })
+                .catch(error => {
+                    console.error('Error saving order:', error);
+                })
+            cartModel.updateOne(
+                { userId: cartForCurrentUser.userId },
+                { $set: { items: [] } },
+            )
+                .then(result => {
+                    if (result.nModified > 0) {
+                        console.log('Cart cleared successfully');
+                    } else {
+                        console.log('User not found or cart was already empty');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error clearing cart:', error);
+                })
+            res.status(201).json("done")
         }
+
+    }
+    else {
+    
         console.log(cartForCurrentUser.items)
         const newOrder = new orderModel({
             userId: cartForCurrentUser.userId, // Replace with a valid user ID from your UserModel
             items: cartForCurrentUser.items,
             total_amount: total, // Replace with the actual total amount
             payment: {
-                card_number: cardNumber, // Replace with a valid card number
-                expiration_date: expirationDate, // Replace with a valid expiration date
-                payment_method: 'Visa', // Replace with the actual payment method
+                card_number: "", // Replace with a valid card number
+                expiration_date: "", // Replace with a valid expiration date
+                payment_method: 'Cash', // Replace with the actual payment method
             },
             status: 'pending', // Default status is 'pending', you can change it if needed
         });
@@ -189,11 +228,7 @@ router.post('/cart/payment', async (req, res) => {
             .catch(error => {
                 console.error('Error clearing cart:', error);
             })
-
-
-    }
-    else {
-
+        res.status(201).json("done")
     }
 })
 function validatecardNumber(cardNumber) {

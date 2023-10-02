@@ -11,13 +11,16 @@
         <% if (orders.length===0) { %>
             <p>No orders found.</p>
             <% } else { %>
+                <p id="status" style="color: red;"></p>
                 <table>
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>username</th>
+                            <!-- <th>Order ID</th> -->
                             <th>Order Date</th>
+                            <th>username</th>
                             <th>Total Amount</th>
+                            <th>Payment Method</th>
+
                             <th>Order Details</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -26,20 +29,23 @@
                     <tbody>
                         <% orders.forEach(order=> { %>
                             <tr>
-                                <td>
+                                <!-- <td>
                                     <%= order._id %>
+                                </td> -->
+                                <td>
+                                    <%= order.order_date.toLocaleDateString() %>
                                 </td>
                                 <td>
                                     <%= order.userId.username %>
                                 </td>
-                                <td>
-                                    <%= order.order_date.toLocaleDateString() %>
-                                </td>
+
                                 <td>$<%= order.total_amount.toFixed(2) %>
                                 </td>
-                               
+                                <td><%= order.payment.payment_method %>
+                                </td>
 
-                                <td >
+
+                                <td>
                                     <table>
                                         <thead>
                                             <tr>
@@ -65,8 +71,9 @@
                                     <%= order.status %>
                                 </td>
                                 <td>
-                                    <form action="/update-status/<%= order._id %>" method="post" class="MarkasReady">
-                                        <button type="submit">Mark as Ready</button>
+                                    <form 
+                                        class="MarkasReady" id="MarkasReady">
+                                        <button type="submit" data-id="<%= order._id %>" onclick="MarkasReady(event)">Mark as Ready</button>
                                     </form>
                                 </td>
                             </tr>
@@ -74,6 +81,31 @@
                     </tbody>
                 </table>
                 <% } %>
+                    <script>
+                       async function MarkasReady(event){
+                        event.preventDefault();
+                            const status = document.getElementById("status")
+                            const id = event.target.getAttribute('data-id')
+                            console.log(id)
+                            status.textContent=''
+                            //api call from frontend to server, sending data from form to server to save in db
+                            const res = await fetch(`http://localhost:3000/admin/allOrders/update-status/${id}`, {
+                                method: "POST",
+                                body: JSON.stringify(),
+                                headers: { 'Content-type': 'application/json' }
+                            })
+
+                            //after getting response from the server
+                            const data = await res.json()
+                            if(data.status){
+                                status.textContent=data.status
+
+                            }
+                            else if(data=="success"){
+                                window.location.reload()
+                            }
+                        }
+                    </script>
 
     </body>
 

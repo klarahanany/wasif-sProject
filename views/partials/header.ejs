@@ -30,3 +30,18 @@
           <% } %>
     </ul>
   </nav>
+  <script>
+     document.addEventListener("DOMContentLoaded", function () {
+            window.addEventListener("scroll", function () {
+                var scrollPosition = window.scrollY;
+                var scrollRange = 40; // Set your scroll range here
+
+                // Check if the scroll position is beyond the scroll range
+                if (scrollPosition > scrollRange) {
+                    document.body.classList.add("scrolled");
+                } else {
+                    document.body.classList.remove("scrolled");
+                }
+            });
+        })
+  </script>

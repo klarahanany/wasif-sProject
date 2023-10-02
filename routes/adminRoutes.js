@@ -1,6 +1,7 @@
 const Router = require('express')
 const express = require('express');
 const router = Router()
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { render } = require("ejs");
@@ -184,12 +185,12 @@ router.post('/inventory/add-product', upload.single("image"), async (req, res) =
             newProduct.save()
                 .then(() => {
                     console.log('Product saved successfully.');
-                    res.status(201).json({status:"product has been added"})
+                    res.status(201).json({ status: "product has been added" })
                 })
                 .catch((error) => {
                     console.error('Error saving product:', error);
                 });
-           
+
         }
     }
 });
@@ -229,14 +230,72 @@ router.get('/allOrders', requireAuthAdmin, async (req, res) => {
         const orders = await orderModel.find({})
             .populate('userId', 'username')
             .populate('items.productId', 'name');
-        console.log('Orders:', orders);
         res.render('adminAllOrders', { orders })
-
         // Optionally close the connection here if you're not using it elsewhere
     } catch (err) {
         console.error('Error:', err);
         // Optionally close the connection here if you're not using it elsewhere
     }
     // const orders = await orderModel.find()
+});
+
+router.post('/allOrders/update-status/:id', async (req, res) => {
+    console.log(req.params)
+    var id = req.params.id
+    //    const order = await orderModel.findOne({_id:req.params.id})
+    const orders = await orderModel.find()
+        .populate('userId', 'email')
+        .populate('items.productId', 'name');
+    var order={};
+    for (let index = 0; index < orders.length; index++) {
+        const element = orders[index];
+        if(element._id == id){
+            order = element
+        }
+    }
+    console.log(order)
+    console.log("what")
+    if (order.status == 'pending') {
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'aff.markssh@gmail.com',
+                pass: 'zcdaufonyexxotnw'
+
+            }
+        });
+
+        var mailOptions = {
+            from: 'lart0242@gmail.com',
+            to: order.userId.email,
+            subject: 'order ready',
+            text: "Your order is prepared and awaiting pickup."
+        };
+
+        transporter.sendMail(mailOptions, async function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+          
+                orderModel.findOneAndUpdate(
+                    { _id: id }, // Condition to find the document
+                    { $set: {status:"ready"} },       // Update data
+                    { new: true }                // Return the updated document
+                  )
+                    .then(updatedItem => {
+                      console.log('Item updated successfully:', updatedItem);
+                      res.status(201).json("success")
+                    })
+                    .catch(err => {
+                      console.error('Error updating item:', err);
+                    });
+               
+            }
+        });
+    }
+    else {
+        res.status(400).json({ status: "An email has been sent to this customer notifying him to pick up their items." })
+    }
 });
 module.exports = router
