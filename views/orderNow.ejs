@@ -14,6 +14,11 @@
     <h1>Spiritual Drinks Menu</h1>
 
     <div class="filters">
+        <div class="searchBar">
+            <input id="searchBar" type="text" placeholder="Search..">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+
         <label class="filterLabel" for="filter">Filter by price:</label>
         <select id="filter">
             <option value="all">All</option>
@@ -47,7 +52,7 @@
         <h2>Our Products</h2>
         <ul class="productsContainer" id="productsContainer">
             <% drinks.forEach((drink)=> { %>
-                <li class="product-card" data-category="<%= drink.category %>">
+                <li class="product-card" data-category="<%= drink.category %>" id="<%= drink._id %>">
                     <img src="/<%= drink.image %>" alt="Example Image">
                     <h3 class="product-title">
                         <%= drink.name %>
@@ -70,7 +75,25 @@
 
     </main>
     <script>
-       
+        var products1 = `<%- JSON.stringify(drinks) %>`;
+        var product = JSON.parse(products1);
+        const categories = [...new Set(product.map((item) => { return item }))]
+
+        document.getElementById('searchBar').addEventListener('keyup', (e) => {
+            const searchData = e.target.value.toLowerCase();
+            const filteredData = categories.filter((item) => {
+                return (
+                    item.name.toLowerCase().includes(searchData)
+                )
+            })
+            product.forEach(pro => {
+                if (filteredData.includes(pro)) {
+                    document.getElementById(`${pro._id}`).style.display = 'block';
+                } else {
+                    document.getElementById(`${pro._id}`).style.display = 'none';
+                }
+            });
+        });
         async function addToCart(event) {
             const allQuantity = document.querySelectorAll('.quantity')
             const drinkId = event.target.getAttribute('data-item-id')
