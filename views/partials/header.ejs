@@ -14,8 +14,8 @@
     <h2><a href="/">Spiritual Drinks Shop</a></h2>
     <ul>
       <% if (user) { %>
-       <li><a href="/">Home</a></li>
-       <li><a href="/order">Order Now</a></li> 
+       <li class="barData"><a href="/">Home</a></li>
+       <li class="barData"><a href="/order">Order Now</a></li> 
         <li><a href="/order/cart"><i class="fa fa-cart-shopping"></i></a></li>
         <li><a href="/profile"><i class="fa-regular fa-user"></i></a></li>
 
@@ -24,8 +24,8 @@
       </p>
         <li><a href="/logout">Log out</a></li>
         <% } else { %>
-          <li><a href="/login">Log in</a></li>
-          <li><a href="/signup" class="btn">Sign up</a></li>
+          <li id="nohover"><a href="/login">Log in</a></li>
+          <li id="nohover"><a href="/signup" class="btn">Sign up</a></li>
           <% } %>
     </ul>
   </nav>

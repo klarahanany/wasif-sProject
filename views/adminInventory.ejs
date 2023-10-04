@@ -17,19 +17,25 @@
         <!-- Product Update, Delete, and Add Forms (Initially hidden) -->
         <div id="updateForm" style="display: none;">
             <h2>Update Product</h2>
-            <form>
+            <form id="formUpdate">
+                <img id="updateImage" alt="Example Image" style="display: none;">
+
                 <!-- Input fields for product update -->
                 <!-- Replace with your specific fields (e.g., name, price, description) -->
                 <label for="productName">Product Name:</label>
 
-                <select id="selectOption" name="selectOption" onchange="changeProductForUpdate()">
-                    <option value="selectProduct">Select Product</option>
+                <select id="selectOption" name="selectName" onchange="changeProductForUpdate()">
+                    <option value="selectProduct">Select Product To Update</option>
                     <% options.forEach(function(option) { %>
                         <option value="<%= option.value %>">
                             <%= option.label %>
                         </option>
                         <% }); %>
                 </select>
+                <label for="productImage">Product image:</label>
+
+                <input type="file" name="image">
+
                 <label for="description">Product Description:</label>
                 <input type="text" id="descriptionForProductUpdate" name="description" required><br>
                 <label for="category">Product Category:</label>
@@ -43,7 +49,7 @@
                 <!-- <input type="text" id="categoryForProductUpdate" name="category" required>-->
                 <br>
                 <label for="price">Product Price:</label>
-                <input type="number" min="0" id="priceForProductUpdate" name="price" required><br>
+                <input type="text" id="priceForProductUpdate" name="price" required><br>
                 <label for="quantity">Product Quantity:</label>
                 <input type="number" min="0" id="quantityForProductUpdate" name="quantity" required><br>
 
@@ -139,7 +145,7 @@
                 <tbody>
                     <% products.forEach(function(product) { %>
                         <tr>
-                           
+
                             <td>
                                 <%= product.name %>
                             </td>
@@ -167,9 +173,12 @@
     <script>
         var products1 = `<%- JSON.stringify(products) %>`;
         var products = JSON.parse(products1);
-        const updateButton = document.getElementById('updateButton');
-        updateButton.addEventListener('click', async (e) => {
+        const formUpdate = document.getElementById('formUpdate');
+        formUpdate.addEventListener('submit', async (e) => {
             e.preventDefault()
+        // const updateButton = document.getElementById('updateButton');
+        // updateButton.addEventListener('click', async (e) => {
+        //     e.preventDefault()
             const value = document.getElementById('selectOption').value;
             const name = document.getElementById('selectOption');
             const description = document.getElementById("descriptionForProductUpdate")
@@ -199,14 +208,16 @@
 
             }
             else {
-                var body = { "selectedValue": value, "description": description.value, "price": price.value, "quantity": quantity.value, "category": category.value }
+                // var body = { "selectedValue": value, "description": description.value, "price": price.value, "quantity": quantity.value, "category": category.value }
+                const formData = new FormData(formUpdate);
+
                 const rawResponse = await fetch('http://localhost:3000/admin/inventory/update-product', {
                     method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(body)
+                    // headers: {
+                    //     'Accept': 'application/json',
+                    //     'Content-Type': 'application/json'
+                    // },
+                    body: formData
                 });
                 const content = await rawResponse.json();
 
@@ -307,13 +318,14 @@
         }
 
         function changeProductForUpdate() {
+            const updateImage = document.getElementById("updateImage")
             const value = document.getElementById('selectOption').value;
             const description = document.getElementById("descriptionForProductUpdate")
             const price = document.getElementById("priceForProductUpdate")
             const quantity = document.getElementById("quantityForProductUpdate")
             const category = document.getElementById("categoryForProductUpdate")
             if (value != "selectProduct") {
-
+                updateImage.style.display='block'
                 for (let index = 0; index < products.length; index++) {
                     const name = products[index].name;
                     console.log(name)
@@ -322,12 +334,12 @@
                         price.value = products[index].price
                         quantity.value = products[index].quantity
                         category.value = products[index].category
-
-                        // description.textContent = products[index].description
-
+                        updateImage.src = `/${products[index].image}`
                     }
-
                 }
+            }
+            else{
+                updateImage.style.display='none'
             }
         }
     </script>

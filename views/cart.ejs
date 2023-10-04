@@ -1,14 +1,9 @@
 <%- include('partials/header'); -%>
+<head>
+    <title>Shopping List</title>
+</head>
     <header>
-        <!-- <div class="topnav">
-            <a href="/">Home</a>
-            <a href="/order">Order Now</a>
-            <input type="text" placeholder="Search..">
-            <a href="/order/cart" class="icon"><i class="fa fa-cart-shopping">
 
-                </i></a>
-            <a class="icon" href="/profile"><i class="fa-regular fa-user"></i></a>
-        </div> -->
     </header>
     <main class="cartContentPage">
         <h2>Shopping List</h2>
@@ -127,7 +122,8 @@
             }
             // Function to calculate the total price of items in the cart
             function calculateTotal() {
-                return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+                var total =  cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+                return total.toFixed(2)
             }
             function onchangeQuantity() {
                 var userId = '<%= userId %>'

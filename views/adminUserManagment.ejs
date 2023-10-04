@@ -1,46 +1,166 @@
 <%- include('partials/headerAdmin'); -%>
 
-<head>
-    <title>User Management</title>
-</head>
-<body>
-    <h1>User Management</h1>
-    <div class="usermanagment">
-        <table>
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Birthday</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% users.forEach(function(user) { %>
+    <head>
+        <title>User Management</title>
+    </head>
+
+    <body>
+        <h1>User Management</h1>
+        <button onclick="formDisplay()" id="addNewAdmin">add new admin</button>
+        <form  id="formDisplay" style="display: none;">
+            <a href="" onclick="formClose()" style="float: right;"><i class="fa-solid fa-x"></i></a>
+            <label for="username">Username</label>
+            <input type="text" name="username" required />
+            <div class="username error"></div>
+            <label for="firstname">First Name</label>
+            <input type="text" name="firstname" required />
+            <label for="lastname">Last Name</label>
+            <input type="text" name="lastname" required />
+            <label for="email">Email</label>
+            <input type="text" name="email" required />
+            <div class="email error"></div>
+            <label for="birthday">Birthday:</label>
+            <input type="date" id="birthday" name="birthday" required>
+            <div class="birthday error"></div>
+            <label for="password">Password</label>
+            <input type="password" name="password" required />
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" name="confirmPassword" required />
+            <div class="password error"></div>
+            <button type="submit">Add Admin</button>
+            <p id="successStatus" style="color: green;font-weight: bold;"></p>
+
+        </form>
+        <div class="usermanagment">
+            <table>
+                <thead>
                     <tr>
-                        <td><%= user.username %></td>
-                        <td><%= user.firstname %></td>
-                        <td><%= user.lastname %></td>
-                        <td><%= user.email %></td>
-                        <td><%= user.birthday %></td>
-                        <td><%= user.isBlocked ? 'Blocked' : 'Active' %></td>
-                        <td>
-                            <form class="blockForm" method="POST" action="/admin/usermanagment/block-user/<%= user._id %>">
-                                <button type="submit"><%= user.isBlocked ? 'Unblock' : 'Block' %></button>
-                            </form>
-                        </td>
+                        <th>Username</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Birthday</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
-                <% }); %>
-            </tbody>
-        </table>
-    </div>
-    
+                </thead>
+                <tbody>
+                    <% users.forEach(function(user) { %>
+                        <tr>
+                            <td>
+                                <%= user.username %>
+                            </td>
+                            <td>
+                                <%= user.firstname %>
+                            </td>
+                            <td>
+                                <%= user.lastname %>
+                            </td>
+                            <td>
+                                <%= user.email %>
+                            </td>
+                            <td>
+                                <%= user.birthday.toLocaleDateString() %>
+                            </td>
+                            <td>
+                                <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                            </td>
+                            <td>
+                                <form class="blockForm" method="POST"
+                                    action="/admin/usermanagment/block-user/<%= user._id %>">
+                                    <button type="submit">
+                                        <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+        </div>
 
-    <!-- Table to display all users -->
-    
-</body>
 
-<%- include('partials/footer'); -%>
+        <!-- Table to display all users -->
+
+    </body>
+    <script>
+        var admin1 = `<%- JSON.stringify(admin) %>`;
+        var admin = JSON.parse(admin1);
+        if(admin.role == 'mainadmin'){
+            document.getElementById("addNewAdmin").style.display="block"
+        }
+        else if(admin.role == 'admin'){
+            document.getElementById("addNewAdmin").style.display="none"
+        }
+        function formDisplay() {
+            document.getElementById("formDisplay").style.display = "block"
+        }
+        function formClose() {
+            document.getElementById("formDisplay").style.display = "none"
+        }
+        const form = document.querySelector('form');
+            const emailError = document.querySelector('.email.error')
+            const passwordError = document.querySelector('.password.error')
+            const usernameError = document.querySelector('.username.error')
+            const birthdayError = document.querySelector('.birthday.error')
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                //reset errors
+                emailError.textContent = ''
+                passwordError.textContent = ''
+                usernameError.textContent = ''
+                birthdayError.textContent = ''
+                // get values
+                const username = form.username.value;
+                const email = form.email.value;
+                const password = form.password.value;
+                const confirmPassword = form.confirmPassword.value
+                const firstname = form.firstname.value;
+                const lastname = form.lastname.value;
+                const birthday = form.birthday.value;
+                
+                if (!isDateBeforeToday(birthday)) {
+                    birthdayError.textContent = "Choose Relevant Birthday "
+                }
+                else if (password!=confirmPassword) {
+                    passwordError.textContent = "not the same password"
+                }
+                else {
+                    //api call from frontend to server, sending data from form to server to save in db
+                    const res = await fetch('/admin/usermanagment/addadmin', {
+                        method: 'POST',
+                        body: JSON.stringify({ username, email, password, firstname, lastname, birthday }),
+                        headers: { 'Content-type': 'application/json' }
+                    })
+
+                    //after getting response from the server
+                    const data = await res.json()
+                    if(data=="done"){
+                        document.getElementById("successStatus").textContent = "admin added successful;y"
+                    }
+                    if (data.error) {
+                        // passwordError.textContent = data.error.password
+                        usernameError.textContent = data.error.username
+                        emailError.textContent = data.error.email
+
+                    }
+
+                }
+            });
+            function isDateBeforeToday(dateString) {
+                // Parse the provided date string into a Date object
+                const providedDate = new Date(dateString);
+
+                // Get the current date
+                const currentDate = new Date();
+
+                // Set hours, minutes, seconds, and milliseconds to 0 for both dates
+                providedDate.setHours(0, 0, 0, 0);
+                currentDate.setHours(0, 0, 0, 0);
+
+                // Compare the two dates
+                return providedDate <= currentDate;
+            }
+    </script>
+
+    <%- include('partials/footer'); -%>

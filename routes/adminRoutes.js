@@ -53,6 +53,24 @@ const handleErrors = (err) => {
 
     return errors;
 }
+const handleErrors2 = (err, usernameValue, emailValue) => {
+    let errors = { username: '', email: '', password: '' };
+    // duplicate username error
+    if (err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: username_1 dup key: { username: "${usernameValue}" }`) {
+        errors.username = 'that username is already registered';
+        return errors;
+    }
+    if (err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: email_1 dup key: { email: "${emailValue}" }`) {
+        errors.email = 'that email is already registered';
+        return errors;
+    }
+    // validation errors
+    else if (err === 'user validation failed') {
+        Object.values(err.errors).forEach(({ properties }) => {
+            errors[properties.path] = properties.message;
+        });
+    }
+}
 router.get('/logout', async (req, res) => {
     res.cookie('jwtAdmin', '', { maxAge: 1 }) //replace the current cookie with empty string
     res.redirect('/admin')
@@ -113,22 +131,35 @@ router.get('/inventory', requireAuthAdmin, async (req, res) => {
     }
     res.render('adminInventory', { products, options })
 });
-router.post('/inventory/update-product', async (req, res) => {
+router.post('/inventory/update-product', upload.single("image"), async (req, res) => {
     console.log(req.body)
-    const { selectedValue, description, price, quantity, category } = req.body
-    productModel.findOneAndUpdate(
-        { name: selectedValue },
-        { description: description, price: price, category: category, quantity: quantity },
-        { new: true, useFindAndModify: false }
-    )
-        .then(updatedProduct => {
-            // Log the updated product
-            console.log('Updated Product:', updatedProduct);
-        })
-        .catch(err => {
-            console.error('Error updating document:', err);
-        })
-    res.json('done')
+    const { selectName, description, price, quantity, selectOption } = req.body
+    if (req.file) {
+        productModel.findOneAndUpdate(
+            { name: selectName },
+            { description: description, price: price, category: selectOption, quantity: quantity, image: req.file.filename },
+            { new: true, useFindAndModify: false })
+            .then(updatedProduct => {
+                console.log('Updated Product:', updatedProduct);
+            })
+            .catch(err => {
+                console.error('Error updating document:', err);
+            })
+        res.json('done')
+    }
+    else {
+        productModel.findOneAndUpdate(
+            { name: selectName },
+            { description: description, price: price, category: selectOption, quantity: quantity },
+            { new: true, useFindAndModify: false })
+            .then(updatedProduct => {
+                console.log('Updated Product:', updatedProduct);
+            })
+            .catch(err => {
+                console.error('Error updating document:', err);
+            })
+        res.json('done')
+    }
 });
 router.post('/inventory/delete-product', async (req, res) => {
     const { selectedValue } = req.body
@@ -215,13 +246,30 @@ router.post('/usermanagment/block-user/:userId', async (req, res) => {
 
         // Save the updated user back to the database
         await user.save();
-
         // Redirect or send a response as needed
         res.redirect('/admin/usermanagment'); // Redirect back to the user management page
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
 
+    }
+});
+router.post('/usermanagment/addadmin', async (req, res) => {
+    console.log(req.body)
+    const username = req.body.username
+    const email = req.body.email
+    const password = req.body.password
+    const firstname = req.body.firstname
+    const lastname = req.body.lastname
+    const birthday = req.body.birthday
+    try {
+        const user = await userModel.create({ username, email, password, firstname, lastname, birthday, role: "admin" });
+        res.status(201).json("done") // send back to frontend as json body
+
+    } catch (e) {
+        const error = handleErrors2(e, username, email)
+        console.log(error)
+        res.status(400).json({ error });
     }
 });
 
@@ -246,10 +294,10 @@ router.post('/allOrders/update-status/:id', async (req, res) => {
     const orders = await orderModel.find()
         .populate('userId', 'email')
         .populate('items.productId', 'name');
-    var order={};
+    var order = {};
     for (let index = 0; index < orders.length; index++) {
         const element = orders[index];
-        if(element._id == id){
+        if (element._id == id) {
             order = element
         }
     }
@@ -277,25 +325,56 @@ router.post('/allOrders/update-status/:id', async (req, res) => {
                 console.log(error);
             } else {
                 console.log('Email sent: ' + info.response);
-          
+
                 orderModel.findOneAndUpdate(
                     { _id: id }, // Condition to find the document
-                    { $set: {status:"ready"} },       // Update data
+                    { $set: { status: "ready" } },       // Update data
                     { new: true }                // Return the updated document
-                  )
+                )
                     .then(updatedItem => {
-                      console.log('Item updated successfully:', updatedItem);
-                      res.status(201).json("success")
+                        console.log('Item updated successfully:', updatedItem);
+                        res.status(201).json("success")
                     })
                     .catch(err => {
-                      console.error('Error updating item:', err);
+                        console.error('Error updating item:', err);
                     });
-               
+
             }
         });
     }
     else {
         res.status(400).json({ status: "An email has been sent to this customer notifying him to pick up their items." })
+    }
+});
+router.get('/revenue', requireAuthAdmin, async (req, res) => {
+    try {
+        const monthlyRevenue = await orderModel.aggregate([
+            {
+                $project: {
+                    month: { $month: '$order_date' }, // Extract month from order_date
+                    total_amount: 1,
+                },
+            },
+            {
+                $group: {
+                    _id: '$month',
+                    totalRevenue: { $sum: '$total_amount' },
+                },
+            },
+            {
+                $sort: {
+                    _id: 1,
+                },
+            },
+        ]);
+        var revenueData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for (const monRev of monthlyRevenue) {
+            revenueData[monRev._id - 1] = monRev.totalRevenue
+        }
+
+        res.render('adminRevenue', { revenueData })
+    } catch (err) {
+        console.error('Error:', err);
     }
 });
 module.exports = router

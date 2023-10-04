@@ -1,16 +1,8 @@
 <%- include('partials/header'); -%>
 
-    <header>
-        <!-- <div class="topnav">
-            <a href="/">Home</a>
-            <a href="/order">Order Now</a>
-            <input type="text" placeholder="Search..">
-            <a href="/order/cart" class="icon"><i class="fa fa-cart-shopping"></i></a>
-            <a class="icon" href="/profile"><i class="fa-regular fa-user"></i></a>
-        </div> -->
-
-
-    </header>
+<head>
+    <title>Order Now</title>
+</head>
     <h1>Spiritual Drinks Menu</h1>
 
     <div class="filters">
@@ -78,6 +70,8 @@
         var products1 = `<%- JSON.stringify(drinks) %>`;
         var product = JSON.parse(products1);
         const categories = [...new Set(product.map((item) => { return item }))]
+        const filterSelectPrice = document.getElementById('filter');
+        const categoryFilter = document.getElementById('categoryFilterForm');
 
         document.getElementById('searchBar').addEventListener('keyup', (e) => {
             const searchData = e.target.value.toLowerCase();
@@ -86,13 +80,49 @@
                     item.name.toLowerCase().includes(searchData)
                 )
             })
-            product.forEach(pro => {
-                if (filteredData.includes(pro)) {
-                    document.getElementById(`${pro._id}`).style.display = 'block';
-                } else {
-                    document.getElementById(`${pro._id}`).style.display = 'none';
+            const selectedCategories = Array.from(categoryFilter.querySelectorAll('input[name="category"]:checked')).map(input => input.value);
+
+            if (filterSelectPrice.value !== 'all') {
+                if (selectedCategories.length > 0) {
+                    product.forEach(pro => {
+                        if (filteredData.includes(pro) && selectedCategories.includes(pro.category) && pro.price <= filterSelectPrice.value) {
+                            document.getElementById(`${pro._id}`).style.display = 'block';
+                        } else {
+                            document.getElementById(`${pro._id}`).style.display = 'none';
+                        }
+                    });
                 }
-            });
+                else {
+                    product.forEach(pro => {
+                        if (filteredData.includes(pro) && pro.price <= filterSelectPrice.value) {
+                            document.getElementById(`${pro._id}`).style.display = 'block';
+                        } else {
+                            document.getElementById(`${pro._id}`).style.display = 'none';
+                        }
+                    });
+                }
+            }
+            else {
+                if (selectedCategories.length > 0) {
+                product.forEach(pro => {
+                    if (filteredData.includes(pro) && selectedCategories.includes(pro.category) ) {
+                        document.getElementById(`${pro._id}`).style.display = 'block';
+                    } else {
+                        document.getElementById(`${pro._id}`).style.display = 'none';
+                    }
+                });
+            }
+            else {
+                product.forEach(pro => {
+                    if (filteredData.includes(pro) ) {
+                        document.getElementById(`${pro._id}`).style.display = 'block';
+                    } else {
+                        document.getElementById(`${pro._id}`).style.display = 'none';
+                    }
+                });
+            }
+            }
+
         });
         async function addToCart(event) {
             const allQuantity = document.querySelectorAll('.quantity')

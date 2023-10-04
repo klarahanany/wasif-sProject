@@ -1,0 +1,46 @@
+<%- include('partials/headerAdmin'); -%>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Revenue Chart</title>
+    <!-- Include necessary libraries for charts, e.g., Chart.js -->
+  </head>
+
+  <body>
+    <h1>Revenue Chart</h1>
+    <div class="chart" >
+      <canvas id="revenueChart"></canvas>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', async function () {
+        // Replace the following with your actual data
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+
+        const revenueData1 = await '<%= JSON.stringify(revenueData) %>';
+        var revenueData = JSON.parse(revenueData1);
+        console.log(revenueData)
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: months,
+            datasets: [{
+              label: 'Monthly Revenue',
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1,
+              data: revenueData,
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+    </script>
+  </body>
