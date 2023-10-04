@@ -87,7 +87,7 @@ router.post('/', async (req, res) => { //to display the UI
     const password = req.body.password
     try {
         const user = await userModel.findOne({ username })
-        if (user && user.role == 'admin') {
+        if (user && (user.role == 'admin' || user.role == 'mainadmin')) {
             console.log("what")
             const auth = await bcrypt.compare(password, user.password)
             console.log("what")
@@ -376,5 +376,15 @@ router.get('/revenue', requireAuthAdmin, async (req, res) => {
     } catch (err) {
         console.error('Error:', err);
     }
+});
+router.get('/profile', requireAuthAdmin, async (req, res) => {
+    try {
+        res.render('adminProfile')
+        // Optionally close the connection here if you're not using it elsewhere
+    } catch (err) {
+        console.error('Error:', err);
+        // Optionally close the connection here if you're not using it elsewhere
+    }
+    // const orders = await orderModel.find()
 });
 module.exports = router
