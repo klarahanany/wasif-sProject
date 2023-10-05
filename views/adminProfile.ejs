@@ -12,7 +12,6 @@
             <h2 style="text-align: center;">Your Information</h2>
             <form action="/update-profile">
                 <label for="username">Username: <label id="username"><%= admin.username %></label></label>
-                <!-- <label type="text" id="username" name="username" ><%= user.username %></label> -->
 
                 <label for="firstName">First Name:</label>
                 <input type="text" id="firstName" name="firstName" value="<%= admin.firstname %>" required>
@@ -24,8 +23,6 @@
                 <input type="email" id="email" name="email" value="<%= admin.email %>" required>
                 <div class="email error"></div>
 
-                <!-- <label for="username">Username:</label>
-                <input type="text" id="username" name="username" value="<%= user.username %>" required> -->
 
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password">

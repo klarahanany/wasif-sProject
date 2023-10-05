@@ -1,14 +1,26 @@
 const Router = require('express')
 const router = Router()
+const nodemailer = require('nodemailer');
+
 const cartModel = require('../models/cartModel.js')
 const orderModel = require('../models/orderModel.js')
 
 const { render } = require("ejs");
 const { currentUser, requireAuth } = require("../middleware/authMiddware");
 const productModel = require('../models/productModel.js');
+const UserModel = require('../models/userModel.js');
 
 function calculateTotal(cartItems) {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    var total = cartItems.reduce((total, item) => {
+        // Check a condition before adding to the total
+        if (item.allQuantity > 0) {
+            // Only add to the total if the quantity is greater than 0
+            total += item.price * item.quantity;
+        }
+
+        return total;
+    }, 0);
+    return total.toFixed(2)
 }
 router.get('/', requireAuth, async (req, res) => {
     const user = res.locals.user;
@@ -66,13 +78,42 @@ router.get('/cart', requireAuth, async (req, res) => {
         cartData.forEach(item => {
             products.forEach(product => {
                 if (item.productId.equals(product._id)) {
-                    cartItems.push({
-                        "productId": product._id,
-                        "name": product.name,
-                        "price": product.price,
-                        "quantity": item.quantity,
-                        "image": product.image
-                    })
+                    if (item.quantity > product.quantity) {
+                        item.quantity = product.quantity
+                        cartModel.findOneAndUpdate(
+                            { userId: user._id },
+                            { $set: { items: cartData } },
+                            { new: true } // To return the updated document
+                        )
+                            .then(updatedProduct => {
+                                if (updatedProduct) {
+                                    console.log('Product updated successfully:', updatedProduct);
+                                } else {
+                                    console.log('Product not found');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error updating product:', error);
+                            })
+                        cartItems.push({
+                            "productId": product._id,
+                            "name": product.name,
+                            "price": product.price,
+                            "quantity": product.quantity,
+                            "image": product.image,
+                            "allQuantity": product.quantity
+                        })
+                    }
+                    else {
+                        cartItems.push({
+                            "productId": product._id,
+                            "name": product.name,
+                            "price": product.price,
+                            "quantity": item.quantity,
+                            "image": product.image,
+                            "allQuantity": product.quantity
+                        })
+                    }
                 }
 
             })
@@ -129,16 +170,68 @@ router.get('/cart/payment', requireAuth, async (req, res) => {
     res.render('payment')
 })
 router.post('/cart/payment', async (req, res) => {
-      const { cardNumber, cardHolder, expirationDate, cvv, paymentMethod, user } = req.body
-      var total = 0;
-      const cartForCurrentUser = await cartModel.findOne({ userId: user._id })
-      var items = cartForCurrentUser.items
-      for (let index = 0; index < items.length; index++) {
-          const element = items[index];
-          const product = await productModel.findOne({ _id: element.productId })
-          total += product.price * element.quantity
-      }
-      if (paymentMethod == 'creditCard') {
+    const { cardNumber, cardHolder, expirationDate, cvv, paymentMethod, user } = req.body
+    var total = 0;
+    const cartForCurrentUser = await cartModel.findOne({ userId: user._id })
+    var items = cartForCurrentUser.items
+    var itemsWithMoreQuantity = []
+    for (let index = 0; index < items.length; index++) {
+        const element = items[index];
+        const product = await productModel.findOne({ _id: element.productId })
+        console.log(product.quantity)
+        if (product.quantity > 0) {
+            itemsWithMoreQuantity.push(element)
+            total += product.price * element.quantity
+            var newQuantity = product.quantity - element.quantity
+            console.log(newQuantity)
+            await productModel.findOneAndUpdate(
+                { _id: element.productId },
+                { $set: { quantity: newQuantity } },
+                { new: true } // To return the updated document
+            )
+                .then(updatedProduct => {
+                    if (updatedProduct) {
+                        console.log('Product updated successfully:', updatedProduct);
+                    } else {
+                        console.log('Product not found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating product:', error);
+                })
+            const productAfter = await productModel.findOne({ _id: element.productId })
+
+            if (productAfter.quantity < 10) {
+                const mainadmin = await UserModel.findOne({ role: "mainadmin" })
+
+                var text = ` The ${productAfter.name} product quantity is running low`
+                var transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: 'aff.markssh@gmail.com',
+                        pass: 'zcdaufonyexxotnw'
+
+                    }
+                });
+
+                var mailOptions = {
+                    from: 'lart0242@gmail.com',
+                    to: mainadmin.email,
+                    subject: 'quantity is running low',
+                    text: text
+                };
+
+                transporter.sendMail(mailOptions, async function (error, info) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });
+            }
+        }
+    }
+    if (paymentMethod == 'creditCard') {
         if (!validatecardNumber(cardNumber)) {
             res.status(400).json({ status: "cardNumber not valid" })
         }
@@ -155,7 +248,8 @@ router.post('/cart/payment', async (req, res) => {
             console.log(cartForCurrentUser.items)
             const newOrder = new orderModel({
                 userId: cartForCurrentUser.userId, // Replace with a valid user ID from your UserModel
-                items: cartForCurrentUser.items,
+                // items: cartForCurrentUser.items,
+                items: itemsWithMoreQuantity,
                 total_amount: total, // Replace with the actual total amount
                 payment: {
                     card_number: cardNumber, // Replace with a valid card number
@@ -192,11 +286,13 @@ router.post('/cart/payment', async (req, res) => {
 
     }
     else {
-    
+
         console.log(cartForCurrentUser.items)
         const newOrder = new orderModel({
             userId: cartForCurrentUser.userId, // Replace with a valid user ID from your UserModel
-            items: cartForCurrentUser.items,
+            //items: cartForCurrentUser.items,
+            items: itemsWithMoreQuantity,
+
             total_amount: total, // Replace with the actual total amount
             payment: {
                 card_number: "", // Replace with a valid card number

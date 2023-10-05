@@ -1,7 +1,8 @@
 <%- include('partials/header'); -%>
-<head>
-    <title>Shopping List</title>
-</head>
+
+    <head>
+        <title>Shopping List</title>
+    </head>
     <header>
 
     </header>
@@ -14,24 +15,30 @@
                     <hr>
                     <% cartItems.forEach((item)=> { %>
                         <li class="cartItem">
-                            <img src="/<%= item.image%>" alt="">
-                            <br>
-                            <span>
-                                <%= item.name %>
-                            </span>
-                            <br>
-                            <span>
-                                Price: $<%= item.price %>
-                            </span>
-                            <br>
-                            <input type="number" class="quantity" id="quantity" name="quantity" min="1"
-                                data-id='<%= item.productId %>' value=<%=item.quantity %>
-                            required>
-                            <button class="DeleteFromCart" data-id='<%= item.productId %>' data-userid='<%= userId %>'
-                                onclick="removeItem( '<%= item.name %>')"><i data-id='<%= item.productId %>'
-                                    data-userid='<%= userId %>' onclick="removeItem( '<%= item.name %>')"
-                                    class="fa-solid fa-trash-can"></i></button>
-                            <!-- Add functionality to remove items from the cart -->
+                            <div>
+                                <img src="/<%= item.image%>" alt="">
+                                <br>
+                                <span>
+                                    <%= item.name %>
+                                </span>
+                                <br>
+                                <span>
+                                    Price: $<%= item.price %>
+                                </span>
+                                <br>
+                                <input type="number" class="quantity" id="quantity" name="quantity" min="1"
+                                    data-id='<%= item.productId %>' value=<%=item.quantity %>
+                                required>
+                                <button class="DeleteFromCart" data-id='<%= item.productId %>'
+                                    data-userid='<%= userId %>' onclick="removeItem( '<%= item.name %>')"><i
+                                        data-id='<%= item.productId %>' data-userid='<%= userId %>'
+                                        onclick="removeItem( '<%= item.name %>')"
+                                        class="fa-solid fa-trash-can"></i></button>
+                                <!-- Add functionality to remove items from the cart -->
+                            </div>
+                            <%if(item.allQuantity==0){%>
+                                <img class="overlay-image" src="/soldOut.png" alt="Your Image">
+                                <%}%>
                         </li>
                         <hr>
                         <% }); %>
@@ -49,9 +56,9 @@
         <script>
             var cartItems1 = `<%- JSON.stringify(cartItems) %>`;
             var cartItems = JSON.parse(cartItems1);
-            document.getElementById("payButton").addEventListener("click", function() {
-            window.location.href = "/order/cart/payment"; // Navigate to the desired URL
-        });
+            document.getElementById("payButton").addEventListener("click", function () {
+                window.location.href = "/order/cart/payment"; // Navigate to the desired URL
+            });
             async function removeItem(nameItem) {
                 var ItemId = event.target.getAttribute('data-id')
                 var userId = event.target.getAttribute('data-userid')
@@ -90,10 +97,16 @@
                 }
                 else {
                     cartItems.forEach(item => {
+                        console.log(item.allQuantity)
                         var userId = '<%= userId %>'
                         const listItem = document.createElement('li');
+                        // const listItem2 = document.createElement('li');
                         listItem.className = "cartItem"
-                        listItem.innerHTML = `
+                        if (item.allQuantity != 0) {
+                            listItem.innerHTML = `
+                            <div>
+                            <img src="/${item.image}" alt="">
+                            <br>
                         <span>${item.name}</span>
                         <br>
                         <span>  Price:$${item.price}</span>
@@ -101,16 +114,34 @@
                             required>
                         <button class="DeleteFromCart" data-id='${item.productId}' data-userid = '${userId}' onclick="removeItem('${item.name}')"><i data-id='${item.productId}' data-userid='${userId}'
                                     onclick="removeItem( '${item.name}')"  class="fa-solid fa-trash-can"></i></button>
-                         `;
+                         </div>`;
+                        }
+                        else {
+                            listItem.innerHTML = `
+                            <div>
+                            <img src="/${item.image}" alt="">
+                            <br>
+                        <span>${item.name}</span>
+                        <br>
+                        <span>  Price:$${item.price}</span>
+                        <input type="number" data-userid = '${userId}'  data-id='${item.productId}' class="quantity" id="quantity" name="quantity" min="1" value=${item.quantity} 
+                            required>
+                        <button class="DeleteFromCart" data-id='${item.productId}' data-userid = '${userId}' onclick="removeItem('${item.name}')"><i data-id='${item.productId}' data-userid='${userId}'
+                                    onclick="removeItem( '${item.name}')"  class="fa-solid fa-trash-can"></i></button>
+                         </div>
+                         <img class="overlay-image" src="/soldOut.png"alt="Your Image">`;
+                        }
+
                         cartList.appendChild(listItem);
+                        const hr = document.createElement('hr');
+                        cartList.appendChild(hr)
                     });
-                    const hr = document.createElement('hr');
                     const p = document.createElement('p');
                     p.className = "total"
                     p.textContent = calculateTotal();
                     const checkout = document.createElement('button');
                     checkout.textContent = "Checkout"
-                    cartList.appendChild(hr)
+
                     cartList.appendChild(p)
                     cartList.appendChild(checkout)
                     // Update the total price if needed
@@ -122,7 +153,15 @@
             }
             // Function to calculate the total price of items in the cart
             function calculateTotal() {
-                var total =  cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+                var total = cartItems.reduce((total, item) => {
+                    // Check a condition before adding to the total
+                    if (item.allQuantity > 0) {
+                        // Only add to the total if the quantity is greater than 0
+                        total += item.price * item.quantity;
+                    }
+
+                    return total;
+                }, 0);
                 return total.toFixed(2)
             }
             function onchangeQuantity() {
@@ -134,17 +173,25 @@
                         for (let index = 0; index < cartItems.length; index++) {
                             const element = cartItems[index];
                             if (element.productId === (productId)) {
-                                element.quantity = quan.value;
-                                var body = { "cartItems": cartItems, "userId": userId, "productId": productId, "newQuan": quan.value }
-                                const rawResponse = await fetch('http://localhost:3000/order/cart/changeQuan', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Accept': 'application/json',
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify(body)
-                                });
-                                const content = await rawResponse.json();
+                                if (quan.value > element.allQuantity) {
+                                    console.log(element.allQuantity)
+                                    quan.value = element.allQuantity
+                                    alert(`Warning: ${element.name} has less quantity than that`);
+
+                                }
+                                else {
+                                    element.quantity = quan.value;
+                                    var body = { "cartItems": cartItems, "userId": userId, "productId": productId, "newQuan": quan.value }
+                                    const rawResponse = await fetch('http://localhost:3000/order/cart/changeQuan', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Accept': 'application/json',
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(body)
+                                    });
+                                    const content = await rawResponse.json();
+                                }
                             }
                         }
 

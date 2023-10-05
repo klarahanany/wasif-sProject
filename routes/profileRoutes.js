@@ -75,4 +75,29 @@ router.post('/', async (req, res) => {
         }
     }
 })
+router.post('/removeaccount', async (req, res) => {
+    const { username} = req.body
+ 
+        try {
+            userModel.findOneAndUpdate(
+                { username: username },
+                {isBlocked:true },
+                { new: true, useFindAndModify: false }
+            )
+                .then(updatedProduct => {
+                    // Log the updated product
+                    console.log('blocked user:', updatedProduct);
+                    res.cookie('jwt', '', { maxAge: 1 }) //replace the current cookie with empty string
+                    res.status(201).json({ status: 'done' })
+
+                })
+                .catch(err => {
+                    console.error('Error updating document:', err);
+                })
+        }
+        catch (err) {
+            console.log(err)
+        }
+    
+})
 module.exports = router;

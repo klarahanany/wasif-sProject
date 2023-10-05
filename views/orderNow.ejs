@@ -1,8 +1,8 @@
 <%- include('partials/header'); -%>
 
-<head>
-    <title>Order Now</title>
-</head>
+    <head>
+        <title>Order Now</title>
+    </head>
     <h1>Spiritual Drinks Menu</h1>
 
     <div class="filters">
@@ -56,11 +56,17 @@
                     </p>
                     <input type="hidden" name="drinkId" value="<%= drink.id %>" id="drinkId">
                     <input type="hidden" name="userId" value="<%= userId %>" id="userId">
-                    <label for="quantity">Quantity</label>
-                    <input type="number" id="quantity" data-item-id="<%= drink.id %>" class="quantity" name="quantity"
-                        min="1" value="1" required>
-                    <button class="add-to-cart" type="submit" data-item-id="<%= drink.id %> "
-                        data-userId="<%= userId %>" onclick="addToCart(event)">Add to Cart</button>
+                  
+                    <% if(drink.quantity==0){ %>
+                        <p class="sold-out-message" style="font-size: 25px;">Sold Out</p>
+                        <%}else{%>
+                            <label for="quantity">Quantity</label>
+                            <input type="number" id="quantity" data-item-id="<%= drink.id %>" class="quantity" name="quantity"
+                                min="1" value="1" required>
+                            <button class="add-to-cart" type="submit" data-item-id="<%= drink.id %> "
+                                data-userId="<%= userId %>" onclick="addToCart(event)">Add to Cart</button>
+
+                            <%}%>
                 </li>
                 <% }); %>
         </ul>
@@ -104,23 +110,23 @@
             }
             else {
                 if (selectedCategories.length > 0) {
-                product.forEach(pro => {
-                    if (filteredData.includes(pro) && selectedCategories.includes(pro.category) ) {
-                        document.getElementById(`${pro._id}`).style.display = 'block';
-                    } else {
-                        document.getElementById(`${pro._id}`).style.display = 'none';
-                    }
-                });
-            }
-            else {
-                product.forEach(pro => {
-                    if (filteredData.includes(pro) ) {
-                        document.getElementById(`${pro._id}`).style.display = 'block';
-                    } else {
-                        document.getElementById(`${pro._id}`).style.display = 'none';
-                    }
-                });
-            }
+                    product.forEach(pro => {
+                        if (filteredData.includes(pro) && selectedCategories.includes(pro.category)) {
+                            document.getElementById(`${pro._id}`).style.display = 'block';
+                        } else {
+                            document.getElementById(`${pro._id}`).style.display = 'none';
+                        }
+                    });
+                }
+                else {
+                    product.forEach(pro => {
+                        if (filteredData.includes(pro)) {
+                            document.getElementById(`${pro._id}`).style.display = 'block';
+                        } else {
+                            document.getElementById(`${pro._id}`).style.display = 'none';
+                        }
+                    });
+                }
             }
 
         });

@@ -227,8 +227,17 @@ router.post('/inventory/add-product', upload.single("image"), async (req, res) =
 });
 
 router.get('/usermanagment', requireAuthAdmin, async (req, res) => {
-    const users = await userModel.find()
-    res.render('adminUserManagment', { users })
+    const admin = res.locals.admin;
+    if (admin.role == 'mainadmin') {
+        const users = await userModel.find({ role: { $in: ['admin', 'normal'] } })
+
+        res.render('adminUserManagment', { users })
+    }
+    else if (admin.role == 'admin') {
+        const users = await userModel.find({ role: { $in: ['normal'] } })
+
+        res.render('adminUserManagment', { users })
+    }
 });
 router.post('/usermanagment/block-user/:userId', async (req, res) => {
     const userId = req.params.userId;
@@ -264,6 +273,33 @@ router.post('/usermanagment/addadmin', async (req, res) => {
     const birthday = req.body.birthday
     try {
         const user = await userModel.create({ username, email, password, firstname, lastname, birthday, role: "admin" });
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'aff.markssh@gmail.com',
+                pass: 'zcdaufonyexxotnw'
+
+            }
+        });
+
+        var mailOptions = {
+            from: 'lart0242@gmail.com',
+            to: email,
+            subject: 'order ready',
+            text: `you have an account now as an admin,
+            username: ${username}
+            password: ${password}
+            login here: http://localhost:3000/admin
+            and please change your password in your profile`
+        };
+
+        transporter.sendMail(mailOptions, async function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
         res.status(201).json("done") // send back to frontend as json body
 
     } catch (e) {
@@ -272,7 +308,24 @@ router.post('/usermanagment/addadmin', async (req, res) => {
         res.status(400).json({ error });
     }
 });
+router.post('/usermanagment/deleteadmin', async (req, res) => {
+    console.log(req.body)
+    const username = req.body.username
+    try {
+        // Define a condition to identify the user you want to delete
+        const condition = { username: username };
+    
+        // Use deleteOne to delete a single document that matches the condition
+        const result = await userModel.deleteOne(condition);
+        console.log('User deleted successfully');
+        res.status(201).json("done")
 
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
+
+
+});
 router.get('/allOrders', requireAuthAdmin, async (req, res) => {
     try {
         const orders = await orderModel.find({})

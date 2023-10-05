@@ -155,13 +155,21 @@
                             <td>
                                 <%= product.category %>
                             </td>
-                            <td>
-                                <%= product.quantity %>
-                            </td>
-                            <td>$<%= product.price %>
-                            </td>
+                            <% if (product.quantity <= 10) { %>
+                                <td style="color: red; font-weight: bold;">
 
-                            <!-- Add more table data cells for other product attributes -->
+                                    <%= product.quantity %>
+                                </td>
+                                <%} else{%>
+                                    <td>
+
+                                        <%= product.quantity %>
+                                    </td>
+                                    <%}%>
+                                        <td>$<%= product.price %>
+                                        </td>
+
+                                        <!-- Add more table data cells for other product attributes -->
                         </tr>
                         <% }); %>
                 </tbody>
@@ -176,9 +184,9 @@
         const formUpdate = document.getElementById('formUpdate');
         formUpdate.addEventListener('submit', async (e) => {
             e.preventDefault()
-        // const updateButton = document.getElementById('updateButton');
-        // updateButton.addEventListener('click', async (e) => {
-        //     e.preventDefault()
+            // const updateButton = document.getElementById('updateButton');
+            // updateButton.addEventListener('click', async (e) => {
+            //     e.preventDefault()
             const value = document.getElementById('selectOption').value;
             const name = document.getElementById('selectOption');
             const description = document.getElementById("descriptionForProductUpdate")
@@ -325,7 +333,7 @@
             const quantity = document.getElementById("quantityForProductUpdate")
             const category = document.getElementById("categoryForProductUpdate")
             if (value != "selectProduct") {
-                updateImage.style.display='block'
+                updateImage.style.display = 'block'
                 for (let index = 0; index < products.length; index++) {
                     const name = products[index].name;
                     console.log(name)
@@ -338,8 +346,8 @@
                     }
                 }
             }
-            else{
-                updateImage.style.display='none'
+            else {
+                updateImage.style.display = 'none'
             }
         }
     </script>

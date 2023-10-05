@@ -8,10 +8,12 @@
         <h1>User Profile</h1>
 
         <% if (user) { %>
-
+            <button onclick="removeAccount()">remove account</button>
             <h2 style="text-align: center;">Your Information</h2>
             <form action="/update-profile">
-                <label for="username">Username: <label id="username"><%= user.username %></label></label>
+                <label for="username">Username: <label id="username">
+                        <%= user.username %>
+                    </label></label>
                 <!-- <label type="text" id="username" name="username" ><%= user.username %></label> -->
 
                 <label for="firstName">First Name:</label>
@@ -133,5 +135,19 @@
 
                                 // Check if the age is greater than or equal to 21
                                 return finalAge >= 21;
+                            }
+                            async function removeAccount() {
+                                if(confirm("Are you certain you want to delete your account?")){
+                                    const res = await fetch('/profile/removeaccount', {
+                                        method: 'POST',
+                                        body: JSON.stringify({ username:user.username}),
+                                        headers: { 'Content-type': 'application/json' }
+                                    })
+                                    const data = await res.json()
+                                    if (data.status == 'done') {
+                                        window.location.href = '/login'
+
+                                    }
+                                }
                             }
                         </script>

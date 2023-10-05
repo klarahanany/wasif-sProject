@@ -37,7 +37,7 @@ a {
 }
 
 .nav {
- 
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -45,8 +45,8 @@ a {
   left: 0px;
   right: 0px;
   top: 0px;
-  
 }
+
 
 .nav a {
   display: block;
@@ -58,13 +58,12 @@ a {
 }
 
 .nav ul {
- 
+
   display: flex;
   align-items: center;
 }
 
 .nav ul li {
-  height: 100%;
   transition: 1s;
   float: right;
 }
@@ -79,8 +78,9 @@ a {
 .nav li:hover {
   background-color: #f9df4b;
 }
-.nav #nohover:hover{
-  background:none;
+
+.nav #nohover:hover {
+  background: none;
 }
 
 /* Base button styles */
@@ -102,6 +102,13 @@ a {
   position: relative;
   transition: background-color 0.3s, box-shadow 0.3s;
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
+}
+
+.scrolled .nav {
+  position: fixed;
+  transition: position 1.3s;
+  z-index: 1000;
+  /* Add other properties as needed */
 }
 
 /* Shiny effect on hover */
@@ -256,19 +263,34 @@ footer {
   font-weight: bold;
   margin: 10px 0;
 }
-.cartItem{
+
+.cartItem {
   font-size: 16px;
   height: 250px;
+  position: relative;
 }
+
+.cartItem .overlay-image {
+  position: absolute;
+  top: 25%;
+  left: 30%;
+  width: 40%;
+  height: 50%;
+  z-index: 1;
+  /* Ensure the image appears on top of other elements within the container */
+}
+
 .cartItem img {
   width: 100px;
   height: 150px;
 }
+
 .cartItem input {
-  width: 50px;
+  width: 70px;
   height: 30px;
   float: right;
 }
+
 .add-to-cart {
   background-color: #77aaec;
   color: #fff;
@@ -416,15 +438,18 @@ footer {
   align-content: center;
 
 }
+
 .cartContentPage .DeleteFromCart i {
   color: black;
   font-size: large;
 }
+
 .cartContentPage .DeleteFromCart i:hover {
   color: red;
 
 }
-.icon{
+
+.icon {
   width: 200px;
 }
 
@@ -505,11 +530,7 @@ select {
 
 }
 
-.scrolled .nav {
-  position: fixed;
-  transition: position 1.3s;
-  /* Add other properties as needed */
-}
+
 
 .searchBar {
   background-color: #eee;
@@ -531,55 +552,82 @@ select {
   width: 100%;
   height: 100%;
 }
-#updateImage{
+
+#updateImage {
   width: 200px;
   height: 200px;
 }
-  @media screen and (max-width: 600px) {
 
-    .nav a,.nav ul{
-      float: none;
-      /* display: block; */
-      text-align: center;
-      width: 100%;
-      margin: 0;
-      padding: 2px;
-      font-size:0.8rem;
+.sold-out-message {
+  color: red;
+  font-weight: bolder;
+  transition: background-color 0.3s;
+  width: 50%;
+  text-align: left;
+  margin-top: 30px;
+}
 
-    }
-    h1{
-      font-size: medium;
-    }
 
-    .chart {
-      width: 400px;
-      height: 300px;
-    }
-    table {
-      width: 80%;
-      margin: 5px auto;
-      border-collapse: collapse;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-      background-color: #fff;
-      font-size: 0.5rem;
-    }
-    
-    th,
-    td {
-      padding: 1px;
-      text-align: center;
-      border-bottom: 1px solid #ddd;
-    }
-    table form{
-      width: 0px;
-    }
-    table form button{
-      width: 60px;
-      font-size: 0.5rem;
-    }
 
-   
-    
+@media screen and (max-width: 600px) {
+
+  .nav a,
+  .nav ul {
+    float: none;
+    /* display: block; */
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 2px;
+    font-size: 0.8rem;
   }
+
+  .nav ul li {
+    height: 100%;
+  }
+
+  h1 {
+    font-size: medium;
+  }
+
+  .chart {
+    width: 400px;
+    height: 300px;
+  }
+
+  table {
+    /* max-width: 100%; */
+    margin: 5px auto;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    font-size: 0.5rem;
+  }
+
+  th,
+  td {
+    padding: 1px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+
+  table form {
+    width: 0px;
+  }
+
+  table form button {
+    width: 50px;
+    font-size: 0.4rem;
+    height: 50px;
+  }
+
+  table .blockForm {
+    height: min-content;
+    width: min-content;
+  }
+
+
+}
