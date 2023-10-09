@@ -6,9 +6,10 @@
 
     <body>
         <h1>User Management</h1>
-        <button onclick="addFormDisplay()" id="addNewAdmin">add new admin</button>
-        <button onclick="deleteFormDisplay()" id="deleteAdmin">delete admin</button>
-
+        <div class="addDelButtons">
+            <button onclick="addFormDisplay()" id="addNewAdmin">add new admin</button>
+            <button onclick="deleteFormDisplay()" id="deleteAdmin">delete admin</button>
+        </div>
         <form id="addFormDisplay" style="display: none;">
             <a href="" onclick="formClose()" style="float: right;"><i class="fa-solid fa-x"></i></a>
             <label for="username">Username</label>
@@ -50,62 +51,57 @@
             <p id="successStatusDelete" style="color: green;font-weight: bold;"></p>
         </form>
         <div class="usermanagment">
-            <% if(admin.role=='mainadmin' ){ %>
-                <h1 style="text-align: center;">Main Admin</h1>
-                <% }else{ %>
-                    <h1 style="text-align: center;">Admin</h1>
 
-                    <% } %>
 
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Username</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Email</th>
-                                    <th>Birthday</th>
-                                    <th>Role</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% users.forEach(function(user) { %>
-                                    <tr>
-                                        <td>
-                                            <%= user.username %>
-                                        </td>
-                                        <td>
-                                            <%= user.firstname %>
-                                        </td>
-                                        <td>
-                                            <%= user.lastname %>
-                                        </td>
-                                        <td>
-                                            <%= user.email %>
-                                        </td>
-                                        <td>
-                                            <%= user.birthday.toLocaleDateString() %>
-                                        </td>
-                                        <td>
-                                            <%= user.role %>
-                                        </td>
-                                        <td>
-                                            <%= user.isBlocked ? 'Blocked' : 'Active' %>
-                                        </td>
-                                        <td>
-                                            <form class="blockForm" method="POST"
-                                                action="/admin/usermanagment/block-user/<%= user._id %>">
-                                                <button type="submit">
-                                                    <%= user.isBlocked ? 'Unblock' : 'Block' %>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    <% }); %>
-                            </tbody>
-                        </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Birth Date</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(function(user) { %>
+                        <tr>
+                            <td>
+                                <%= user.username %>
+                            </td>
+                            <td>
+                                <%= user.firstname %>
+                            </td>
+                            <td>
+                                <%= user.lastname %>
+                            </td>
+                            <td>
+                                <%= user.email %>
+                            </td>
+                            <td>
+                                <%= user.birthday.toLocaleDateString() %>
+                            </td>
+                            <td>
+                                <%= user.role %>
+                            </td>
+                            <td>
+                                <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                            </td>
+                            <td>
+                                <form class="blockForm" method="POST"
+                                    action="/admin/usermanagment/block-user/<%= user._id %>">
+                                    <button type="submit">
+                                        <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
         </div>
 
 
@@ -208,7 +204,7 @@
                 //api call from frontend to server, sending data from form to server to save in db
                 const res = await fetch('/admin/usermanagment/deleteadmin', {
                     method: 'POST',
-                    body: JSON.stringify({ username:adminUsername.value}),
+                    body: JSON.stringify({ username: adminUsername.value }),
                     headers: { 'Content-type': 'application/json' }
                 })
 
@@ -217,7 +213,7 @@
                 if (data == "done") {
                     document.getElementById("successStatusDelete").textContent = "admin deleted successfully"
                 }
-                
+
             }
         })
         function isDateBeforeToday(dateString) {

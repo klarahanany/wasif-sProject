@@ -285,7 +285,7 @@ router.post('/usermanagment/addadmin', async (req, res) => {
         var mailOptions = {
             from: 'lart0242@gmail.com',
             to: email,
-            subject: 'order ready',
+            subject: 'adding admin',
             text: `you have an account now as an admin,
             username: ${username}
             password: ${password}
@@ -348,14 +348,23 @@ router.post('/allOrders/update-status/:id', async (req, res) => {
         .populate('userId', 'email')
         .populate('items.productId', 'name');
     var order = {};
+    var items = []
     for (let index = 0; index < orders.length; index++) {
         const element = orders[index];
         if (element._id == id) {
             order = element
+            items = element.items
         }
     }
-    console.log(order)
+    console.log(items)
     console.log("what")
+    var details = ""
+    for (let index = 0; index < order.items.length; index++) {
+        const element = order.items[index];
+        details+=index+") name: "+ element.productId.name +" quantity: "+ element.quantity
+        details+='\n'
+        
+    }
     if (order.status == 'pending') {
         var transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -369,8 +378,10 @@ router.post('/allOrders/update-status/:id', async (req, res) => {
         var mailOptions = {
             from: 'lart0242@gmail.com',
             to: order.userId.email,
-            subject: 'order ready',
-            text: "Your order is prepared and awaiting pickup."
+            subject: 'Your Order Is Ready',
+            text: `Your order is ready and awaiting pickup.
+            Order Detail:
+            ${details} `
         };
 
         transporter.sendMail(mailOptions, async function (error, info) {

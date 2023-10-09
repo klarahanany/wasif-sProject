@@ -26,7 +26,27 @@ router.get('/', requireAuth, async (req, res) => {
     const user = res.locals.user;
     var userId = user._id
     const drinks = await productModel.find()
-    res.render('orderNow', { drinks, userId })
+    const category ='all'
+    res.render('orderNow', { drinks, userId ,category})
+});
+router.get('/category/:category', requireAuth, async (req, res) => {
+    const user = res.locals.user;
+    var userId = user._id
+    const drinks = await productModel.find()
+    const category =req.params.category
+    res.render('orderNow', { drinks, userId ,category})
+});
+router.get('/product/:id', requireAuth, async (req, res) => {
+    try {
+        const productId = req.params.id
+        const product = await productModel.findOne({ _id: productId })
+        const user = res.locals.user;
+        var userId = user._id
+        res.render('displayOneProduct', { product,userId })
+    } catch (error) {
+        console.error('Error rendering page:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 router.post('/add-to-cart', async (req, res) => {

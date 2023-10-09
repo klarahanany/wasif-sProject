@@ -11,6 +11,8 @@
     <i><a href="/forgotPass">Forget password?</a></i>
     <button>Login</button>
 </form>
+<i style="margin-left: 32%;">customer? <a href="/login">login here</a></i>
+
 <%- include('partials/footer'); -%>
 
 <script>
@@ -40,7 +42,7 @@
             usernameError.textContent = data.error.username
         }
         if(data.user){
-            location.assign('/admin/inventory')
+            location.assign('/admin/usermanagment')
         }
         // console.log(data)
     });

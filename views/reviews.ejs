@@ -1,22 +1,78 @@
 <%- include('partials/header'); -%>
 
-<head>
-    <title>Reviews</title>
-</head>
-<body>
-    <h1>Reviews</h1>
+    <head>
+        <title>Reviews</title>
+    </head>
 
-    <ul>
+    <body>
+        <h1>Reviews</h1>
+
         <% reviews.forEach(function(review) { %>
-            <li>
-                <h2><%= review.title %></h2>
-                <p>Rating: <%= review.rating %></p>
-                <p>Author: <%= review.author %></p>
-                <p>Date: <%= review.date %></p>
-                <p><%= review.body %></p>
-            </li>
-        <% }); %>
-    </ul>
+            <div class="review">
+                <p>
+                    <%= review.title %>
+                </p>
+                <p>Rating: <%= review.rating %>
+                </p>
+                <p>Author: <%= review.author %>
+                </p>
 
-    <a href="/">Back to Home</a>
-    <%- include('partials/footer'); -%>
+                <p>
+                    <%= review.body %>
+                </p>
+
+                <p>Date: <%= review.date.toLocaleDateString() %>
+                </p>
+            </div>
+            <% }); %>
+                <div class="form-container">
+                    <h2>Add a Review</h2>
+
+                    <!-- Review Form -->
+                    <form id="reviewForm">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" name="title" required>
+
+                        <label for="rating">Rating (1-5):</label>
+                        <input type="number" id="rating" name="rating" min="1" max="5" required>
+
+                        <label for="body">Review:</label>
+                        <textarea id="body" name="body" rows="4" required></textarea>
+
+                        <button type="submit">Submit Review</button>
+                    </form>
+                    <p id="status"></p>
+                </div>
+                <script>
+                    const form = document.querySelector('#reviewForm');
+
+                    form.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+
+                        // get values
+                        var user1 = `<%- JSON.stringify(user) %>`;
+                        var user = JSON.parse(user1);
+                        console.log(user)
+                        const title = form.title.value;
+                        const body = form.body.value;
+                        const rating = form.rating.value;
+
+                        //api call from frontend to server, sending data from form to server to save in db
+                        const res = await fetch('/reviews/addReview', {
+                            method: 'POST',
+                            body: JSON.stringify({ user, title, body, rating }),
+                            headers: { 'Content-type': 'application/json' }
+                        })
+
+                        //after getting response from the server
+                        const data = await res.json()
+                        if (data == "done") {
+                            // window.location.reload()
+                            document.getElementById("status").textContent = "your review has been submited"
+                            form.title.value = '';
+                            form.body.value = '';
+                            form.rating.value = '';
+                        }
+                    })
+                </script>
+                <%- include('partials/footer'); -%>

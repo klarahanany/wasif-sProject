@@ -46,6 +46,9 @@
                 if (data.user) {
                     location.assign('/')
                 }
+                if(data.errorBlocked){
+                    passwordError.textContent ="You Are Blocked!"
+                }
                 console.log(data)
             });
         </script>

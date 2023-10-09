@@ -1,20 +1,127 @@
 <%- include('partials/header'); -%>
-<head>
-  <title>Home Page</title>
-</head>
-<header>
-  <div class="smoothie">
-    <img src="/wine.png" alt="">
+
+  <head>
+    <title>Spiritual drinks shop </title>
+  </head>
+
+  <div class="videoContainer">
+    <video src="/video.mp4" autoplay muted playsinline loop>
+    </video>
+    <div class="text-overlay">
+      <p>Your Text Here</p>
+      <button id="shopNow">Shop Now</button>
+    </div>
   </div>
 
-  <div class="headings">
-    <h2>Spiritual drinks shop</h2>
-    <h3></h3>
-    <!-- <a href="/smoothies" class="btn">View Recipes</a> -->
-    <a href="/order" class="btn">Order Now</a>
-    <a href="/feedback" class="btn">Send Feedback</a>
-    <a href="/aboutUs" class="btn">About Us</a>
-
+  <div class="spiritual-explanation">
+    <h2>Welcome to our Spiritual Drinks Shop</h2>
+    <p>
+      Step into a realm of tranquility and rejuvenation. Our Spiritual Drinks Shop offers a unique collection of
+      beverages that are crafted to nourish not just the body, but also the soul.
+    </p>
+    <p>
+      Immerse yourself in a selection of drinks inspired by ancient recipes, infused with natural herbs, and designed to
+      bring a sense of peace and balance to your life.
+    </p>
+    <p>
+      Each sip is a journey towards relaxation and mindfulness. Whether you seek a calming herbal tea, an energizing
+      elixir, or a refreshing potion, our offerings are curated to elevate your spirit.
+    </p>
+    <p>
+      Explore the harmony of flavors and the calming energy of our drinks. Embrace the serenity and let each beverage
+      become a ritual for your well-being.
+    </p>
   </div>
-</header>
-<%- include('partials/footer'); -%>
+  <div class="best-sellers">
+    <h2>Best Sellers</h2>
+
+    <div class="best-seller-item">
+      <img class="best-seller-image" src="corona.png" alt="Best Seller 1">
+      <h3>Corona</h3>
+      <p><strong>Price:</strong> $9.99</p>
+    </div>
+
+    <div class="best-seller-item">
+      <img class="best-seller-image" src="jackDaniel.png" alt="Best Seller 2">
+      <h3>Jack Daniel's</h3>
+      <p><strong>Price:</strong> $12.99</p>
+    </div>
+
+    <div class="best-seller-item">
+      <img class="best-seller-image" src="grayGoose.png" alt="Best Seller 3">
+      <h3>Gray Goose</h3>
+      <p><strong>Price:</strong> $14.99</p>
+    </div>
+  </div>
+  <div class="category-list">
+    <h2>Categories</h2>
+    <ul class="category-items">
+      <li class="category-item">
+        <img class="category-image" src="accession.jpg" alt="Herbal Teas" data-cat="accession" onclick="goTo(event)">
+        <div class="textOverlay">
+          <p>ACCESSIONS</p>
+        </div>
+
+      </li>
+      <li class="category-item">
+        <img class="category-image" src="beers.jpg" alt="Energizing Elixirs" data-cat="beer" onclick="goTo(event)">
+        <div class="textOverlay">
+          <p>BEER</p>
+        </div>
+      </li>
+      <li class="category-item">
+        <img class="category-image" src="winecat.jpg" alt="Calming Blends" data-cat="wine" onclick="goTo(event)">
+        <div class="textOverlay">
+          <p>WINE</p>
+        </div>
+      </li>
+      <li class="category-item">
+        <img class="category-image" src="alcohol.jpg" alt="Calming Blends" data-cat="alcohol" onclick="goTo(event)">
+        <div class="textOverlay">
+          <p>ALCOHOL</p>
+        </div>
+      </li>
+      <!-- Add more categories as needed -->
+    </ul>
+  </div>
+   <!-- Review container -->
+   <div class="review-container">
+    <h2>Reviews</h2>
+    <!-- Review 1 -->
+    <% reviews.forEach(function(review) { %>
+      <div class="review">
+          <p>
+              <%= review.title %>
+          </p>
+          <p>Rating: <%= review.rating %>
+          </p>
+          <p>Author: <%= review.author %>
+          </p>
+
+          <p>
+              <%= review.body %>
+          </p>
+
+          <p>Date: <%= review.date.toLocaleDateString() %>
+          </p>
+      </div>
+      <% }); %>
+
+    <!-- "See All" link -->
+    <a href="/reviews" class="see-all">See All Reviews</a>
+</div>
+  <script>
+    function goToPath() {
+      // You can replace '/your-path' with the actual path you want to navigate to
+      window.location.href = '/order';
+    }
+
+    // Attach the function to the button's click event
+    document.getElementById('shopNow').addEventListener('click', goToPath);
+    function goTo(e){
+      const category = event.target.getAttribute('data-cat');
+      window.location.href = `/order/category/${category}`
+    }
+
+  </script>
+  <%- include('partials/footer'); -%>

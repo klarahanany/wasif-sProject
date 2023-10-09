@@ -24,17 +24,17 @@
         <label class="filterLabel">Filter by Categories:</label>
         <form id="categoryFilterForm" dir="ltr" class="filter-form">
             <label>
-                <input type="checkbox" name="category" value="Wine">Wine
+                <input id="wine" type="checkbox" name="category" value="Wine">Wine
             </label>
             <label>
-                <input type="checkbox" name="category" value="Beer">Beer
+                <input id="beer" type="checkbox" name="category" value="Beer">Beer
             </label>
             <label>
-                <input type="checkbox" name="category" value="Alcohol">
+                <input id="alcohol" type="checkbox" name="category" value="Alcohol">
                 Alcohol
             </label>
             <label>
-                <input type="checkbox" name="category" value="Accessions">
+                <input id="accession" type="checkbox" name="category" value="Accessions">
                 Accessions
             </label>
             <!-- <button type="reset">Reset</button> -->
@@ -44,25 +44,26 @@
         <h2>Our Products</h2>
         <ul class="productsContainer" id="productsContainer">
             <% drinks.forEach((drink)=> { %>
-                <li class="product-card" data-category="<%= drink.category %>" id="<%= drink._id %>">
-                    <img src="/<%= drink.image %>" alt="Example Image">
-                    <h3 class="product-title">
+                <li class="product-card" data-category="<%= drink.category %>" id="<%= drink._id %>"
+                    theId="<%= drink._id %>" onclick="goToProduct(event)">
+                    <img src="/<%= drink.image %>" alt="Example Image" theId="<%= drink._id %>">
+                    <h3 class="product-title" theId="<%= drink._id %>">
                         <%= drink.name %>
                     </h3>
-                    <p class="product-description">
+                    <p class="product-description" theId="<%= drink._id %>">
                         <%= drink.description %>
                     </p>
-                    <p class="product-price">Price: $<%= drink.price.toFixed(2) %>
+                    <p class="product-price" theId="<%= drink._id %>">Price: $<%= drink.price.toFixed(2) %>
                     </p>
                     <input type="hidden" name="drinkId" value="<%= drink.id %>" id="drinkId">
                     <input type="hidden" name="userId" value="<%= userId %>" id="userId">
-                  
+
                     <% if(drink.quantity==0){ %>
-                        <p class="sold-out-message" style="font-size: 25px;">Sold Out</p>
+                        <p class="sold-out-message" style="font-size: 25px;" theId="<%= drink._id %>">Sold Out</p>
                         <%}else{%>
-                            <label for="quantity">Quantity</label>
-                            <input type="number" id="quantity" data-item-id="<%= drink.id %>" class="quantity" name="quantity"
-                                min="1" value="1" required>
+                            <label for="quantity" theId="<%= drink._id %>">Quantity</label>
+                            <input type="number" id="quantity" data-item-id="<%= drink.id %>" class="quantity"
+                                name="quantity" min="1" value="1" required>
                             <button class="add-to-cart" type="submit" data-item-id="<%= drink.id %> "
                                 data-userId="<%= userId %>" onclick="addToCart(event)">Add to Cart</button>
 
@@ -75,9 +76,36 @@
     <script>
         var products1 = `<%- JSON.stringify(drinks) %>`;
         var product = JSON.parse(products1);
+        var category1 = `<%- JSON.stringify(category) %>`;
+        var category = JSON.parse(category1);
+        if (category != 'all') {
+            const checkbox = document.getElementById(category);
+            // Check the checkbox programmatically
+            checkbox.checked = true;
+            const products = document.querySelectorAll('.product-card');
+            const categoryFilterForm = document.getElementById('categoryFilterForm');
+            const selectedCategories = Array.from(categoryFilterForm.querySelectorAll('input[name="category"]:checked')).map(input => input.value);
+            const filteredProducts = document.getElementById('productsContainer');
+            console.log(selectedCategories)
+            if (selectedCategories.length > 0) {
+                products.forEach(product => product.style.display = 'none');
+                console.log(selectedCategories)
+                selectedCategories.forEach(category => {
+                    const matchingProducts = filteredProducts.querySelectorAll(`.product-card[data-category="${category}"]`);
+                    matchingProducts.forEach(product => product.style.display = 'block');
+                });
+            }
+        }
         const categories = [...new Set(product.map((item) => { return item }))]
         const filterSelectPrice = document.getElementById('filter');
         const categoryFilter = document.getElementById('categoryFilterForm');
+        async function goToProduct(event) {
+            const drinkId = event.target.getAttribute('theId');
+            console.log(drinkId)
+            if (drinkId) {
+                window.location.href = `/order/product/${drinkId}`
+            }
+        }
 
         document.getElementById('searchBar').addEventListener('keyup', (e) => {
             const searchData = e.target.value.toLowerCase();
@@ -154,8 +182,7 @@
                 body: JSON.stringify(body)
             });
             const content = await rawResponse.json();
-            console.log("the content : ")
-            console.log(content)
+            alert("item has added")
         }
         const filterSelect = document.getElementById('filter');
         const products = document.querySelectorAll('.product-card');

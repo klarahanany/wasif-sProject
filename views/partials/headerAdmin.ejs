@@ -14,7 +14,7 @@
 <body>
   <nav class="nav">
     <!-- <h1><a href="/">Spiritual Drinks Shop</a></h1> -->
-
+    <h2><a href="/">Spiritual Drinks Shop</a></h2>
     <ul>
       <% if (admin) { %>
         <!-- <p>Welcome, <%= admin.firstname %> <%= admin.lastname %></p> -->
@@ -24,7 +24,13 @@
         <li><a href="/admin/allorders">Orders Managmenet</a></li>
         <li><a href="/admin/revenue">Revenue Managmenet</a></li>
         <li><a href="/admin/profile"><i class="fa-regular fa-user"></i></a></li>
-        <li><a href="/admin/logout">Log out</a></li>
+        <% if(admin.role=='mainadmin' ){ %>
+          <h5 style="text-align: center;">Main Admin</h5
+          <% }else{ %>
+              <h5 style="text-align: center;">Admin</h5>
+
+              <% } %>
+        <li><a href="/admin/logout">Logout</a></li>
         <% } else { %>
           <li id="nohover"><a href="/admin">Log in</a></li>
           <!-- <li id="nohover"><a href="/signup" class="btn">Sign up</a></li> -->

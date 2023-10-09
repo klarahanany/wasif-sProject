@@ -9,9 +9,9 @@
 
         <!-- Buttons for Update, Delete, and Add -->
         <div>
-            <button id="updateBtn" onclick="showUpdateForm()">Update</button>
-            <button id="deleteBtn" onclick="showDeleteForm()">Delete</button>
-            <button id="addBtn" onclick="showAddForm()">Add</button>
+            <button id="addBtn" onclick="showAddForm()">add product</button>
+            <button id="updateBtn" onclick="showUpdateForm()">update product</button>
+            <button id="deleteBtn" onclick="showDeleteForm()">delete product</button>
         </div>
 
         <!-- Product Update, Delete, and Add Forms (Initially hidden) -->
@@ -87,14 +87,14 @@
         <div id="addForm" style="display: none;">
             <h2>Add Product</h2>
             <form id="addingForm" action="/admin/inventory/add-product" method="post" enctype="multipart/form-data">
-                <!-- <input id="img" type="file" name="image" required>
-                 -->
-                <input type="file" name="image">
+                <label for="newProductImage">Product Image:</label>
+
+                <input id="file" type="file" name="image" required>
 
                 <!-- Input fields for new product -->
                 <!-- Replace with your specific fields (e.g., name, price, description) -->
                 <label for="newProductName">Product Name:</label>
-                <input type="text" id="newProductName" name="newProductName" placeholder="enter product name"
+                <input type="text" id="newProductName" name="newProductName" 
                     required><br>
                 <label for="description">Product Description:</label>
                 <input type="text" id="descriptionForProductAdd" name="description" required><br>
@@ -120,7 +120,7 @@
 
                 </p>
                 <!-- Add more fields as needed -->
-                <input type="submit" id="addButton" value="submit">
+                <input class="btnadd" type="submit" id="addButton" value="ADD">
 
                 <!-- <button type="submit" id="addButton">Add</button> -->
             </form>
@@ -132,7 +132,7 @@
             <table>
                 <thead>
                     <tr>
-
+                        <th>Product Image</th>
                         <th>Product Name</th>
                         <th>Product Description</th>
                         <th>Product Category</th>
@@ -145,7 +145,9 @@
                 <tbody>
                     <% products.forEach(function(product) { %>
                         <tr>
-
+                            <td>
+                                <img src="/<%= product.image %>" alt="">
+                            </td>
                             <td>
                                 <%= product.name %>
                             </td>
