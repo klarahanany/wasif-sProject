@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const Review = require('./models/Review'); // Assuming you have a Review model
 const productModel = require('./models/productModel.js')
 const multer = require('multer');
 const authRoutes = require('./routes/authRoutes')
@@ -44,13 +45,15 @@ app.post('/upload', upload.single("image"),(req,res)=>{
 // routes
 app.get('*', currentUser)//apply to every route (protect routes)
 app.get('*', currentAdminUser)//apply to every route (protect routes)
-app.get('/', (req, res) => res.render('home'));
+app.get('/',async (req, res) => {
+  const reviews = await Review.find().limit(3); // Fetch reviews from your database
+
+  res.render('home',{ reviews })});
 
 app.get('/smoothies', requireAuth, (req, res) => res.render('smoothies'));
 app.use('/profile', profileRoutes)
 app.use('/reviews', reviewRoutes)
 app.use('/order', orderNowRoutes)
 app.use('/admin', adminRoutes)
-
 app.use("/", authRoutes)
 

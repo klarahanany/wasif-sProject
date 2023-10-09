@@ -7,21 +7,14 @@ const { promisify } = require("util");
 const cartModel = require('../models/cartModel.js');
 // handle errors
 const handleErrors = (err, usernameValue, emailValue) => {
-
-
-    console.log(err)
-
     let errors = { username: '', email: '', password: '' };
-
     //incorrect email
     if (err === 'incorrect username') {
         errors.username = 'that username is not registered'
     }
     if(err == 'incorrect password'){
         errors.password = 'incorrect password'
-
     }
-
     //incorrect email
     if (err.message === 'incorrect email') {
         errors.email = 'that mail is not registered'
@@ -29,7 +22,6 @@ const handleErrors = (err, usernameValue, emailValue) => {
     // duplicate username error
     if (err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: username_1 dup key: { username: "${usernameValue}" }`) {
         errors.username = 'that username is already registered';
-
         return errors;
     }
     if (err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: email_1 dup key: { email: "${emailValue}" }`) {
@@ -38,10 +30,7 @@ const handleErrors = (err, usernameValue, emailValue) => {
     }
     // validation errors
     else if (err === 'user validation failed') {
-        // console.log(err);
         Object.values(err.errors).forEach(({ properties }) => {
-            // console.log(val);
-            // console.log(properties);
             errors[properties.path] = properties.message;
         });
     }
@@ -128,8 +117,8 @@ const login_post = async (req, res) => {
                 }
             }
             else {
-                const error = "errorBlocked"
-                res.status(400).json({ error })
+                const errorBlocked = "errorBlocked"
+                res.status(400).json({ errorBlocked })
             }
 
         } else { //if user exists in db
@@ -185,7 +174,7 @@ const forgetPass_post = async (req, res) => {
         var mailOptions = {
             from: 'lart0242@gmail.com',
             to: email,
-            subject: 'Sending Email using Node.js',
+            subject: 'Reset Password',
             text: link
         };
 
