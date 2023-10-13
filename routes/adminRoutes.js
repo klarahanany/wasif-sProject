@@ -316,8 +316,33 @@ router.post('/usermanagment/deleteadmin', async (req, res) => {
         const condition = { username: username };
     
         // Use deleteOne to delete a single document that matches the condition
+        const user = await userModel.findOne({username:username})
         const result = await userModel.deleteOne(condition);
+        
         console.log('User deleted successfully');
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'aff.markssh@gmail.com',
+                pass: 'zcdaufonyexxotnw'
+
+            }
+        });
+
+        var mailOptions = {
+            from: 'lart0242@gmail.com',
+            to: user.email,
+            subject: 'Deleting Admin',
+            text: `Your account has been deactivated. You no longer have administrator privileges.`
+        };
+
+        transporter.sendMail(mailOptions, async function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
         res.status(201).json("done")
 
       } catch (error) {

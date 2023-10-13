@@ -6,6 +6,9 @@
 
     <body>
         <h1>User Management</h1>
+        <div class="searchBarContainer"> <input id="searchBar" type="text" placeholder="Search..">
+            <i class="fa-solid fa-magnifying-glass"></i></div>
+        
         <div class="addDelButtons">
             <button onclick="addFormDisplay()" id="addNewAdmin">add new admin</button>
             <button onclick="deleteFormDisplay()" id="deleteAdmin">delete admin</button>
@@ -68,7 +71,7 @@
                 </thead>
                 <tbody>
                     <% users.forEach(function(user) { %>
-                        <tr>
+                        <tr id="<%=user._id%>">
                             <td>
                                 <%= user.username %>
                             </td>
@@ -212,6 +215,7 @@
                 const data = await res.json()
                 if (data == "done") {
                     document.getElementById("successStatusDelete").textContent = "admin deleted successfully"
+                    adminUsername.value = "selectAdmin"
                 }
 
             }
@@ -230,6 +234,24 @@
             // Compare the two dates
             return providedDate <= currentDate;
         }
+        var users1 = `<%- JSON.stringify(users) %>`;
+        var users = JSON.parse(users1);
+        const categories = [...new Set(users.map((item) => { return item }))]
+        document.getElementById('searchBar').addEventListener('keyup', (e) => {
+            const searchData = e.target.value.toLowerCase();
+            const filteredData = categories.filter((item) => {
+                return (
+                    item.username.toLowerCase().includes(searchData)
+                )
+            })
+            users.forEach(use => {
+                if (filteredData.includes(use)) {
+                    document.getElementById(`${use._id}`).style.display = 'block';
+                } else {
+                    document.getElementById(`${use._id}`).style.display = 'none';
+                }
+            });
+        })
     </script>
 
     <%- include('partials/footer'); -%>
