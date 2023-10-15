@@ -1,49 +1,67 @@
 <%- include('partials/headerAdmin'); -%>
-<form action="/admin/login" >
-    <h2>Admin Login</h2>
 
-    <label for="username">Username</label>
-    <input type="text" name="username" required />
-    <div class="username error"></div>
-    <label for="password">Password</label>
-    <input type="password" name="password" required />
-    <div class="password error"></div>
-    <i><a href="/forgotPass">Forget password?</a></i>
-    <button>Login</button>
+<form action="/admin/login">
+  <h2>Admin Login</h2>
+
+  <!-- Username -->
+  <label for="username">Username</label>
+  <input type="text" name="username" placeholder="Enter your username" required />
+  <div class="username error"></div>
+
+  <!-- Password -->
+  <label for="password">Password</label>
+  <input type="password" name="password" placeholder="Enter your password" required />
+  <div class="password error"></div>
+
+  <i><a href="/forgotPass">Forget password?</a></i>
+
+  <button>Login</button>
+  <i style="margin-left: 25%">customer? <a href="/login">login here</a></i>
 </form>
-<i style="margin-left: 32%;">customer? <a href="/login">login here</a></i>
 
 <%- include('partials/footer'); -%>
 
 <script>
-    const form = document.querySelector('form');
-    const passwordError = document.querySelector('.password.error')
-    const usernameError = document.querySelector('.username.error')
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        //reset errors
+  // Get the form element.
+  const form = document.querySelector("form");
 
-        passwordError.textContent = ''
-        usernameError.textContent= ''
-        // get values
-        const username = form.username.value;
-        const password = form.password.value;
-        //api call from frontend to server, sending data from form to server to save in db
-        const res = await fetch('/admin',{
-            method : 'POST',
-            body: JSON.stringify({username,password}),
-            headers: {'Content-type':'application/json'}
-        })
+  // Get the password error element.
+  const passwordError = document.querySelector(".password.error");
 
-        //after getting response from the server
-        const data = await res.json()
-        if(data.error){
-            passwordError.textContent = data.error.password
-            usernameError.textContent = data.error.username
-        }
-        if(data.user){
-            location.assign('/admin/usermanagment')
-        }
-        // console.log(data)
+  // Get the username error element.
+  const usernameError = document.querySelector(".username.error");
+
+  // Add an event listener to the form submit event.
+  form.addEventListener("submit", async (e) => {
+    // Prevent the default form submission.
+    e.preventDefault();
+
+    // Reset the error messages.
+    passwordError.textContent = "";
+    usernameError.textContent = "";
+
+    // Get the form values.
+    const username = form.username.value;
+    const password = form.password.value;
+
+    // Make an API call to the admin login endpoint.
+    const res = await fetch("/admin", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+      headers: { "Content-type": "application/json" },
     });
+
+    // Get the response data.
+    const data = await res.json();
+
+    // Handle the response.
+    if (data.error) {
+      passwordError.textContent = data.error.password;
+      usernameError.textContent = data.error.username;
+    } else if (data.user) {
+      location.assign("/admin/usermanagment");
+    }
+
+    // console.log(data);
+  });
 </script>
