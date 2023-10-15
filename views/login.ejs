@@ -1,54 +1,88 @@
+Okay, here are some comments for the login form code you originally pasted:
+
+```html
 <%- include('partials/header'); -%>
-    <form action="/login">
-        <h2>Login</h2>
 
-        <label for="username">Username</label>
-        <input type="text" name="username" required />
-        <div class="username error"></div>
-        <label for="password">Password</label>
-        <input type="password" name="password" required />
-        <div class="password error"></div>
-        <i><a href="/forgotPass">Forget password?</a></i>
-        <button>Login</button>
-    </form>
-    <i style="margin-left: 32%;">admin? <a href="/admin">login here</a></i>
+<form action="/login">
 
+  <!-- Form heading -->
+  <h2>Login Customer</h2>
 
-    <%- include('partials/footer'); -%>
+  <!-- Username label and input -->
+  <label for="username">Username</label>
+  <input type="text" name="username" placeholder="Enter your username" required/>
+  
+  <!-- Username error message container -->
+  <div class="username error"></div>
 
-        <script>
-            const form = document.querySelector('form');
-            const passwordError = document.querySelector('.password.error')
-            const usernameError = document.querySelector('.username.error')
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                //reset errors
+  <!-- Password label and input -->
+  <label for="password">Password</label>
+  <input type="password" name="password" placeholder="Enter your passsword" required />
+  
+  <!-- Password error message container -->
+  <div class="password error"></div>
 
-                passwordError.textContent = ''
-                usernameError.textContent = ''
-                // get values
-                const username = form.username.value;
-                const password = form.password.value;
-                //api call from frontend to server, sending data from form to server to save in db
-                const res = await fetch('/login', {
-                    method: 'POST',
-                    body: JSON.stringify({ username, password }),
-                    headers: { 'Content-type': 'application/json' }
-                })
+  <!-- Forgot password link -->
+  <i><a href="/forgotPass">Forget password?</a></i>
+  
+  <!-- Submit button -->
+  <button>Login</button>
 
-                //after getting response from the server
-                const data = await res.json()
-                if (data.error) {
+</form>
 
-                    passwordError.textContent = data.error.password
-                    usernameError.textContent = data.error.username
-                }
-                if (data.user) {
-                    location.assign('/')
-                }
-                if(data.errorBlocked){
-                    passwordError.textContent ="You Are Blocked!"
-                }
-                console.log(data)
-            });
-        </script>
+<!-- Admin login link -->  
+<i style="margin-left: 32%;">admin? <a href="/admin">login here</a></i>
+
+<%- include('partials/footer'); -%>
+
+<script>
+
+  // Get references to error containers
+  const passwordError = document.querySelector('.password.error')
+  const usernameError = document.querySelector('.username.error')
+
+  // Listen for form submit
+  form.addEventListener('submit', async (e) => {
+
+    // Prevent default submit
+    e.preventDefault();
+    
+    // Reset error messages
+    passwordError.textContent = ''
+    usernameError.textContent = ''
+
+    // Get form values
+    const username = form.username.value;
+    const password = form.password.value;
+
+    // Make API call to submit form data
+    const res = await fetch('/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+      headers: { 'Content-type': 'application/json' }
+    })
+
+    // Get API response
+    const data = await res.json()
+
+    // Handle errors
+    if (data.error) {
+      passwordError.textContent = data.error.password
+      usernameError.textContent = data.error.username
+    }
+
+    // Redirect on successful login
+    if (data.user) {
+      location.assign('/') 
+    }
+
+    // Handle blocked user
+    if(data.errorBlocked){
+      passwordError.textContent ="You Are Blocked!"
+    }
+    
+    // Log response
+    console.log(data)
+  });
+
+</script>
