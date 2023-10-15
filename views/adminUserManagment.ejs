@@ -7,8 +7,9 @@
     <body>
         <h1>User Management</h1>
         <div class="searchBarContainer"> <input id="searchBar" type="text" placeholder="Search..">
-            <i class="fa-solid fa-magnifying-glass"></i></div>
-        
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+
         <div class="addDelButtons">
             <button onclick="addFormDisplay()" id="addNewAdmin">add new admin</button>
             <button onclick="deleteFormDisplay()" id="deleteAdmin">delete admin</button>
@@ -236,22 +237,28 @@
         }
         var users1 = `<%- JSON.stringify(users) %>`;
         var users = JSON.parse(users1);
-        const categories = [...new Set(users.map((item) => { return item }))]
+        const usernames = [...new Set(users.map((item) => item.username.toLowerCase()))];
+
         document.getElementById('searchBar').addEventListener('keyup', (e) => {
             const searchData = e.target.value.toLowerCase();
-            const filteredData = categories.filter((item) => {
+            const filteredData = users.filter((item) => {
                 return (
                     item.username.toLowerCase().includes(searchData)
                 )
-            })
-            users.forEach(use => {
-                if (filteredData.includes(use)) {
-                    document.getElementById(`${use._id}`).style.display = 'block';
+            });
+
+            users.forEach(user => {
+                const userElement = document.getElementById(`${user._id}`);
+                if (filteredData.includes(user)) {
+                    userElement.style.display = 'table-row';
                 } else {
-                    document.getElementById(`${use._id}`).style.display = 'none';
+                    userElement.style.display = 'none';
                 }
             });
-        })
+        });
+
+
+
     </script>
 
     <%- include('partials/footer'); -%>
