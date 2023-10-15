@@ -1,46 +1,49 @@
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <title>Document</title> -->
+    <link rel="stylesheet" href="/styles.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" rel="stylesheet" />
+    <!-- <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"> -->
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- <title>Document</title> -->
-  <link rel="stylesheet" href="/styles.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" rel="stylesheet">
-  <!-- <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"> -->
-</head>
+  <body>
+    <nav class="nav">
+      <h2><a href="/">Spiritual Drinks Shop</a></h2>
+      <ul>
+        <% if (user) { %>
+        <li class="barData"><a href="/">Home</a></li>
+        <li class="barData"><a href="/order">Order Now</a></li>
+        <li>
+          <a href="/order/cart"><i class="fa fa-cart-shopping"></i></a>
+        </li>
+        <li>
+          <a href="/profile"><i class="fa-regular fa-user"></i></a>
+        </li>
 
-<body>
-  <nav class="nav">
-    <h2><a href="/">Spiritual Drinks Shop</a></h2>
-    <ul>
-      <% if (user) { %>
-       <li class="barData"><a href="/">Home</a></li>
-       <li class="barData"><a href="/order">Order Now</a></li> 
-        <li><a href="/order/cart"><i class="fa fa-cart-shopping"></i></a></li>
-        <li><a href="/profile"><i class="fa-regular fa-user"></i></a></li>
-
-        <p>Welcome, <%= user.firstname %>
-            <%= user.lastname %>
-      </p>
+        <p>Welcome, <%= user.firstname %> <%= user.lastname %></p>
         <li><a href="/logout">Logout</a></li>
         <% } else { %>
-          <li id="nohover"><a href="/login">Login</a></li>
-          <li id="nohover"><a href="/signup" class="btn">Signup</a></li>
-          <% } %>
-    </ul>
-  </nav>
-  <script>
-     document.addEventListener("DOMContentLoaded", function () {
-            window.addEventListener("scroll", function () {
-                var scrollPosition = window.scrollY;
-                var scrollRange = 40; // Set your scroll range here
+        <li id="nohover"><a href="/login">Login</a></li>
+        <li id="nohover"><a href="/signup" class="btn">Signup</a></li>
+        <% } %>
+      </ul>
+    </nav>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        window.addEventListener("scroll", function () {
+          var scrollPosition = window.scrollY;
+          var scrollRange = 40; // Set your scroll range here
 
-                // Check if the scroll position is beyond the scroll range
-                if (scrollPosition > scrollRange) {
-                    document.body.classList.add("scrolled");
-                } else {
-                    document.body.classList.remove("scrolled");
-                }
-            });
-        })
-  </script>
+          // Check if the scroll position is beyond the scroll range
+          if (scrollPosition > scrollRange) {
+            document.body.classList.add("scrolled");
+          } else {
+            document.body.classList.remove("scrolled");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
