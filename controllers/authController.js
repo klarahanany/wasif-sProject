@@ -5,30 +5,34 @@ const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer');
 const { promisify } = require("util");
 const cartModel = require('../models/cartModel.js');
-// handle errors
+
+// Error handler
 const handleErrors = (err, usernameValue, emailValue) => {
     let errors = { username: '', email: '', password: '' };
-    //incorrect email
+
+    // Incorrect username
     if (err === 'incorrect username') {
-        errors.username = 'that username is not registered'
+        errors.username = 'username is not registered'
     }
-    if(err == 'incorrect password'){
+    // Incorrect password
+     if(err == 'incorrect password'){
         errors.password = 'incorrect password'
     }
-    //incorrect email
+    // Incorrect email
     if (err.message === 'incorrect email') {
-        errors.email = 'that mail is not registered'
+        errors.email = 'mail is not registered'
     }
-    // duplicate username error
+    // Duplicate username error
     if (err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: username_1 dup key: { username: "${usernameValue}" }`) {
         errors.username = 'that username is already registered';
         return errors;
     }
+    // 
     if (err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: email_1 dup key: { email: "${emailValue}" }`) {
         errors.email = 'that email is already registered';
         return errors;
     }
-    // validation errors
+    // Validation errors
     else if (err === 'user validation failed') {
         Object.values(err.errors).forEach(({ properties }) => {
             errors[properties.path] = properties.message;
@@ -37,6 +41,8 @@ const handleErrors = (err, usernameValue, emailValue) => {
 
     return errors;
 }
+// -----------
+
 
 const forgotPass_get = (req, res) => {
     res.render('forgetPass', { status: "" })

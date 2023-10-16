@@ -32,18 +32,22 @@ const createToken = (id) => {
         expiresIn: maxAge // 3 days
     })
 }
+
+// Error handler
 const handleErrors = (err) => {
 
     let errors = { username: '', password: '' };
 
-    //incorrect email
+    // Incorrect user/admin
     if (err === 'incorrect username') {
-        errors.username = 'that username is not registered'
+        errors.username = 'you are not an admin'
     }
+
+    // Incorrect password admin
     if (err == 'incorrect password') {
         errors.password = 'incorrect password'
-
     }
+
     // validation errors
     else if (err === 'user validation failed') {
         Object.values(err.errors).forEach(({ properties }) => {
@@ -53,17 +57,23 @@ const handleErrors = (err) => {
 
     return errors;
 }
+
 const handleErrors2 = (err, usernameValue, emailValue) => {
+
     let errors = { username: '', email: '', password: '' };
-    // duplicate username error
+
+    // Duplicate username error
     if (err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: username_1 dup key: { username: "${usernameValue}" }`) {
         errors.username = 'that username is already registered';
         return errors;
     }
+
+    // Duplicate email error
     if (err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: email_1 dup key: { email: "${emailValue}" }`) {
         errors.email = 'that email is already registered';
         return errors;
     }
+
     // validation errors
     else if (err === 'user validation failed') {
         Object.values(err.errors).forEach(({ properties }) => {
@@ -71,6 +81,7 @@ const handleErrors2 = (err, usernameValue, emailValue) => {
         });
     }
 }
+
 router.get('/logout', async (req, res) => {
     res.cookie('jwtAdmin', '', { maxAge: 1 }) //replace the current cookie with empty string
     res.redirect('/admin')
