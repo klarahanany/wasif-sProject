@@ -1,34 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-  <%- include('partials/header'); -%>
+<%- include('partials/header'); -%>
 
   <head>
     <title>Reset Password</title>
   </head>
 
+
+  <body>
+    <h1>
+      <%= email%>
+    </h1>
+    <form action="" method="post" onsubmit="return validateForm()">
+      <!-- Password & COnfirm password -->
+      <label for="passsword">Password</label>
+      <input type="password" name="password" id="password" placeholder="Enter your new password" /><br />
+      <div class="password strong"></div>
+      <div class="password notStrong"></div>
+      <label for="confirm-password">Confirm Password</label>
+      <input type="password" name="confirmpassword" id="confirm-password"
+        placeholder="Confirm your new password" /><br />
+
+      <input type="submit" value="RESET" class="btnadd" />
+    </form>
+  </body>
   <script>
-    var status = "<%- JSON.stringify(status) %>";
+    // Get the password strong element.
+    const passwordStrong = document.querySelector(".password.strong");
+    // Get the password not strong element.
+    const passwordNotStrong = document.querySelector(".password.notStrong");
+    const password = document.getElementById("password")
+    password.addEventListener('keyup', () => {
+      if (checkPasswordStrength(password.value) != "Password is strong!") {
+        passwordNotStrong.textContent = checkPasswordStrength(password.value)
+        passwordStrong.textContent = ""
+      }
+      else {
+        passwordStrong.textContent = checkPasswordStrength(password.value)
+        passwordNotStrong.textContent = ""
+      }
+    })
+    // Function to check password strength
+    function checkPasswordStrength(password) {
+      const minLength = 6;
+      const minUpperCase = 1;
+      const minLowerCase = 1;
+      const minNumbers = 1;
+
+      if (password.length < minLength) {
+        return "Password must be at least 8 characters long.";
+      }
+
+      if (password.replace(/[^A-Z]/g, "").length < minUpperCase) {
+        return "Password must contain at least one uppercase letter.";
+      }
+
+      if (password.replace(/[^a-z]/g, "").length < minLowerCase) {
+        return "Password must contain at least one lowercase letter.";
+      }
+
+      if (password.replace(/[^0-9]/g, "").length < minNumbers) {
+        return "Password must contain at least one number.";
+      }
+
+      return "Password is strong!"; // Password meets all criteria
+    };
+    // Function to validate form before submission
+    function validateForm() {
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+
+      const strengthMessage = checkPasswordStrength(password);
+
+      if (strengthMessage !== "Password is strong!") {
+        alert(strengthMessage);
+        return false; // Prevent form submission
+      }
+      else if (password != confirmPassword) {
+        alert("not the same password try again.");
+        return false
+      }
+
+      return true; // Allow form submission
+    }
+    var status = `<%- JSON.stringify(status) %>`;
 
     if (JSON.parse(status) === "verified") {
       if (confirm("Do u want to login?")) {
         window.location.href = "http://localhost:3000/login";
       }
-    } else if (JSON.parse(status) === "error") {
-      alert("not the same password try again.");
-    }
+    } 
   </script>
 
-  <body>
-    <h1><%= email%></h1>
-    <form action="" method="post">
-      <!-- Password & COnfirm password -->
-      <label for="passsword">Password</label>
-      <input type="password" name="password" id="password" placeholder="Enter your new password" /><br />
-
-      <label for="confirm-password">Confirm Password</label>
-      <input type="password" name="confirmpassword" id="confirm-password" placeholder="Confirm your new password" /><br />
-
-      <input type="submit" value="RESET" class="btnadd" />
-    </form>
-  </body>
 </html>

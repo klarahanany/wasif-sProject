@@ -192,6 +192,18 @@ button {
   font-size: 0.8em;
   font-weight: bold;
 }
+.notStrong {
+  color: #ff0099;
+  margin: 10px 2px;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+.strong {
+  color: #2bc414;
+  margin: 10px 2px;
+  font-size: 0.8em;
+  font-weight: bold;
+}
 
 header {
   display: flex;

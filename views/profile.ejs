@@ -11,10 +11,7 @@
             <button onclick="removeAccount()">remove account</button>
             <h2 style="text-align: center;">Your Information</h2>
             <form action="/update-profile">
-                <label for="username">Username: <label id="username">
-                        <%= user.username %>
-                    </label></label>
-                <!-- <label type="text" id="username" name="username" ><%= user.username %></label> -->
+                <label for="username">Username: <label id="username"><%= user.username %></label></label>
 
                 <label for="firstName">First Name:</label>
                 <input type="text" id="firstName" name="firstName" value="<%= user.firstname %>" required>
@@ -26,12 +23,11 @@
                 <input type="email" id="email" name="email" value="<%= user.email %>" required>
                 <div class="email error"></div>
 
-                <!-- <label for="username">Username:</label>
-                <input type="text" id="username" name="username" value="<%= user.username %>" required> -->
-
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password">
-
+                <div class="password strong"></div>
+                <div class="password notStrong"></div>
+                
                 <label for="birthday">Birthday:</label>
                 <input type="date" id="birthday" name="birthday" onchange="isDateBeforeToday()"
                     value="<%= user.birthday %>" required>
@@ -46,6 +42,10 @@
                 <% } %>
                     <%- include('partials/footer'); -%>
                         <script>
+                            // Get the password strong element.
+                            const passwordStrong = document.querySelector(".password.strong");
+                            // Get the password not strong element.
+                            const passwordNotStrong = document.querySelector(".password.notStrong");
                             var user1 = `<%- JSON.stringify(user) %>`;
                             var user = JSON.parse(user1);
                             var birthdayDate = user.birthday
@@ -79,7 +79,8 @@
                                     emailError.textContent = ''
 
                                 }
-                                else {
+                              
+                                else if(checkPasswordStrength(password)== "Password is strong!" ||checkPasswordStrength(password) == ""){
                                     const res = await fetch('/profile', {
                                         method: 'POST',
                                         body: JSON.stringify({ username, password, firstname, lastName, birthday, email }),
@@ -100,7 +101,23 @@
                                         emailError.textContent = 'This Email Already Exist'
                                     }
                                 }
+                                else if (checkPasswordStrength(password) != "Password is strong!" ) {
+                                    alert(checkPasswordStrength(password));
+                                }
 
+                            }
+                            
+                            )
+                            const password = document.getElementById("password")
+                            password.addEventListener('keyup', () => {
+                                if (checkPasswordStrength(password.value) != "Password is strong!") {
+                                    passwordNotStrong.textContent = checkPasswordStrength(password.value)
+                                    passwordStrong.textContent = ""
+                                }
+                                else {
+                                    passwordStrong.textContent = checkPasswordStrength(password.value)
+                                    passwordNotStrong.textContent = ""
+                                }
                             })
                             function isDateBeforeToday(dateString) {
                                 // Parse the provided date string into a Date object
@@ -137,10 +154,10 @@
                                 return finalAge >= 21;
                             }
                             async function removeAccount() {
-                                if(confirm("Are you certain you want to delete your account?")){
+                                if (confirm("Are you certain you want to delete your account?")) {
                                     const res = await fetch('/profile/removeaccount', {
                                         method: 'POST',
-                                        body: JSON.stringify({ username:user.username}),
+                                        body: JSON.stringify({ username: user.username }),
                                         headers: { 'Content-type': 'application/json' }
                                     })
                                     const data = await res.json()
@@ -150,4 +167,32 @@
                                     }
                                 }
                             }
+                            // Function to check password strength
+                            function checkPasswordStrength(password) {
+                                const minLength = 6;
+                                const minUpperCase = 1;
+                                const minLowerCase = 1;
+                                const minNumbers = 1;
+                                if (password.length ==0) {
+                                    return "";
+                                }
+                                if (password.length < minLength) {
+                                    return "Password must be at least 8 characters long.";
+                                }
+                             
+
+                                if (password.replace(/[^A-Z]/g, "").length < minUpperCase) {
+                                    return "Password must contain at least one uppercase letter.";
+                                }
+
+                                if (password.replace(/[^a-z]/g, "").length < minLowerCase) {
+                                    return "Password must contain at least one lowercase letter.";
+                                }
+
+                                if (password.replace(/[^0-9]/g, "").length < minNumbers) {
+                                    return "Password must contain at least one number.";
+                                }
+
+                                return "Password is strong!"; // Password meets all criteria
+                            };
                         </script>

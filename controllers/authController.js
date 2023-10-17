@@ -160,7 +160,7 @@ const forgetPass_post = async (req, res) => {
     try {
         const User = await userModel.findOne({ email })
         if (!User) {
-            res.json({ status: "User Not Exists!!" })
+            res.render('forgetPass', { status: "User Not Exists!!", user: undefined })
         }
 
         const secret = process.env.SECRET_CODE + User.password
