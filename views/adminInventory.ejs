@@ -6,7 +6,10 @@
 
   <main>
     <h1>Product Management</h1>
-
+    <div class="searchBarContainer">
+      <input id="searchBar" type="text" placeholder="Search.." />
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </div>
     <!-- Buttons for Update, Delete, and Add -->
     <div>
       <button id="addBtn" onclick="showAddForm()">add product</button>
@@ -134,7 +137,7 @@
         </thead>
         <tbody>
           <% products.forEach(function(product) { %>
-            <tr>
+            <tr id="<%=product._id%>">
               <td>
                 <img src="/<%= product.image %>" alt="" />
               </td>
@@ -340,6 +343,21 @@
         updateImage.style.display = "none";
       }
     }
+    document.getElementById("searchBar").addEventListener("keyup", (e) => {
+    const searchData = e.target.value.toLowerCase();
+    const filteredData = products.filter((item) => {
+      return item.name.toLowerCase().includes(searchData);
+    });
+
+    products.forEach((pro) => {
+      const userElement = document.getElementById(`${pro._id}`);
+      if (filteredData.includes(pro)) {
+        userElement.style.display = "table-row";
+      } else {
+        userElement.style.display = "none";
+      }
+    });
+  });
   </script>
 
   <%- include('partials/footer'); -%>

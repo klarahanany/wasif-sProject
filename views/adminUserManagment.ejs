@@ -211,7 +211,6 @@
   var users1 = `<%- JSON.stringify(users) %>`;
   var users = JSON.parse(users1);
   const usernames = [...new Set(users.map((item) => item.username.toLowerCase()))];
-
   document.getElementById("searchBar").addEventListener("keyup", (e) => {
     const searchData = e.target.value.toLowerCase();
     const filteredData = users.filter((item) => {
