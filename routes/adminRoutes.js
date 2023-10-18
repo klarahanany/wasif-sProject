@@ -99,19 +99,12 @@ router.post('/', async (req, res) => { //to display the UI
     try {
         const user = await userModel.findOne({ username })
         if (user && (user.role == 'admin' || user.role == 'mainadmin')) {
-            console.log("what")
             const auth = await bcrypt.compare(password, user.password)
-            console.log("what")
-            console.log(auth)
             if (auth) { //if password is correct after comparing
                 const token = createToken(user._id)
                 console.log(token)
                 //sending the token as a cookie to frontend
-                console.log("what")
-
                 res.cookie('jwtAdmin', token, { httpOnly: true, maxAge: maxAge * 1000 })
-                console.log("what")
-
                 res.status(201).json({ user: user._id }) // send back to frontend as json body
 
             }
@@ -135,7 +128,7 @@ router.post('/', async (req, res) => { //to display the UI
 })
 router.get('/inventory', requireAuthAdmin, async (req, res) => {
     const options = [];
-    const products = await productModel.find()
+    const products = await productModel.find().sort({ quantity: 1 });
     for (let index = 0; index < products.length; index++) {
         const element = { value: products[index].name, label: products[index].name }
         options.push(element)
@@ -172,6 +165,11 @@ router.post('/inventory/update-product', upload.single("image"), async (req, res
         res.json('done')
     }
 });
+router.post('/inventory/update-product/changes', async (req, res) => {
+    console.log(req.body)
+    const products = await productModel.find()
+    res.json({products:products})
+})
 router.post('/inventory/delete-product', async (req, res) => {
     const { selectedValue } = req.body
     try {
