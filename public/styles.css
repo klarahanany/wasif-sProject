@@ -876,6 +876,7 @@ footer {
   padding: 3px;
   display: flex;
   align-items: center;
+  margin:5px 5px 0px 0px ;
 }
 .searchBarContainer #searchBar{
   width: 100%;

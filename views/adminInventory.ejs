@@ -6,10 +6,7 @@
 
   <main>
     <h1>Product Management</h1>
-    <div class="searchBarContainer">
-      <input id="searchBar" type="text" placeholder="Search.." />
-      <i class="fa-solid fa-magnifying-glass"></i>
-    </div>
+ 
     <!-- Buttons for Update, Delete, and Add -->
     <div>
       <button id="addBtn" onclick="showAddForm()">add product</button>
@@ -122,6 +119,10 @@
     <!-- Table for displaying products from MongoDB -->
     <div>
       <h2>Product List</h2>
+      <div class="searchBarContainer">
+        <input id="searchBar" type="text" placeholder="Search.." />
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
       <table>
         <thead>
           <tr>
