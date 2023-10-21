@@ -12,6 +12,7 @@ const orderModel = require('../models/orderModel.js')
 const cartModel = require('../models/cartModel.js')
 const multer = require('multer');
 const path = require('path')
+
 // Set up Multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -395,7 +396,7 @@ router.post('/allOrders/update-status/:id', async (req, res) => {
     var details = ""
     for (let index = 0; index < order.items.length; index++) {
         const element = order.items[index];
-        details+=index+") name: "+ element.productId.name +" quantity: "+ element.quantity
+        details+=index+") Product Name: "+ element.productId.name +", Quantity: "+ element.quantity
         details+='\n'
         
     }

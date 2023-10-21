@@ -219,12 +219,13 @@ router.post('/cart/payment', async (req, res) => {
                 .catch(error => {
                     console.error('Error updating product:', error);
                 })
-            const productAfter = await productModel.findOne({ _id: element.productId })
 
+            const productAfter = await productModel.findOne({ _id: element.productId })
+            // If product qunty less than 10 the main admin will get an email
             if (productAfter.quantity < 10) {
                 const mainadmin = await UserModel.findOne({ role: "mainadmin" })
 
-                var text = ` The ${productAfter.name} product quantity is running low`
+                var text = `The Product: ${productAfter.name} Quantity Is Running Low`
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
@@ -234,10 +235,11 @@ router.post('/cart/payment', async (req, res) => {
                     }
                 });
 
+                // Sending the email
                 var mailOptions = {
                     from: 'lart0242@gmail.com',
                     to: mainadmin.email,
-                    subject: 'quantity is running low',
+                    subject: 'Product Quantity Is Running Low',
                     text: text
                 };
 
@@ -251,6 +253,8 @@ router.post('/cart/payment', async (req, res) => {
             }
         }
     }
+
+
     if (paymentMethod == 'creditCard') {
         if (!validatecardNumber(cardNumber)) {
             res.status(400).json({ status: "cardNumber not valid" })
