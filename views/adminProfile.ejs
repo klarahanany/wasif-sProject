@@ -11,7 +11,7 @@
 
             <h2 style="text-align: center;">Your Information</h2>
             <form action="/update-profile">
-                <label for="username">Username: 
+                <label for="username">Username:
                     <label id="username"><%= admin.username %></label>
                 </label>
 
@@ -45,6 +45,8 @@
                 <% } %>
                     <%- include('partials/footer'); -%>
                         <script>
+                            document.getElementById("profileManage").style.backgroundColor = "#f9df4b"
+
                             // Get the password strong element.
                             const passwordStrong = document.querySelector(".password.strong");
                             // Get the password not strong element.

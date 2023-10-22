@@ -175,6 +175,7 @@
   <script>
     var products1 = `<%- JSON.stringify(products) %>`;
     var products = JSON.parse(products1);
+    document.getElementById("productManage").style.backgroundColor="#f9df4b"
     const formUpdate = document.getElementById("formUpdate");
     formUpdate.addEventListener("submit", async (e) => {
       e.preventDefault();
