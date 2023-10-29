@@ -26,15 +26,15 @@ router.get('/', requireAuth, async (req, res) => {
     const user = res.locals.user;
     var userId = user._id
     const drinks = await productModel.find()
-    const category ='all'
-    res.render('orderNow', { drinks, userId ,category})
+    const category = 'all'
+    res.render('orderNow', { drinks, userId, category })
 });
 router.get('/category/:category', requireAuth, async (req, res) => {
     const user = res.locals.user;
     var userId = user._id
     const drinks = await productModel.find()
-    const category =req.params.category
-    res.render('orderNow', { drinks, userId ,category})
+    const category = req.params.category
+    res.render('orderNow', { drinks, userId, category })
 });
 router.get('/product/:id', requireAuth, async (req, res) => {
     try {
@@ -42,7 +42,7 @@ router.get('/product/:id', requireAuth, async (req, res) => {
         const product = await productModel.findOne({ _id: productId })
         const user = res.locals.user;
         var userId = user._id
-        res.render('displayOneProduct', { product,userId })
+        res.render('displayOneProduct', { product, userId })
     } catch (error) {
         console.error('Error rendering page:', error);
         res.status(500).send('Internal Server Error');
@@ -195,18 +195,21 @@ router.post('/cart/payment', async (req, res) => {
     const cartForCurrentUser = await cartModel.findOne({ userId: user._id })
     var items = cartForCurrentUser.items
     var itemsWithMoreQuantity = []
+    var orderDetails = ""
     for (let index = 0; index < items.length; index++) {
         const element = items[index];
         const product = await productModel.findOne({ _id: element.productId })
+        var num =index+1
+        orderDetails += num + ") product name: " + product.name + " quantity: " + element.quantity
         console.log(product.quantity)
         if (product.quantity > 0) {
             itemsWithMoreQuantity.push(element)
             total += product.price * element.quantity
             var newQuantity = product.quantity - element.quantity
-            var newPurchaseQuantity = product.purchaseQuantity +element.quantity;
+            var newPurchaseQuantity = product.purchaseQuantity + element.quantity;
             await productModel.findOneAndUpdate(
                 { _id: element.productId },
-                { $set: { quantity: newQuantity , purchaseQuantity : newPurchaseQuantity } },
+                { $set: { quantity: newQuantity, purchaseQuantity: newPurchaseQuantity } },
                 { new: true } // To return the updated document
             )
                 .then(updatedProduct => {
@@ -253,6 +256,34 @@ router.post('/cart/payment', async (req, res) => {
             }
         }
     }
+    const mainadmin = await UserModel.findOne({ role: "mainadmin" })
+    var text = `customer's name:${user.firstname} ${user.lastname}
+    order details: 
+    ${orderDetails} `
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'aff.markssh@gmail.com',
+            pass: 'zcdaufonyexxotnw'
+
+        }
+    });
+
+    // Sending the email
+    var mailOptions = {
+        from: 'lart0242@gmail.com',
+        to: mainadmin.email,
+        subject: 'New Order',
+        text: text
+    };
+
+    transporter.sendMail(mailOptions, async function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
 
 
     if (paymentMethod == 'creditCard') {
