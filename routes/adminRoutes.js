@@ -169,7 +169,7 @@ router.post('/inventory/update-product', upload.single("image"), async (req, res
 router.post('/inventory/update-product/changes', async (req, res) => {
     console.log(req.body)
     const products = await productModel.find()
-    res.json({products:products})
+    res.json({ products: products })
 })
 router.post('/inventory/delete-product', async (req, res) => {
     const { selectedValue } = req.body
@@ -324,11 +324,11 @@ router.post('/usermanagment/deleteadmin', async (req, res) => {
     try {
         // Define a condition to identify the user you want to delete
         const condition = { username: username };
-    
+
         // Use deleteOne to delete a single document that matches the condition
-        const user = await userModel.findOne({username:username})
+        const user = await userModel.findOne({ username: username })
         const result = await userModel.deleteOne(condition);
-        
+
         console.log('User deleted successfully');
         var transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -355,9 +355,9 @@ router.post('/usermanagment/deleteadmin', async (req, res) => {
         });
         res.status(201).json("done")
 
-      } catch (error) {
+    } catch (error) {
         console.error('Error deleting user:', error);
-      }
+    }
 
 
 });
@@ -396,9 +396,9 @@ router.post('/allOrders/update-status/:id', async (req, res) => {
     var details = ""
     for (let index = 0; index < order.items.length; index++) {
         const element = order.items[index];
-        details+=index+") Product Name: "+ element.productId.name +", Quantity: "+ element.quantity
-        details+='\n'
-        
+        details += index + ") Product Name: " + element.productId.name + ", Quantity: " + element.quantity
+        details += '\n'
+
     }
     if (order.status == 'pending') {
         var transporter = nodemailer.createTransport({
@@ -447,6 +447,11 @@ router.post('/allOrders/update-status/:id', async (req, res) => {
 });
 router.get('/revenue', requireAuthAdmin, async (req, res) => {
     try {
+        var wineProducts = [];
+        var alcoholProducts = [];
+        var beerProducts = [];
+        var accessoriesProducts = [];
+
         const monthlyRevenue = await orderModel.aggregate([
             {
                 $project: {
@@ -470,12 +475,61 @@ router.get('/revenue', requireAuthAdmin, async (req, res) => {
         for (const monRev of monthlyRevenue) {
             revenueData[monRev._id - 1] = monRev.totalRevenue
         }
+        const products = await productModel.find();
+        for (let index = 0; index < products.length; index++) {
+            const element = products[index];
+            if (element.category == 'Wine') {
+                wineProducts.push(element)
+            }
+            else if (element.category == 'Beer') {
+                console.log(element)
+                beerProducts.push(element)
+            }
+            else if (element.category == 'Alcohol') {
+                alcoholProducts.push(element)
+            }
+            else if (element.category == 'Accessions') {
+                accessoriesProducts.push(element)
+            }
+        }
+        var accessoriesMostSold = getMostSoldProduct(accessoriesProducts)
+        var wineMostSold = getMostSoldProduct(wineProducts)
+        var beerMostSold = getMostSoldProduct(beerProducts)
+        var alcoholMostSold = getMostSoldProduct(alcoholProducts)
+        console.log(wineMostSold)
+        console.log(alcoholMostSold)
+        console.log(accessoriesMostSold)
+        console.log( beerMostSold)
 
-        res.render('adminRevenue', { revenueData })
+        res.render('adminRevenue', { revenueData, alcoholMostSold, wineMostSold, beerMostSold, accessoriesMostSold })
     } catch (err) {
         console.error('Error:', err);
     }
 });
+function getMostSoldProduct(products) {
+    if (!Array.isArray(products) || products.length === 0) {
+        // Handle the case when the input is not a valid array or is empty
+        return null;
+    }
+
+    // Initialize variables to keep track of the most sold product
+    let mostSoldProduct = products[0]; // Assume the first product is the most sold
+    let maxPurchaseQuantity = mostSoldProduct.purchaseQuantity || 0;
+
+    // Iterate through the array to find the most sold product
+    for (let i = 1; i < products.length; i++) {
+        const currentProduct = products[i];
+        const currentPurchaseQuantity = currentProduct.purchaseQuantity || 0;
+
+        if (currentPurchaseQuantity > maxPurchaseQuantity) {
+            // Update the most sold product if the current one has a higher purchase quantity
+            mostSoldProduct = currentProduct;
+            maxPurchaseQuantity = currentPurchaseQuantity;
+        }
+    }
+
+    return mostSoldProduct;
+}
 router.get('/profile', requireAuthAdmin, async (req, res) => {
     try {
         res.render('adminProfile')

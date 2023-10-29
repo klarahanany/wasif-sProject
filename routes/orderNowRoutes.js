@@ -203,10 +203,10 @@ router.post('/cart/payment', async (req, res) => {
             itemsWithMoreQuantity.push(element)
             total += product.price * element.quantity
             var newQuantity = product.quantity - element.quantity
-            console.log(newQuantity)
+            var newPurchaseQuantity = product.purchaseQuantity +element.quantity;
             await productModel.findOneAndUpdate(
                 { _id: element.productId },
-                { $set: { quantity: newQuantity } },
+                { $set: { quantity: newQuantity , purchaseQuantity : newPurchaseQuantity } },
                 { new: true } // To return the updated document
             )
                 .then(updatedProduct => {

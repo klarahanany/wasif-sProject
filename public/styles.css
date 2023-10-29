@@ -246,7 +246,7 @@ header .btn {
   padding: 15px;
   width: 250px;
   background-color: #f7efc1;
-  background: linear-gradient(45deg, #3498db, #2ecc71, #f9df4b);
+  background: linear-gradient(45deg, #f9df4b, #eb94c8, #3498db);
   /* Gradient background */
   overflow: hidden;
 }
@@ -884,6 +884,14 @@ footer {
   outline: none;
   background: none;
 }
+.category{
+ display: inline-block;
+ padding: 10px;
+}
+.revenueImage{
+  width: 250px;
+  height: 200px;
+}
 @media screen and (max-width: 600px) {
 
   .nav a,
@@ -944,5 +952,8 @@ footer {
     width: min-content;
   }
 
-
+  .revenueImage{
+    width: 100px;
+    height: 75px;
+  }
 }

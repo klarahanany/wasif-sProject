@@ -35,6 +35,13 @@ const productSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    purchaseQuantity:{
+        type: Number,
+        required: true,
+        min: 0, // Ensure price is non-negative
+        default: 0,
+    },
+
 });
 
 const productModel = mongoose.model('Product', productSchema);

@@ -7,42 +7,108 @@
   </head>
 
   <body>
-    <h1>Revenue Chart</h1>
-    <div class="chart">
-      <canvas id="revenueChart"></canvas>
-    </div>
+    <br>
+    <h2>Top-selling products within each category</h2>
+    <br>
+    <%if(wineMostSold){%>
+      <div id="Category1-div" class="category">
+        <strong>
+          WINE
+        </strong>:
+        <br>
+        <img class="revenueImage" src="/<%= wineMostSold.image %>" alt="">
+        <p>name: <%= wineMostSold.name %>
+        </p>
+        <p>selling amount: <%= wineMostSold.purchaseQuantity %>
+        </p>
+      </div>
+      <%}%>
+        <%if(beerMostSold){%>
 
-    <script>
-      document.getElementById("revenueManage").style.backgroundColor = "#f9df4b"
-      document.addEventListener('DOMContentLoaded', async function () {
-        // Replace the following with your actual data
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+          <div id="Category2-div" class="category">
+            <strong>
+              BEER
+            </strong>:
+            <br>
+            <img class="revenueImage" src="/<%= beerMostSold.image %>" alt="">
+            <p>name: <%= beerMostSold.name %>
+            </p>
+            <p>selling amount: <%= beerMostSold.purchaseQuantity %>
+            </p>
+          </div>
+          <%}%>
+            <%if(accessoriesMostSold){%>
 
-        const revenueData1 = await '<%= JSON.stringify(revenueData) %>';
-        var revenueData = JSON.parse(revenueData1);
-        console.log(revenueData)
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        const chart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: months,
-            datasets: [{
-              label: 'Monthly Revenue',
-              backgroundColor: 'rgba(75, 192, 192, 0.2)',
-              borderColor: 'rgba(75, 192, 192, 1)',
-              borderWidth: 1,
-              data: revenueData,
-            }]
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true
-              }
-            }
-          }
-        });
-      });
-    </script>
-    <%- include('partials/footer'); -%>
+              <div id="Category3-div" class="category">
+                <strong>
+                  ACCESSORIES
+                </strong>:
+                <br>
+                <img class="revenueImage" src="/<%= accessoriesMostSold.image %>" alt="">
+                <p>name: <%= accessoriesMostSold.name %>
+                </p>
+                <p>selling amount: <%= accessoriesMostSold.purchaseQuantity %>
+                </p>
+              </div>
+              <%}%>
+
+                <%if(alcoholMostSold){%>
+
+                  <div id="Category3-div" class="category">
+                    <strong>
+                      ALCOHOL
+                    </strong>:
+                    <br>
+                    <img class="revenueImage" src="/<%= alcoholMostSold.image %>" alt="">
+                    <p>name: <%= alcoholMostSold.name %>
+                    </p>
+                    <p>selling amount: <%= alcoholMostSold.purchaseQuantity %>
+                    </p>
+                  </div>
+                  <%}%>
+                    <br>
+                    <br>
+                    <h2>Revenue Chart</h2>
+                    <br>
+                    <div class="chart">
+                      <canvas id="revenueChart"></canvas>
+                    </div>
+                    <!-- Display divs for each category -->
+
+
+
+
+                    <script>
+                      document.getElementById("revenueManage").style.backgroundColor = "#f9df4b"
+                      document.addEventListener('DOMContentLoaded', async function () {
+                        // Replace the following with your actual data
+                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+
+                        const revenueData1 = await '<%= JSON.stringify(revenueData) %>';
+                        var revenueData = JSON.parse(revenueData1);
+                        console.log(revenueData)
+                        const ctx = document.getElementById('revenueChart').getContext('2d');
+                        const chart = new Chart(ctx, {
+                          type: 'bar',
+                          data: {
+                            labels: months,
+                            datasets: [{
+                              label: 'Monthly Revenue',
+                              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                              borderColor: 'rgba(75, 192, 192, 1)',
+                              borderWidth: 1,
+                              data: revenueData,
+                            }]
+                          },
+                          options: {
+                            scales: {
+                              y: {
+                                beginAtZero: true
+                              }
+                            }
+                          }
+                        });
+                      });
+                    </script>
+                    <%- include('partials/footer'); -%>
   </body>

@@ -141,7 +141,7 @@
                     p.textContent = calculateTotal();
                     const checkout = document.createElement('button');
                     checkout.textContent = "Checkout"
-
+                    checkout.id = "payButton"
                     cartList.appendChild(p)
                     cartList.appendChild(checkout)
                     // Update the total price if needed
