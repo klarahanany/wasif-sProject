@@ -4,11 +4,12 @@ const nodemailer = require('nodemailer');
 
 const cartModel = require('../models/cartModel.js')
 const orderModel = require('../models/orderModel.js')
+const productModel = require('../models/productModel.js');
+const UserModel = require('../models/userModel.js');
 
 const { render } = require("ejs");
 const { currentUser, requireAuth } = require("../middleware/authMiddware");
-const productModel = require('../models/productModel.js');
-const UserModel = require('../models/userModel.js');
+
 
 function calculateTotal(cartItems) {
     var total = cartItems.reduce((total, item) => {

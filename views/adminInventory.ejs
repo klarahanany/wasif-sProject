@@ -6,7 +6,9 @@
 
   <main>
     <h1>Product Management</h1>
- 
+    <form id="formDownload" action="/admin/inventory/downloadProductsData" method="get">
+      <button type="submit">Download Products Data</button>
+    </form>
     <!-- Buttons for Update, Delete, and Add -->
     <div>
       <button id="addBtn" onclick="showAddForm()">add product</button>
@@ -175,7 +177,17 @@
   <script>
     var products1 = `<%- JSON.stringify(products) %>`;
     var products = JSON.parse(products1);
-    document.getElementById("productManage").style.backgroundColor="#f9df4b"
+    var admin1 = `<%- JSON.stringify(admin) %>`;
+    var admin = JSON.parse(admin1);
+    if (admin.role == "mainadmin") {
+
+      document.getElementById("formDownload").style.display = "block";
+    } else if (admin.role == "admin") {
+
+      document.getElementById("formDownload").style.display = "none";
+
+    }
+    document.getElementById("productManage").style.backgroundColor = "#f9df4b"
     const formUpdate = document.getElementById("formUpdate");
     formUpdate.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -346,20 +358,20 @@
       }
     }
     document.getElementById("searchBar").addEventListener("keyup", (e) => {
-    const searchData = e.target.value.toLowerCase();
-    const filteredData = products.filter((item) => {
-      return item.name.toLowerCase().includes(searchData);
-    });
+      const searchData = e.target.value.toLowerCase();
+      const filteredData = products.filter((item) => {
+        return item.name.toLowerCase().includes(searchData);
+      });
 
-    products.forEach((pro) => {
-      const userElement = document.getElementById(`${pro._id}`);
-      if (filteredData.includes(pro)) {
-        userElement.style.display = "table-row";
-      } else {
-        userElement.style.display = "none";
-      }
+      products.forEach((pro) => {
+        const userElement = document.getElementById(`${pro._id}`);
+        if (filteredData.includes(pro)) {
+          userElement.style.display = "table-row";
+        } else {
+          userElement.style.display = "none";
+        }
+      });
     });
-  });
   </script>
 
   <%- include('partials/footer'); -%>

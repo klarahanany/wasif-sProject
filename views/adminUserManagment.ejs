@@ -6,16 +6,16 @@
 
     <body>
         <h1>User Management</h1>
-        <div class="searchBarContainer">
-            <input id="searchBar" type="text" placeholder="Search.." />
-            <i class="fa-solid fa-magnifying-glass"></i>
-        </div>
+        <form id="formDownload" action="/admin/usermanagment/downloadUserData" method="get" >
+            <button type="submit" >Download Users Data</button>
+        </form>
+     
 
         <div class="addDelButtons">
             <button onclick="addFormDisplay()" id="addNewAdmin">add new admin</button>
             <button onclick="deleteFormDisplay()" id="deleteAdmin">delete admin</button>
         </div>
-
+        
         <form id="addFormDisplay" style="display: none">
             <a href="" onclick="formClose()" style="float: right"><i class="fa-solid fa-x"></i></a>
 
@@ -64,6 +64,11 @@
 
             <p id="successStatusDelete" style="color: green; font-weight: bold"></p>
         </form>
+        <h2 style="margin-top: 10px;">Users List</h2>
+        <div class="searchBarContainer">
+            <input id="searchBar" type="text" placeholder="Search.." />
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
         <div class="usermanagment">
             <table>
                 <thead>
@@ -125,9 +130,12 @@
         if (admin.role == "mainadmin") {
             document.getElementById("addNewAdmin").style.display = "block";
             document.getElementById("deleteAdmin").style.display = "block";
+            document.getElementById("formDownload").style.display = "block";
         } else if (admin.role == "admin") {
             document.getElementById("addNewAdmin").style.display = "none";
             document.getElementById("deleteAdmin").style.display = "none";
+            document.getElementById("formDownload").style.display = "none";
+
         }
         function addFormDisplay() {
             document.getElementById("addFormDisplay").style.display = "block";

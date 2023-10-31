@@ -12,7 +12,9 @@ const orderModel = require('../models/orderModel.js')
 const cartModel = require('../models/cartModel.js')
 const multer = require('multer');
 const path = require('path')
-
+const json2xls = require('json2xls');
+const tmp = require('tmp');
+const fs = require('fs');
 // Set up Multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -136,6 +138,57 @@ router.get('/inventory', requireAuthAdmin, async (req, res) => {
     }
     res.render('adminInventory', { products, options })
 });
+// Add the route to download data as JSON
+router.get('/inventory/downloadProductsData', async (req, res) => {
+    try {
+        // Fetch data from MongoDB
+        const data = await productModel.find({});
+        
+             // Convert specific fields to Excel format
+             const xls = json2xls(
+              
+                data.map(item => {
+                    return {
+                        // Include the specific fields you want in the Excel file
+                        'Product Name': item.name,
+                        'Product Description': item.description,
+                        'Product Category': item.category,
+                        'Product Quantity': item.quantity,
+                        'Product Price': item.price,
+                        // Add more fields as needed
+                    };
+                })
+            );
+    
+            // Create a temporary file
+            tmp.file((err, tempFilePath) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Internal Server Error');
+                }
+    
+                // Write the Excel data to the temporary file
+                fs.writeFileSync(tempFilePath, xls, 'binary');
+    
+                // Set response headers for downloading
+                res.setHeader('Content-disposition', 'attachment; filename=data.xlsx');
+                res.setHeader('Content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    
+                // Stream the file to the client
+                res.sendFile(tempFilePath, (err) => {
+                    // Remove the temporary file after it has been sent
+                    fs.unlinkSync(tempFilePath);
+                    if (err) {
+                        console.error(err);
+                        res.status(500).send('Internal Server Error');
+                    }
+                });
+            });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 router.post('/inventory/update-product', upload.single("image"), async (req, res) => {
     console.log(req.body)
     const { selectName, description, price, quantity, selectOption } = req.body
@@ -247,6 +300,59 @@ router.get('/usermanagment', requireAuthAdmin, async (req, res) => {
         const users = await userModel.find({ role: { $in: ['normal'] } })
 
         res.render('adminUserManagment', { users })
+    }
+});
+// Add the route to download data as JSON
+router.get('/usermanagment/downloadUserData', async (req, res) => {
+    try {
+        // Fetch data from MongoDB
+        const data = await userModel.find({ role: { $in: ['normal'] } });
+        
+             // Convert specific fields to Excel format
+             const xls = json2xls(
+              
+                data.map(item => {
+                    var isBlocked=item.isBlocked?'Blocked':'Active'
+                    return {
+                        // Include the specific fields you want in the Excel file
+                        'Username': item.username,
+                        'First Name': item.firstname,
+                        'Last Name': item.lastname,
+                        'Birth Date': item.birthday,
+                        'Status': isBlocked,
+                        'Role': item.role,
+                        // Add more fields as needed
+                    };
+                })
+            );
+    
+            // Create a temporary file
+            tmp.file((err, tempFilePath) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Internal Server Error');
+                }
+    
+                // Write the Excel data to the temporary file
+                fs.writeFileSync(tempFilePath, xls, 'binary');
+    
+                // Set response headers for downloading
+                res.setHeader('Content-disposition', 'attachment; filename=data.xlsx');
+                res.setHeader('Content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    
+                // Stream the file to the client
+                res.sendFile(tempFilePath, (err) => {
+                    // Remove the temporary file after it has been sent
+                    fs.unlinkSync(tempFilePath);
+                    if (err) {
+                        console.error(err);
+                        res.status(500).send('Internal Server Error');
+                    }
+                });
+            });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
 });
 router.post('/usermanagment/block-user/:userId', async (req, res) => {
@@ -496,11 +602,6 @@ router.get('/revenue', requireAuthAdmin, async (req, res) => {
         var wineMostSold = getMostSoldProduct(wineProducts)
         var beerMostSold = getMostSoldProduct(beerProducts)
         var alcoholMostSold = getMostSoldProduct(alcoholProducts)
-        console.log(wineMostSold)
-        console.log(alcoholMostSold)
-        console.log(accessoriesMostSold)
-        console.log( beerMostSold)
-
         res.render('adminRevenue', { revenueData, alcoholMostSold, wineMostSold, beerMostSold, accessoriesMostSold })
     } catch (err) {
         console.error('Error:', err);

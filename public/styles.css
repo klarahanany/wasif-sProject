@@ -697,7 +697,7 @@ select {
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 30%;
+  width: 21.74%;
   height: 250px;
   background: linear-gradient(45deg, #f9d929, #fcefa5, #FFFFFF);
   overflow: hidden;
@@ -891,6 +891,19 @@ footer {
 .revenueImage{
   width: 250px;
   height: 200px;
+}
+#formDownload{
+  height: 20px;
+  background: none;
+  box-shadow: none;
+  text-align: left;
+  margin-left: -27px;
+  margin-bottom: 20px;
+  margin-top: 0px;
+}
+#formDownload button{
+  margin-top: 10px;
+
 }
 @media screen and (max-width: 600px) {
 
