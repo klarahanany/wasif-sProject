@@ -15,6 +15,7 @@ const path = require('path')
 const json2xls = require('json2xls');
 const tmp = require('tmp');
 const fs = require('fs');
+const xlsx = require('xlsx');
 // Set up Multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -143,47 +144,48 @@ router.get('/inventory/downloadProductsData', async (req, res) => {
     try {
         // Fetch data from MongoDB
         const data = await productModel.find({});
-        
-             // Convert specific fields to Excel format
-             const xls = json2xls(
-              
-                data.map(item => {
-                    return {
-                        // Include the specific fields you want in the Excel file
-                        'Product Name': item.name,
-                        'Product Description': item.description,
-                        'Product Category': item.category,
-                        'Product Quantity': item.quantity,
-                        'Product Price': item.price,
-                        // Add more fields as needed
-                    };
-                })
-            );
-    
-            // Create a temporary file
-            tmp.file((err, tempFilePath) => {
+
+        // Convert specific fields to Excel format
+        const xls = json2xls(
+
+            data.map(item => {
+                return {
+                    // Include the specific fields you want in the Excel file
+                    'image': item.image,
+                    'name': item.name,
+                    'description': item.description,
+                    'category': item.category,
+                    'quantity': item.quantity,
+                    'price': item.price,
+                    // Add more fields as needed
+                };
+            })
+        );
+
+        // Create a temporary file
+        tmp.file((err, tempFilePath) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Internal Server Error');
+            }
+
+            // Write the Excel data to the temporary file
+            fs.writeFileSync(tempFilePath, xls, 'binary');
+
+            // Set response headers for downloading
+            res.setHeader('Content-disposition', 'attachment; filename=data.xlsx');
+            res.setHeader('Content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+            // Stream the file to the client
+            res.sendFile(tempFilePath, (err) => {
+                // Remove the temporary file after it has been sent
+                fs.unlinkSync(tempFilePath);
                 if (err) {
                     console.error(err);
-                    return res.status(500).send('Internal Server Error');
+                    res.status(500).send('Internal Server Error');
                 }
-    
-                // Write the Excel data to the temporary file
-                fs.writeFileSync(tempFilePath, xls, 'binary');
-    
-                // Set response headers for downloading
-                res.setHeader('Content-disposition', 'attachment; filename=data.xlsx');
-                res.setHeader('Content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    
-                // Stream the file to the client
-                res.sendFile(tempFilePath, (err) => {
-                    // Remove the temporary file after it has been sent
-                    fs.unlinkSync(tempFilePath);
-                    if (err) {
-                        console.error(err);
-                        res.status(500).send('Internal Server Error');
-                    }
-                });
             });
+        });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -306,50 +308,50 @@ router.get('/usermanagment', requireAuthAdmin, async (req, res) => {
 router.get('/usermanagment/downloadUserData', async (req, res) => {
     try {
         // Fetch data from MongoDB
-        const data = await userModel.find({ role: { $in: ['normal'] } });
-        
-             // Convert specific fields to Excel format
-             const xls = json2xls(
-              
-                data.map(item => {
-                    var isBlocked=item.isBlocked?'Blocked':'Active'
-                    return {
-                        // Include the specific fields you want in the Excel file
-                        'Username': item.username,
-                        'First Name': item.firstname,
-                        'Last Name': item.lastname,
-                        'Birth Date': item.birthday,
-                        'Status': isBlocked,
-                        'Role': item.role,
-                        // Add more fields as needed
-                    };
-                })
-            );
-    
-            // Create a temporary file
-            tmp.file((err, tempFilePath) => {
+        const data = await userModel.find({ role: { $in: ['normal', 'admin'] } });
+
+        // Convert specific fields to Excel format
+        const xls = json2xls(
+
+            data.map(item => {
+                var isBlocked = item.isBlocked ? 'Blocked' : 'Active'
+                return {
+                    // Include the specific fields you want in the Excel file
+                    'Username': item.username,
+                    'First Name': item.firstname,
+                    'Last Name': item.lastname,
+                    'Birth Date': item.birthday,
+                    'Status': isBlocked,
+                    'Role': item.role,
+                    // Add more fields as needed
+                };
+            })
+        );
+
+        // Create a temporary file
+        tmp.file((err, tempFilePath) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Internal Server Error');
+            }
+
+            // Write the Excel data to the temporary file
+            fs.writeFileSync(tempFilePath, xls, 'binary');
+
+            // Set response headers for downloading
+            res.setHeader('Content-disposition', 'attachment; filename=data.xlsx');
+            res.setHeader('Content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+            // Stream the file to the client
+            res.sendFile(tempFilePath, (err) => {
+                // Remove the temporary file after it has been sent
+                fs.unlinkSync(tempFilePath);
                 if (err) {
                     console.error(err);
-                    return res.status(500).send('Internal Server Error');
+                    res.status(500).send('Internal Server Error');
                 }
-    
-                // Write the Excel data to the temporary file
-                fs.writeFileSync(tempFilePath, xls, 'binary');
-    
-                // Set response headers for downloading
-                res.setHeader('Content-disposition', 'attachment; filename=data.xlsx');
-                res.setHeader('Content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    
-                // Stream the file to the client
-                res.sendFile(tempFilePath, (err) => {
-                    // Remove the temporary file after it has been sent
-                    fs.unlinkSync(tempFilePath);
-                    if (err) {
-                        console.error(err);
-                        res.status(500).send('Internal Server Error');
-                    }
-                });
             });
+        });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -480,7 +482,62 @@ router.get('/allOrders', requireAuthAdmin, async (req, res) => {
     }
     // const orders = await orderModel.find()
 });
+// Add the route to download data as JSON
+router.get('/allOrders/downloadOrdersData', async (req, res) => {
+    try {
+        // Fetch data from MongoDB
+        const data = await orderModel.find({});
 
+        // Convert specific fields to Excel format
+        const xls = json2xls(
+            await Promise.all(
+                data.map(async (item) => {
+                    const userdata = await userModel.findOne({ _id: item.userId });
+                    console.log(userdata);
+
+                    return {
+                        // Include the specific fields you want in the Excel file
+                        'Order Date': item.order_date,
+                        'username': userdata.username,
+                        'Total Amount': item.total_amount,
+                        'Payment Method': item.payment.payment_method,
+                        'Order Details': item.items,
+                        // Add more fields as needed
+                    };
+                })
+            )
+        );
+
+
+        // Create a temporary file
+        tmp.file((err, tempFilePath) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Internal Server Error');
+            }
+
+            // Write the Excel data to the temporary file
+            fs.writeFileSync(tempFilePath, xls, 'binary');
+
+            // Set response headers for downloading
+            res.setHeader('Content-disposition', 'attachment; filename=data.xlsx');
+            res.setHeader('Content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+            // Stream the file to the client
+            res.sendFile(tempFilePath, (err) => {
+                // Remove the temporary file after it has been sent
+                fs.unlinkSync(tempFilePath);
+                if (err) {
+                    console.error(err);
+                    res.status(500).send('Internal Server Error');
+                }
+            });
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 router.post('/allOrders/update-status/:id', async (req, res) => {
     console.log(req.params)
     var id = req.params.id

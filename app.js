@@ -4,6 +4,7 @@ const Review = require('./models/Review'); // Assuming you have a Review model
 const UserModel = require('./models/userModel.js');
 const productModel = require('./models/productModel.js')
 const multer = require('multer');
+const xlsx = require('xlsx');
 const authRoutes = require('./routes/authRoutes')
 const orderNowRoutes = require('./routes/orderNowRoutes')
 const profileRoutes = require('./routes/profileRoutes')
@@ -112,6 +113,7 @@ function getMostSoldProduct(products) {
 
   return mostSoldProduct;
 }
+
 app.get('/smoothies', requireAuth, (req, res) => res.render('smoothies'));
 app.use('/profile', profileRoutes)
 app.use('/reviews', reviewRoutes)
