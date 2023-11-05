@@ -81,7 +81,15 @@
         <% } %>
           <script>
             document.getElementById("orderManage").style.backgroundColor = "#f9df4b"
+            var admin1 = `<%- JSON.stringify(admin) %>`;
+            var admin = JSON.parse(admin1);
+            if (admin.role == "mainadmin") {
 
+              document.getElementById("formDownload").style.display = "block";
+            } else if (admin.role == "admin") {
+  
+              document.getElementById("formDownload").style.display = "none";
+            }
             async function MarkasReady(event) {
               event.preventDefault();
               const status = document.getElementById("status");

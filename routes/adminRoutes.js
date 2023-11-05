@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { render } = require("ejs");
 const { currentUser, requireAuthAdmin } = require("../middleware/authMiddware");
+const Review = require('../models/Review'); // Assuming you have a Review model
 const productModel = require('../models/productModel.js');
 const userModel = require('../models/userModel.js')
 const orderModel = require('../models/orderModel.js')
@@ -93,6 +94,31 @@ router.get('/logout', async (req, res) => {
 })
 router.get('/loginErrorAdmin', (req, res) => {
     res.render('loginErrorAdmin')
+})
+router.get('/reviews', requireAuthAdmin, async (req, res) => {
+    try {
+        const reviews = await Review.find({})
+        res.render('adminReviews', { reviews })
+    } catch (err) {
+        console.error('Error:', err);
+    }
+
+});
+router.post('/reviews/deleteItem', async (req, res) => { //to display the UI
+    const ReviewId = req.body.ReviewId
+    try {
+        const removedItem = await Review.findByIdAndRemove(ReviewId);
+
+        if (removedItem) {
+            console.log(`Item with ID ${ReviewId} removed successfully.`);
+            res.json('DONE')
+        } else {
+            console.log(`Item with ID ${ReviewId} not found.`);
+        }
+    } catch (err) {
+        console.error(err);
+        // Handle the error (e.g., send an error response)
+    }
 })
 router.get('/', (req, res) => { //to display the UI
     res.render('adminLogin')
