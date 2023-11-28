@@ -61,11 +61,12 @@ const signup_post = async (req, res) => {
     const firstname = req.body.firstname
     const lastname = req.body.lastname
     const birthday = req.body.birthday
+    const phoneNumber = req.body.phone
+
     try {
         if (isOver21(birthday) == true) {
             console.log(password)
-            const user = await userModel.create({ username, email, password, firstname, lastname, birthday });
-            console.log(user.password)
+            const user = await userModel.create({ username, email, password, firstname, lastname, birthday ,phoneNumber});
             const token = createToken(user._id)
             res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
             res.status(201).json({ user: user._id }) // send back to frontend as json body

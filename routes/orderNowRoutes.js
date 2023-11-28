@@ -53,7 +53,6 @@ router.get('/product/:id', requireAuth, async (req, res) => {
 router.post('/add-to-cart', async (req, res) => {
     const productId = req.body.drinkId.trim();; // Replace with the actual product ID
     const quantity = req.body.quantity; // Set the quantity as needed
-    // const user =res.locals.user;
     const userId = req.body.userId.trim();
     try {
         // Find the user's cart by user ID

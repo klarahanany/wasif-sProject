@@ -20,14 +20,10 @@ router.get('/', requireAuth, async (req, res) => {
     }
 });
 router.post('/', async (req, res) => {
-    const { username, password, firstname, lastName, birthday, email } = req.body
-    console.log(username)
+    const { username, password, firstname, lastName, birthday, email,phoneNumber } = req.body
     const currentuser = await userModel.findOne({username:username})
-    console.log(currentuser)
     var id =currentuser._id;
     const user = await userModel.findOne({email:email,_id: { $ne: id} })
-    console.log(currentuser._id)
-    console.log(user)
     if(user){
         res.status(400).json({ status: 'emailAlreadyExist' })
     }
@@ -35,7 +31,7 @@ router.post('/', async (req, res) => {
         try {
             userModel.findOneAndUpdate(
                 { username: username },
-                { email: email, firstname: firstname, lastname: lastName, birthday: birthday },
+                { email: email, firstname: firstname, lastname: lastName, birthday: birthday,phoneNumber:phoneNumber },
                 { new: true, useFindAndModify: false }
             )
                 .then(updatedProduct => {

@@ -24,6 +24,10 @@
     <label for="email">Email</label>
     <input type="text" name="email" placeholder="Enter your email" required />
     <div class="email error"></div>
+ 
+    <label for="phoneNumber">Phone Number:</label>
+    <input type="tel" id="phoneNumber" name="phone" pattern="[0-9]{10}" required>
+    <div class="phone error"></div>
 
     <!-- Birth date -->
     <label for="birthday">Birth Date</label>
@@ -74,6 +78,8 @@
         passwordError.textContent = "";
         usernameError.textContent = "";
         birthdayError.textContent = "";
+        passwordStrong.textContent = "";
+        passwordNotStrong.textContent = "";
 
         // Get the form values.
         const username = form.username.value;
@@ -83,6 +89,7 @@
         const firstname = form.firstname.value;
         const lastname = form.lastname.value;
         const birthday = form.birthday.value;
+        const phone = form.phone.value;
 
         // Validate the birth date.
         if (!isDateBeforeToday(birthday)) {
@@ -108,6 +115,7 @@
             firstname,
             lastname,
             birthday,
+            phone
           }),
           headers: { "Content-type": "application/json" },
         });

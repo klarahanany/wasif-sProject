@@ -13,6 +13,15 @@
         <form id="formDownload" action="/admin/allOrders/downloadOrdersData" method="get">
           <button type="submit">Download Orders Data</button>
         </form>
+        <label class="filterLabel">Filter by Status:</label>
+        <form id="statusFilterForm" dir="ltr" class="filter-form">
+          <label>
+            <input id="Ready" type="checkbox" name="category" value="ready">Ready
+          </label>
+          <label>
+            <input id="Pending" type="checkbox" name="category" value="pending">Pending
+          </label>
+        </form>
         <p id="status" style="color: red"></p>
         <table>
           <thead>
@@ -30,7 +39,7 @@
           </thead>
           <tbody>
             <% orders.forEach(order=> { %>
-              <tr>
+              <tr id="<%=order._id%>">
                 <td>
                   <%= order.order_date.toLocaleDateString() %>
                 </td>
@@ -81,13 +90,15 @@
         <% } %>
           <script>
             document.getElementById("orderManage").style.backgroundColor = "#f9df4b"
+            var orders1 = `<%- JSON.stringify(orders) %>`;
+            var orders = JSON.parse(orders1);
             var admin1 = `<%- JSON.stringify(admin) %>`;
             var admin = JSON.parse(admin1);
             if (admin.role == "mainadmin") {
 
               document.getElementById("formDownload").style.display = "block";
             } else if (admin.role == "admin") {
-  
+
               document.getElementById("formDownload").style.display = "none";
             }
             async function MarkasReady(event) {
@@ -111,6 +122,41 @@
                 window.location.reload();
               }
             }
+            const statusFilterForm = document.getElementById('statusFilterForm');
+
+            statusFilterForm.addEventListener('change', () => {
+              const selectedstatus = Array.from(statusFilterForm.querySelectorAll('input[name="category"]:checked')).map(input => input.value);
+              if (selectedstatus.length > 0) {
+
+                filteredData = []
+                console.log(selectedstatus)
+                orders.forEach((order) => {
+                  console.log(order.status)
+                  if (selectedstatus.includes(order.status)) {
+                    filteredData.push(order)
+                  }
+                })
+                orders.forEach((order) => {
+                  const orderElement = document.getElementById(`${order._id}`);
+                  if (filteredData.includes(order)) {
+                    orderElement.style.display = "table-row";
+                  } else {
+                    orderElement.style.display = "none";
+                  }
+                });
+              }
+              else {
+                orders.forEach((order) => {
+                  const orderElement = document.getElementById(`${order._id}`);
+                  orderElement.style.display = "table-row";
+
+                });
+              }
+
+
+
+
+            });
           </script>
   </body>
 
