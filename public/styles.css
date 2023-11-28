@@ -869,6 +869,17 @@ footer {
   display: inline-block;
   margin-right: 10px;
 }
+.addDelUpdateProduct {
+  display: flex;
+  /* Adjust the alignment as needed */
+}
+
+#addBtn,
+#deleteBtn,
+#updateBtn{
+  display: inline-block;
+  margin-right: 10px;
+}
 .searchBarContainer{
   width: 300px;
   background-color: #eee;
