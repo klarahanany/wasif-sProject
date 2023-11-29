@@ -6,16 +6,16 @@
 
     <body>
         <h1>User Management</h1>
-        <form id="formDownload" action="/admin/usermanagment/downloadUserData" method="get" >
-            <button type="submit" >Download Users Data</button>
+        <form id="formDownload" action="/admin/usermanagment/downloadUserData" method="get">
+            <button type="submit">Download Users Data</button>
         </form>
-     
+
 
         <div class="addDelButtons">
-            <button onclick="addFormDisplay()" id="addNewAdmin">add new admin</button>
-            <button onclick="deleteFormDisplay()" id="deleteAdmin">delete admin</button>
+            <button onclick="addFormDisplay()" id="addNewAdmin">add new Worker</button>
+            <button onclick="deleteFormDisplay()" id="deleteAdmin">delete Worker</button>
         </div>
-        
+
         <form id="addFormDisplay" style="display: none">
             <a href="" onclick="formClose()" style="float: right"><i class="fa-solid fa-x"></i></a>
 
@@ -43,7 +43,7 @@
             <input type="password" name="confirmPassword" required />
             <div class="password error"></div>
 
-            <button type="submit">Add Admin</button>
+            <button type="submit">Add Worker</button>
             <p id="successStatus" style="color: green; font-weight: bold"></p>
         </form>
 
@@ -51,8 +51,8 @@
             <a href="" onclick="formClose()" style="float: right"><i class="fa-solid fa-x"></i></a>
             <label for="username">Username</label>
             <select name="admins" id="alladmins">
-                <option value="selectAdmin">select admin to delete</option>
-                <% users.forEach(function(option) { if(option.role=='admin' ){%>
+                <option value="selectAdmin">select Worker to delete</option>
+                <% users.forEach(function(option) { if(option.role=='worker' ){%>
                     <option value="<%= option.username %>">
                         <%= option.username %>
                     </option>
@@ -60,7 +60,7 @@
             </select>
             <p id="failStatusDelete" style="color: red; font-weight: bold"></p>
 
-            <button type="submit">Delete Admin</button>
+            <button type="submit">Delete Worker</button>
 
             <p id="successStatusDelete" style="color: green; font-weight: bold"></p>
         </form>
@@ -131,7 +131,7 @@
             document.getElementById("addNewAdmin").style.display = "block";
             document.getElementById("deleteAdmin").style.display = "block";
             document.getElementById("formDownload").style.display = "block";
-        } else if (admin.role == "admin") {
+        } else if (admin.role == "worker") {
             document.getElementById("addNewAdmin").style.display = "none";
             document.getElementById("deleteAdmin").style.display = "none";
             document.getElementById("formDownload").style.display = "none";
@@ -159,7 +159,6 @@
         const birthdayError = document.querySelector(".birthday.error");
         formadd.addEventListener("submit", async (e) => {
             e.preventDefault();
-            console.log("what2");
             //reset errors
             emailError.textContent = "";
             passwordError.textContent = "";
@@ -189,7 +188,19 @@
                 //after getting response from the server
                 const data = await res.json();
                 if (data == "done") {
-                    document.getElementById("successStatus").textContent = "admin added successfully";
+                    document.getElementById("successStatus").textContent = "worker added successfully";
+                    emailError.textContent = "";
+                    passwordError.textContent = "";
+                    usernameError.textContent = "";
+                    birthdayError.textContent = "";
+                    formadd.username.value = '';
+                    formadd.email.value = '';
+                    formadd.password.value = '';
+                    formadd.confirmPassword.value = '';
+                    formadd.firstname.value = '';
+                    formadd.lastname.value ='';
+                    formadd.birthday.value = '';
+
                 }
                 if (data.error) {
                     // passwordError.textContent = data.error.password
@@ -205,7 +216,7 @@
             const adminUsername = document.getElementById("alladmins");
             if (adminUsername.value == "selectAdmin") {
                 console.log("what");
-                usernameError2.textContent = "please choose an admin to delete";
+                usernameError2.textContent = "please choose an worker to delete";
             } else {
                 //api call from frontend to server, sending data from form to server to save in db
                 const res = await fetch("/admin/usermanagment/deleteadmin", {
@@ -217,7 +228,7 @@
                 //after getting response from the server
                 const data = await res.json();
                 if (data == "done") {
-                    document.getElementById("successStatusDelete").textContent = "admin deleted successfully";
+                    document.getElementById("successStatusDelete").textContent = "worker deleted successfully";
                     adminUsername.value = "selectAdmin";
                 }
             }

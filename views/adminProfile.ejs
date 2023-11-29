@@ -1,175 +1,185 @@
 <%- include('partials/headerAdmin'); -%>
 
     <head>
-        <title>Admin Profile</title>
+        <% if (admin.role=="mainadmin" ) { %>
+            <title>Admin Profile</title>
+            <% } else { %>
+                <title>Worker Profile</title>
+                <% } %>
     </head>
 
     <body>
-        <h1>User Profile</h1>
-
-        <% if (admin) { %>
-
-            <h2 style="text-align: center;">Your Information</h2>
-            <form action="/update-profile">
-                <label for="username">Username:
-                    <label id="username"><%= admin.username %></label>
-                </label>
-
-                <label for="firstName">First Name:</label>
-                <input type="text" id="firstName" name="firstName" value="<%= admin.firstname %>" required>
-
-                <label for="lastName">Last Name:</label>
-                <input type="text" id="lastName" name="lastName" value="<%= admin.lastname %>" required>
-
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="<%= admin.email %>" required>
-                <div class="email error"></div>
-
-
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password">
-                <div class="password strong"></div>
-                <div class="password notStrong"></div>
-
-                <label for="birthday">Birthday:</label>
-                <input type="date" id="birthday" name="birthday" onchange="isDateBeforeToday()"
-                    value="<%= admin.birthday %>" required>
-                <div class="birthday error"></div>
-
-                <button type="submit">Update Profile</button>
-                <p id="status" style="color: green; font-weight: bold;"></p>
-
-            </form>
+        <% if (admin.role=="mainadmin" ) { %>
+            <h1>Admin Profile</h1>
             <% } else { %>
-                <p>User not found.</p>
+                <h1>Worker Profile</h1>
                 <% } %>
-                    <%- include('partials/footer'); -%>
-                        <script>
-                            document.getElementById("profileManage").style.backgroundColor = "#f9df4b"
 
-                            // Get the password strong element.
-                            const passwordStrong = document.querySelector(".password.strong");
-                            // Get the password not strong element.
-                            const passwordNotStrong = document.querySelector(".password.notStrong");
+                    <% if (admin) { %>
 
-                            var user1 = `<%- JSON.stringify(admin) %>`;
-                            var user = JSON.parse(user1);
-                            var birthdayDate = user.birthday
-                            const formattedDate = birthdayDate.toString().split('T')[0];
-                            // Set the value of the date input
-                            document.getElementById('birthday').value = formattedDate;
-                            const form = document.querySelector('form');
-                            form.addEventListener('submit', async (e) => {
-                                e.preventDefault();
-                                const username = document.getElementById('username').textContent
-                                const password = form.password.value;
-                                const firstname = form.firstName.value;
-                                const lastName = form.lastName.value;
-                                const birthday = form.birthday.value;
-                                const email = form.email.value;
-                                const birthdayError = document.querySelector('.birthday.error')
-                                const emailError = document.querySelector('.email.error')
+                        <h2 style="text-align: center;">Your Information</h2>
+                        <form action="/update-profile">
+                            <label for="username">Username:
+                                <label id="username">
+                                    <%= admin.username %>
+                                </label>
+                            </label>
 
-                                if (!isDateBeforeToday(birthday)) {
-                                    birthdayError.textContent = 'Choose Relevant Birthday'
-                                    document.getElementById("status").textContent = ""
-                                    emailError.textContent = ''
-                                }
+                            <label for="firstName">First Name:</label>
+                            <input type="text" id="firstName" name="firstName" value="<%= admin.firstname %>" required>
 
-                                else if (checkPasswordStrength(password) == "Password is strong!" || checkPasswordStrength(password) == "") {
-                                    const res = await fetch('/profile', {
-                                        method: 'POST',
-                                        body: JSON.stringify({ username, password, firstname, lastName, birthday, email }),
-                                        headers: { 'Content-type': 'application/json' }
-                                    })
+                            <label for="lastName">Last Name:</label>
+                            <input type="text" id="lastName" name="lastName" value="<%= admin.lastname %>" required>
 
-                                    //after getting response from the server
-                                    const data = await res.json()
-                                    if (data.status == 'done') {
-                                        document.getElementById("status").textContent = "Your Data Has Been Updated"
-                                        birthdayError.textContent = ''
-                                        emailError.textContent = ''
-
-                                    }
-                                    else if (data.status = 'emailAlreadyExist') {
-                                        document.getElementById("status").textContent = ""
-                                        birthdayError.textContent = ''
-                                        emailError.textContent = 'This Email Already Exist'
-                                    }
-                                }
-                                else if (checkPasswordStrength(password) != "Password is strong!") {
-                                    alert(checkPasswordStrength(password));
-                                }
-
-                            })
-                            const password = document.getElementById("password")
-                            password.addEventListener('keyup', () => {
-                                if (checkPasswordStrength(password.value) != "Password is strong!") {
-                                    passwordNotStrong.textContent = checkPasswordStrength(password.value)
-                                    passwordStrong.textContent = ""
-                                }
-                                else {
-                                    passwordStrong.textContent = checkPasswordStrength(password.value)
-                                    passwordNotStrong.textContent = ""
-                                }
-                            })
-                            function isDateBeforeToday(dateString) {
-                                // Parse the provided date string into a Date object
-                                const providedDate = new Date(dateString);
-                                // Get the current date
-                                const currentDate = new Date();
-                                // Set hours, minutes, seconds, and milliseconds to 0 for both dates
-                                providedDate.setHours(0, 0, 0, 0);
-                                currentDate.setHours(0, 0, 0, 0);
-                                // Compare the two dates
-                                return providedDate <= currentDate;
-                            }
-                            function isOver21(birthdate) {
-                                // Parse the birthdate string into a Date object
-                                const birthDateObject = new Date(birthdate);
-                                // Get the current date
-                                const currentDate = new Date();
-                                // Calculate the age
-                                const age = currentDate.getFullYear() - birthDateObject.getFullYear();
-                                // Check if the birthday has occurred for this year
-                                const hasBirthdayOccurred = (
-                                    currentDate.getMonth() > birthDateObject.getMonth() ||
-                                    (currentDate.getMonth() === birthDateObject.getMonth() &&
-                                        currentDate.getDate() >= birthDateObject.getDate())
-                                );
-
-                                // If the birthday has not occurred yet, subtract 1 from the age
-                                const finalAge = hasBirthdayOccurred ? age : age - 1;
-
-                                // Check if the age is greater than or equal to 21
-                                return finalAge >= 21;
-                            }
-                            // Function to check password strength
-                            function checkPasswordStrength(password) {
-                                const minLength = 6;
-                                const minUpperCase = 1;
-                                const minLowerCase = 1;
-                                const minNumbers = 1;
-                                if (password.length == 0) {
-                                    return "";
-                                }
-                                if (password.length < minLength) {
-                                    return "Password must be at least 8 characters long.";
-                                }
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" value="<%= admin.email %>" required>
+                            <div class="email error"></div>
 
 
-                                if (password.replace(/[^A-Z]/g, "").length < minUpperCase) {
-                                    return "Password must contain at least one uppercase letter.";
-                                }
+                            <label for="password">Password:</label>
+                            <input type="password" id="password" name="password">
+                            <div class="password strong"></div>
+                            <div class="password notStrong"></div>
 
-                                if (password.replace(/[^a-z]/g, "").length < minLowerCase) {
-                                    return "Password must contain at least one lowercase letter.";
-                                }
+                            <label for="birthday">Birthday:</label>
+                            <input type="date" id="birthday" name="birthday" onchange="isDateBeforeToday()"
+                                value="<%= admin.birthday %>" required>
+                            <div class="birthday error"></div>
 
-                                if (password.replace(/[^0-9]/g, "").length < minNumbers) {
-                                    return "Password must contain at least one number.";
-                                }
+                            <button type="submit">Update Profile</button>
+                            <p id="status" style="color: green; font-weight: bold;"></p>
 
-                                return "Password is strong!"; // Password meets all criteria
-                            };
-                        </script>
+                        </form>
+                        <% } else { %>
+                            <p>User not found.</p>
+                            <% } %>
+                                <%- include('partials/footer'); -%>
+                                    <script>
+                                        document.getElementById("profileManage").style.backgroundColor = "#f9df4b"
+
+                                        // Get the password strong element.
+                                        const passwordStrong = document.querySelector(".password.strong");
+                                        // Get the password not strong element.
+                                        const passwordNotStrong = document.querySelector(".password.notStrong");
+
+                                        var user1 = `<%- JSON.stringify(admin) %>`;
+                                        var user = JSON.parse(user1);
+                                        var birthdayDate = user.birthday
+                                        const formattedDate = birthdayDate.toString().split('T')[0];
+                                        // Set the value of the date input
+                                        document.getElementById('birthday').value = formattedDate;
+                                        const form = document.querySelector('form');
+                                        form.addEventListener('submit', async (e) => {
+                                            e.preventDefault();
+                                            const username = document.getElementById('username').textContent
+                                            const password = form.password.value;
+                                            const firstname = form.firstName.value;
+                                            const lastName = form.lastName.value;
+                                            const birthday = form.birthday.value;
+                                            const email = form.email.value;
+                                            const birthdayError = document.querySelector('.birthday.error')
+                                            const emailError = document.querySelector('.email.error')
+
+                                            if (!isDateBeforeToday(birthday)) {
+                                                birthdayError.textContent = 'Choose Relevant Birthday'
+                                                document.getElementById("status").textContent = ""
+                                                emailError.textContent = ''
+                                            }
+
+                                            else if (checkPasswordStrength(password) == "Password is strong!" || checkPasswordStrength(password) == "") {
+                                                const res = await fetch('/profile', {
+                                                    method: 'POST',
+                                                    body: JSON.stringify({ username, password, firstname, lastName, birthday, email }),
+                                                    headers: { 'Content-type': 'application/json' }
+                                                })
+
+                                                //after getting response from the server
+                                                const data = await res.json()
+                                                if (data.status == 'done') {
+                                                    document.getElementById("status").textContent = "Your Data Has Been Updated"
+                                                    birthdayError.textContent = ''
+                                                    emailError.textContent = ''
+
+                                                }
+                                                else if (data.status = 'emailAlreadyExist') {
+                                                    document.getElementById("status").textContent = ""
+                                                    birthdayError.textContent = ''
+                                                    emailError.textContent = 'This Email Already Exist'
+                                                }
+                                            }
+                                            else if (checkPasswordStrength(password) != "Password is strong!") {
+                                                alert(checkPasswordStrength(password));
+                                            }
+
+                                        })
+                                        const password = document.getElementById("password")
+                                        password.addEventListener('keyup', () => {
+                                            if (checkPasswordStrength(password.value) != "Password is strong!") {
+                                                passwordNotStrong.textContent = checkPasswordStrength(password.value)
+                                                passwordStrong.textContent = ""
+                                            }
+                                            else {
+                                                passwordStrong.textContent = checkPasswordStrength(password.value)
+                                                passwordNotStrong.textContent = ""
+                                            }
+                                        })
+                                        function isDateBeforeToday(dateString) {
+                                            // Parse the provided date string into a Date object
+                                            const providedDate = new Date(dateString);
+                                            // Get the current date
+                                            const currentDate = new Date();
+                                            // Set hours, minutes, seconds, and milliseconds to 0 for both dates
+                                            providedDate.setHours(0, 0, 0, 0);
+                                            currentDate.setHours(0, 0, 0, 0);
+                                            // Compare the two dates
+                                            return providedDate <= currentDate;
+                                        }
+                                        function isOver21(birthdate) {
+                                            // Parse the birthdate string into a Date object
+                                            const birthDateObject = new Date(birthdate);
+                                            // Get the current date
+                                            const currentDate = new Date();
+                                            // Calculate the age
+                                            const age = currentDate.getFullYear() - birthDateObject.getFullYear();
+                                            // Check if the birthday has occurred for this year
+                                            const hasBirthdayOccurred = (
+                                                currentDate.getMonth() > birthDateObject.getMonth() ||
+                                                (currentDate.getMonth() === birthDateObject.getMonth() &&
+                                                    currentDate.getDate() >= birthDateObject.getDate())
+                                            );
+
+                                            // If the birthday has not occurred yet, subtract 1 from the age
+                                            const finalAge = hasBirthdayOccurred ? age : age - 1;
+
+                                            // Check if the age is greater than or equal to 21
+                                            return finalAge >= 21;
+                                        }
+                                        // Function to check password strength
+                                        function checkPasswordStrength(password) {
+                                            const minLength = 6;
+                                            const minUpperCase = 1;
+                                            const minLowerCase = 1;
+                                            const minNumbers = 1;
+                                            if (password.length == 0) {
+                                                return "";
+                                            }
+                                            if (password.length < minLength) {
+                                                return "Password must be at least 8 characters long.";
+                                            }
+
+
+                                            if (password.replace(/[^A-Z]/g, "").length < minUpperCase) {
+                                                return "Password must contain at least one uppercase letter.";
+                                            }
+
+                                            if (password.replace(/[^a-z]/g, "").length < minLowerCase) {
+                                                return "Password must contain at least one lowercase letter.";
+                                            }
+
+                                            if (password.replace(/[^0-9]/g, "").length < minNumbers) {
+                                                return "Password must contain at least one number.";
+                                            }
+
+                                            return "Password is strong!"; // Password meets all criteria
+                                        };
+                                    </script>

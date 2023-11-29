@@ -128,7 +128,7 @@ router.post('/', async (req, res) => { //to display the UI
     const password = req.body.password
     try {
         const user = await userModel.findOne({ username })
-        if (user && (user.role == 'admin' || user.role == 'mainadmin')) {
+        if (user && (user.role == 'worker' || user.role == 'mainadmin')) {
             const auth = await bcrypt.compare(password, user.password)
             if (auth) { //if password is correct after comparing
                 const token = createToken(user._id)
@@ -320,11 +320,11 @@ router.post('/inventory/add-product', upload.single("image"), async (req, res) =
 router.get('/usermanagment', requireAuthAdmin, async (req, res) => {
     const admin = res.locals.admin;
     if (admin.role == 'mainadmin') {
-        const users = await userModel.find({ role: { $in: ['admin', 'normal'] } })
+        const users = await userModel.find({ role: { $in: ['worker', 'normal'] } })
 
         res.render('adminUserManagment', { users })
     }
-    else if (admin.role == 'admin') {
+    else if (admin.role == 'worker') {
         const users = await userModel.find({ role: { $in: ['normal'] } })
 
         res.render('adminUserManagment', { users })
@@ -334,7 +334,7 @@ router.get('/usermanagment', requireAuthAdmin, async (req, res) => {
 router.get('/usermanagment/downloadUserData', async (req, res) => {
     try {
         // Fetch data from MongoDB
-        const data = await userModel.find({ role: { $in: ['normal', 'admin'] } });
+        const data = await userModel.find({ role: { $in: ['normal', 'worker'] } });
 
         // Convert specific fields to Excel format
         const xls = json2xls(
@@ -408,15 +408,15 @@ router.post('/usermanagment/block-user/:userId', async (req, res) => {
     }
 });
 router.post('/usermanagment/addadmin', async (req, res) => {
-    console.log(req.body)
     const username = req.body.username
     const email = req.body.email
     const password = req.body.password
     const firstname = req.body.firstname
     const lastname = req.body.lastname
     const birthday = req.body.birthday
+    const phoneNumber = "0000000000"
     try {
-        const user = await userModel.create({ username, email, password, firstname, lastname, birthday, role: "admin" });
+        const user = await userModel.create({ username, email, password, firstname, lastname, birthday,phoneNumber, role: "worker" });
         var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -429,8 +429,8 @@ router.post('/usermanagment/addadmin', async (req, res) => {
         var mailOptions = {
             from: 'lart0242@gmail.com',
             to: email,
-            subject: 'adding admin',
-            text: `you have an account now as an admin,
+            subject: 'adding worker',
+            text: `you have an account now as an worker,
             username: ${username}
             password: ${password}
             login here: http://localhost:3000/admin
@@ -476,7 +476,7 @@ router.post('/usermanagment/deleteadmin', async (req, res) => {
         var mailOptions = {
             from: 'lart0242@gmail.com',
             to: user.email,
-            subject: 'Deleting Admin',
+            subject: 'Deleting Worker',
             text: `Your account has been deactivated. You no longer have administrator privileges.`
         };
 
@@ -695,7 +695,6 @@ function getMostSoldProduct(products) {
         // Handle the case when the input is not a valid array or is empty
         return null;
     }
-
     // Initialize variables to keep track of the most sold product
     let mostSoldProduct = products[0]; // Assume the first product is the most sold
     let maxPurchaseQuantity = mostSoldProduct.purchaseQuantity || 0;
