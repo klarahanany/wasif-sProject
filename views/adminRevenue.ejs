@@ -7,109 +7,108 @@
   </head>
 
   <body>
-    <br>
-    <h2>Top-selling products within each category</h2>
-    <br>
-    <%if(wineMostSold){%>
-      <div id="Category1-div" class="category">
-        <strong>
-          WINE
-        </strong>:
+    <div class="containerOfRevenue">
+      <div>
         <br>
-        <img class="revenueImage" src="/<%= wineMostSold.image %>" alt="">
-        <p>name: <%= wineMostSold.name %>
-        </p>
-        <p>selling amount: <%= wineMostSold.purchaseQuantity %>
-        </p>
-      </div>
-      <%}%>
-        <%if(beerMostSold){%>
-
-          <div id="Category2-div" class="category">
+        <h4>Top-selling products within each category</h4>
+        <%if(wineMostSold){%>
+          <div id="Category1-div" class="category">
             <strong>
-              BEER
+              WINE
             </strong>:
             <br>
-            <img class="revenueImage" src="/<%= beerMostSold.image %>" alt="">
-            <p>name: <%= beerMostSold.name %>
+            <img class="revenueImage" src="/<%= wineMostSold.image %>" alt="">
+            <p>name: <%= wineMostSold.name %>
             </p>
-            <p>selling amount: <%= beerMostSold.purchaseQuantity %>
+            <p>selling amount: <%= wineMostSold.purchaseQuantity %>
             </p>
           </div>
           <%}%>
-            <%if(accessoriesMostSold){%>
+            <%if(beerMostSold){%>
 
-              <div id="Category3-div" class="category">
+              <div id="Category2-div" class="category">
                 <strong>
-                  ACCESSORIES
+                  BEER
                 </strong>:
                 <br>
-                <img class="revenueImage" src="/<%= accessoriesMostSold.image %>" alt="">
-                <p>name: <%= accessoriesMostSold.name %>
+                <img class="revenueImage" src="/<%= beerMostSold.image %>" alt="">
+                <p>name: <%= beerMostSold.name %>
                 </p>
-                <p>selling amount: <%= accessoriesMostSold.purchaseQuantity %>
+                <p>selling amount: <%= beerMostSold.purchaseQuantity %>
                 </p>
               </div>
+              <br />
               <%}%>
+                <%if(accessoriesMostSold){%>
 
-                <%if(alcoholMostSold){%>
-
-                  <div id="Category3-div" class="category">
+                  <div id="Category3-div" class="category2">
                     <strong>
-                      ALCOHOL
+                      ACCESSORIES
                     </strong>:
                     <br>
-                    <img class="revenueImage" src="/<%= alcoholMostSold.image %>" alt="">
-                    <p>name: <%= alcoholMostSold.name %>
+                    <img class="revenueImage" src="/<%= accessoriesMostSold.image %>" alt="">
+                    <p>name: <%= accessoriesMostSold.name %>
                     </p>
-                    <p>selling amount: <%= alcoholMostSold.purchaseQuantity %>
+                    <p>selling amount: <%= accessoriesMostSold.purchaseQuantity %>
                     </p>
                   </div>
                   <%}%>
-                    <br>
-                    <br>
-                    <h2>Revenue Chart</h2>
-                    <br>
-                    <div class="chart">
-                      <canvas id="revenueChart"></canvas>
-                    </div>
-                    <!-- Display divs for each category -->
 
+                    <%if(alcoholMostSold){%>
 
+                      <div id="Category3-div" class="category2">
+                        <strong>
+                          ALCOHOL
+                        </strong>:
+                        <br>
+                        <img class="revenueImage" src="/<%= alcoholMostSold.image %>" alt="">
+                        <p>name: <%= alcoholMostSold.name %>
+                        </p>
+                        <p>selling amount: <%= alcoholMostSold.purchaseQuantity %>
+                        </p>
+                      </div>
+                      <%}%>
+      </div>
+      <div class="theChart">
+        <br>
+        <h4>Revenue Chart</h4>
+        <div class="chart">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.getElementById("revenueManage").style.backgroundColor = "#f9df4b"
+      document.addEventListener('DOMContentLoaded', async function () {
+        // Replace the following with your actual data
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
 
-
-                    <script>
-                      document.getElementById("revenueManage").style.backgroundColor = "#f9df4b"
-                      document.addEventListener('DOMContentLoaded', async function () {
-                        // Replace the following with your actual data
-                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
-
-                        const revenueData1 = await '<%= JSON.stringify(revenueData) %>';
-                        var revenueData = JSON.parse(revenueData1);
-                        console.log(revenueData)
-                        const ctx = document.getElementById('revenueChart').getContext('2d');
-                        const chart = new Chart(ctx, {
-                          type: 'bar',
-                          data: {
-                            labels: months,
-                            datasets: [{
-                              label: 'Monthly Revenue',
-                              backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                              borderColor: 'rgba(75, 192, 192, 1)',
-                              borderWidth: 1,
-                              data: revenueData,
-                            }]
-                          },
-                          options: {
-                            scales: {
-                              y: {
-                                beginAtZero: true
-                              }
-                            }
-                          }
-                        });
-                      });
-                    </script>
-                    <br>
-                    <%- include('partials/footer'); -%>
+        const revenueData1 = await '<%= JSON.stringify(revenueData) %>';
+        var revenueData = JSON.parse(revenueData1);
+        console.log(revenueData)
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: months,
+            datasets: [{
+              label: 'Monthly Revenue',
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1,
+              data: revenueData,
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+    </script>
+    <br>
+    <%- include('partials/footer'); -%>
   </body>
