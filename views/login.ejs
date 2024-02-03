@@ -1,7 +1,7 @@
 <%- include('partials/header'); -%>
 
 <head>
-  <title>Login Customer</title>
+  <title>Login</title>
 </head>
 
 <form action="/login">
@@ -17,9 +17,13 @@
   <input type="password" name="password" placeholder="Enter your password" required />
   <div class="password error"></div>
 
+  <!-- Forgot Password Link -->
   <i><a href="/forgotPass">Forget password?</a></i>
 
+  <!-- Login Button -->
   <button>Login</button>
+
+  <!-- Admin/Worker Login Link -->
   <i style="margin-left: 25%">admin/worker? <a href="/admin">login here</a></i>
 </form>
 

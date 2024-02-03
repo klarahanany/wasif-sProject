@@ -5,16 +5,18 @@
 </head>
 
 <body>
-  <h1>Forgot Password</h1>
-  <p>Enter your email address below, and we'll send you a password reset link.</p>
-
-  <!-- Create a form to collect the user's email -->
   <form action="/forgotPass" method="post">
+    <h1>Forgot Password</h1>
+    <p>Enter your email address below, and we'll send you a password reset link.</p>
+
     <label for="email">Email</label>
     <input type="email" id="email" name="email" placeholder="Enter your email" required />
     <br />
+
+    <!-- Reset Button -->
     <button type="submit">Reset Password</button>
     <br />
+
     <p style="text-align: center; color: green"><%= status %></p>
   </form>
 </body>

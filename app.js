@@ -1,53 +1,55 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const Review = require('./models/Review'); // Assuming you have a Review model
-const UserModel = require('./models/userModel.js');
-const productModel = require('./models/productModel.js')
-const multer = require('multer');
-const xlsx = require('xlsx');
-const authRoutes = require('./routes/authRoutes')
-const orderNowRoutes = require('./routes/orderNowRoutes')
-const profileRoutes = require('./routes/profileRoutes')
-const reviewRoutes = require('./routes/reviewRoutes')
-const adminRoutes = require('./routes/adminRoutes')
-const cookieParser = require('cookie-parser')
-const bodyParser = require('body-parser');
+const express = require("express");
+const mongoose = require("mongoose");
+const Review = require("./models/Review"); // Assuming you have a Review model
+const UserModel = require("./models/userModel.js");
+const productModel = require("./models/productModel.js");
+const multer = require("multer");
+const xlsx = require("xlsx");
+const authRoutes = require("./routes/authRoutes");
+const orderNowRoutes = require("./routes/orderNowRoutes");
+const profileRoutes = require("./routes/profileRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 const { currentUser, requireAuth, currentAdminUser } = require("./middleware/authMiddware");
 const app = express();
+
 // middleware
-app.use(express.static('public'));
+app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.json())
-app.use(cookieParser())
-app.set('view engine', 'ejs');
+app.use(express.json());
+app.use(cookieParser());
+app.set("view engine", "ejs");
 // database connection
-const dbURI = 'mongodb://127.0.0.1:27017/SpiritualDrinksShop';
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+const dbURI = "mongodb://127.0.0.1:27017/SpiritualDrinksShop";
+mongoose
+  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => app.listen(3000))
   .catch((err) => console.log(err));
 // Set up Multer
-const path = require('path')
+const path = require("path");
 // Set up Multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'images'); // Specify the directory where files should be saved
+    cb(null, "images"); // Specify the directory where files should be saved
   },
   filename: function (req, file, cb) {
     // Use the original name of the file
-    console.log(file)
+    console.log(file);
     cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 const upload = multer({ storage: storage });
-app.post('/upload', upload.single("image"), (req, res) => {
-  console.log(req.body.image)
-  res.send("uploaded")
-})
+app.post("/upload", upload.single("image"), (req, res) => {
+  console.log(req.body.image);
+  res.send("uploaded");
+});
 
 // routes
-app.get('*', currentUser)//apply to every route (protect routes)
-app.get('*', currentAdminUser)//apply to every route (protect routes)
-app.get('/', async (req, res) => {
+app.get("*", currentUser); //apply to every route (protect routes)
+app.get("*", currentAdminUser); //apply to every route (protect routes)
+app.get("/", async (req, res) => {
   const reviews = await Review.find().limit(3); // Fetch reviews from your database
   const products = await productModel.find();
   var wineProducts = [];
@@ -57,37 +59,36 @@ app.get('/', async (req, res) => {
 
   for (let index = 0; index < products.length; index++) {
     const element = products[index];
-    if (element.category == 'Wine') {
-      wineProducts.push(element)
-    }
-    else if (element.category == 'Beer') {
-      console.log(element)
-      beerProducts.push(element)
-    }
-    else if (element.category == 'Alcohol') {
-      alcoholProducts.push(element)
-    }
-    else if (element.category == 'Accessions') {
-      accessoriesProducts.push(element)
+    if (element.category == "Wine") {
+      wineProducts.push(element);
+    } else if (element.category == "Beer") {
+      console.log(element);
+      beerProducts.push(element);
+    } else if (element.category == "Alcohol") {
+      alcoholProducts.push(element);
+    } else if (element.category == "Accessions") {
+      accessoriesProducts.push(element);
     }
   }
-  var accessoriesMostSold = getMostSoldProduct(accessoriesProducts)
-  var wineMostSold = getMostSoldProduct(wineProducts)
-  var beerMostSold = getMostSoldProduct(beerProducts)
-  var alcoholMostSold = getMostSoldProduct(alcoholProducts)
-  var bestSellerItems = []
+  var accessoriesMostSold = getMostSoldProduct(accessoriesProducts);
+  var wineMostSold = getMostSoldProduct(wineProducts);
+  var beerMostSold = getMostSoldProduct(beerProducts);
+  var alcoholMostSold = getMostSoldProduct(alcoholProducts);
+  var bestSellerItems = [];
   if (accessoriesMostSold) {
-    bestSellerItems.push(accessoriesMostSold)
+    bestSellerItems.push(accessoriesMostSold);
   }
   if (wineMostSold) {
-    bestSellerItems.push(wineMostSold)
-  } if (beerMostSold) {
-    bestSellerItems.push(beerMostSold)
-  } if (alcoholMostSold) {
-    bestSellerItems.push(alcoholMostSold)
+    bestSellerItems.push(wineMostSold);
+  }
+  if (beerMostSold) {
+    bestSellerItems.push(beerMostSold);
+  }
+  if (alcoholMostSold) {
+    bestSellerItems.push(alcoholMostSold);
   }
 
-  res.render('home', { reviews, bestSellerItems })
+  res.render("home", { reviews, bestSellerItems });
 });
 function getMostSoldProduct(products) {
   if (!Array.isArray(products) || products.length === 0) {
@@ -114,11 +115,10 @@ function getMostSoldProduct(products) {
   return mostSoldProduct;
 }
 
-app.get('/smoothies', requireAuth, (req, res) => res.render('smoothies'));
-app.use('/profile', profileRoutes)
-app.use('/reviews', reviewRoutes)
-app.use('/order', orderNowRoutes)
-app.use('/admin', adminRoutes)
+app.get("/smoothies", requireAuth, (req, res) => res.render("smoothies"));
+app.use("/profile", profileRoutes);
+app.use("/reviews", reviewRoutes);
+app.use("/order", orderNowRoutes);
+app.use("/admin", adminRoutes);
 
-app.use("/", authRoutes)
-
+app.use("/", authRoutes);
