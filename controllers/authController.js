@@ -3,8 +3,7 @@ const userModel = require("../models/userModel.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-const { promisify } = require("util");
-const cartModel = require("../models/cartModel.js");
+
 
 // Error handler
 const handleErrors = (err, usernameValue, emailValue) => {
