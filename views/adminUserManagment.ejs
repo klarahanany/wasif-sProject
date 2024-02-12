@@ -1,270 +1,248 @@
 <%- include('partials/headerAdmin'); -%>
 
-    <head>
-        <title>User Management</title>
-    </head>
+<head>
+  <title>User Management</title>
+</head>
 
-    <body>
-        <h1>User Management</h1>
-        <form id="formDownload" action="/admin/usermanagment/downloadUserData" method="get">
-            <button type="submit">Download Users Data</button>
-        </form>
+<body>
+  <h1>User Management</h1>
+  <form id="formDownload" action="/admin/usermanagment/downloadUserData" method="get">
+    <button type="submit">Download Users Data</button>
+  </form>
 
+  <div class="addDelButtons">
+    <button onclick="addFormDisplay()" id="addNewAdmin">add new Worker</button>
+    <button onclick="deleteFormDisplay()" id="deleteAdmin">delete Worker</button>
+  </div>
 
-        <div class="addDelButtons">
-            <button onclick="addFormDisplay()" id="addNewAdmin">add new Worker</button>
-            <button onclick="deleteFormDisplay()" id="deleteAdmin">delete Worker</button>
-        </div>
+  <form id="addFormDisplay" style="display: none">
+    <a href="" onclick="formClose()" style="float: right"><i class="fa-solid fa-x"></i></a>
 
-        <form id="addFormDisplay" style="display: none">
-            <a href="" onclick="formClose()" style="float: right"><i class="fa-solid fa-x"></i></a>
+    <label for="username">Username</label>
+    <input type="text" name="username" required />
+    <div class="username error"></div>
 
-            <label for="username">Username</label>
-            <input type="text" name="username" required />
-            <div class="username error"></div>
+    <label for="firstname">First Name</label>
+    <input type="text" name="firstname" required />
 
-            <label for="firstname">First Name</label>
-            <input type="text" name="firstname" required />
+    <label for="lastname">Last Name</label>
+    <input type="text" name="lastname" required />
 
-            <label for="lastname">Last Name</label>
-            <input type="text" name="lastname" required />
+    <label for="email">Email</label>
+    <input type="text" name="email" required />
+    <div class="email error"></div>
 
-            <label for="email">Email</label>
-            <input type="text" name="email" required />
-            <div class="email error"></div>
+    <label for="birthday">Birthday:</label>
+    <input type="date" id="birthday" name="birthday" required />
+    <div class="birthday error"></div>
 
-            <label for="birthday">Birthday:</label>
-            <input type="date" id="birthday" name="birthday" required />
-            <div class="birthday error"></div>
+    <label for="password">Password</label>
+    <input type="password" name="password" required />
+    <label for="confirmPassword">Confirm Password</label>
+    <input type="password" name="confirmPassword" required />
+    <div class="password error"></div>
 
-            <label for="password">Password</label>
-            <input type="password" name="password" required />
-            <label for="confirmPassword">Confirm Password</label>
-            <input type="password" name="confirmPassword" required />
-            <div class="password error"></div>
+    <button type="submit">Add Worker</button>
+    <p id="successStatus" style="color: green; font-weight: bold"></p>
+  </form>
 
-            <button type="submit">Add Worker</button>
-            <p id="successStatus" style="color: green; font-weight: bold"></p>
-        </form>
+  <form id="deleteFormDisplay" style="display: none">
+    <a href="" onclick="formClose()" style="float: right"><i class="fa-solid fa-x"></i></a>
+    <label for="username">Username</label>
+    <select name="admins" id="alladmins">
+      <option value="selectAdmin">select Worker to delete</option>
+      <% users.forEach(function(option) { if(option.role=='worker' ){%>
+      <option value="<%= option.username %>"><%= option.username %></option>
+      <% }}); %>
+    </select>
+    <p id="failStatusDelete" style="color: red; font-weight: bold"></p>
 
-        <form id="deleteFormDisplay" style="display: none">
-            <a href="" onclick="formClose()" style="float: right"><i class="fa-solid fa-x"></i></a>
-            <label for="username">Username</label>
-            <select name="admins" id="alladmins">
-                <option value="selectAdmin">select Worker to delete</option>
-                <% users.forEach(function(option) { if(option.role=='worker' ){%>
-                    <option value="<%= option.username %>">
-                        <%= option.username %>
-                    </option>
-                    <% }}); %>
-            </select>
-            <p id="failStatusDelete" style="color: red; font-weight: bold"></p>
+    <button type="submit">Delete Worker</button>
 
-            <button type="submit">Delete Worker</button>
+    <p id="successStatusDelete" style="color: green; font-weight: bold"></p>
+  </form>
+  <h2 style="margin-top: 10px">Users List</h2>
+  <div class="searchBarContainer">
+    <input id="searchBar" type="text" placeholder="Search.." />
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </div>
+  <div class="usermanagment">
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Birth Date</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(function(user) { %>
+        <tr id="<%=user._id%>">
+          <td><%= user.username %></td>
+          <td><%= user.firstname %></td>
+          <td><%= user.lastname %></td>
+          <td><%= user.email %></td>
+          <td><%= user.birthday.toLocaleDateString() %></td>
+          <td><%= user.role %></td>
+          <td><%= user.isBlocked ? 'Blocked' : 'Active' %></td>
+          <td>
+            <form class="blockForm" method="POST" action="/admin/usermanagment/block-user/<%= user._id %>">
+              <button type="submit"><%= user.isBlocked ? 'Unblock' : 'Block' %></button>
+            </form>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
 
-            <p id="successStatusDelete" style="color: green; font-weight: bold"></p>
-        </form>
-        <h2 style="margin-top: 10px;">Users List</h2>
-        <div class="searchBarContainer">
-            <input id="searchBar" type="text" placeholder="Search.." />
-            <i class="fa-solid fa-magnifying-glass"></i>
-        </div>
-        <div class="usermanagment">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Birth Date</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% users.forEach(function(user) { %>
-                        <tr id="<%=user._id%>">
-                            <td>
-                                <%= user.username %>
-                            </td>
-                            <td>
-                                <%= user.firstname %>
-                            </td>
-                            <td>
-                                <%= user.lastname %>
-                            </td>
-                            <td>
-                                <%= user.email %>
-                            </td>
-                            <td>
-                                <%= user.birthday.toLocaleDateString() %>
-                            </td>
-                            <td>
-                                <%= user.role %>
-                            </td>
-                            <td>
-                                <%= user.isBlocked ? 'Blocked' : 'Active' %>
-                            </td>
-                            <td>
-                                <form class="blockForm" method="POST"
-                                    action="/admin/usermanagment/block-user/<%= user._id %>">
-                                    <button type="submit">
-                                        <%= user.isBlocked ? 'Unblock' : 'Block' %>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        <% }); %>
-                </tbody>
-            </table>
-        </div>
+  <!-- Table to display all users -->
+</body>
+<script>
+  document.getElementById("userManage").style.backgroundColor = "#f9df4b";
+  var admin1 = `<%- JSON.stringify(admin) %>`;
+  var admin = JSON.parse(admin1);
+  if (admin.role == "mainadmin") {
+    document.getElementById("addNewAdmin").style.display = "block";
+    document.getElementById("deleteAdmin").style.display = "block";
+    document.getElementById("formDownload").style.display = "block";
+  } else if (admin.role == "worker") {
+    document.getElementById("addNewAdmin").style.display = "none";
+    document.getElementById("deleteAdmin").style.display = "none";
+    document.getElementById("formDownload").style.display = "none";
+  }
+  function addFormDisplay() {
+    document.getElementById("addFormDisplay").style.display = "block";
+    document.getElementById("deleteFormDisplay").style.display = "none";
+  }
+  function deleteFormDisplay() {
+    document.getElementById("deleteFormDisplay").style.display = "block";
+    document.getElementById("addFormDisplay").style.display = "none";
+  }
+  function formClose() {
+    document.getElementById("addFormDisplay").style.display = "none";
+    document.getElementById("deleteFormDisplay").style.display = "none";
+  }
+  const formadd = document.querySelector("#addFormDisplay");
+  const formdelete = document.querySelector("#deleteFormDisplay");
 
-        <!-- Table to display all users -->
-    </body>
-    <script>
-        document.getElementById("userManage").style.backgroundColor = "#f9df4b"
-        var admin1 = `<%- JSON.stringify(admin) %>`;
-        var admin = JSON.parse(admin1);
-        if (admin.role == "mainadmin") {
-            document.getElementById("addNewAdmin").style.display = "block";
-            document.getElementById("deleteAdmin").style.display = "block";
-            document.getElementById("formDownload").style.display = "block";
-        } else if (admin.role == "worker") {
-            document.getElementById("addNewAdmin").style.display = "none";
-            document.getElementById("deleteAdmin").style.display = "none";
-            document.getElementById("formDownload").style.display = "none";
+  const emailError = document.querySelector(".email.error");
+  const passwordError = document.querySelector(".password.error");
+  const usernameError = document.querySelector(".username.error");
 
-        }
-        function addFormDisplay() {
-            document.getElementById("addFormDisplay").style.display = "block";
-            document.getElementById("deleteFormDisplay").style.display = "none";
-        }
-        function deleteFormDisplay() {
-            document.getElementById("deleteFormDisplay").style.display = "block";
-            document.getElementById("addFormDisplay").style.display = "none";
-        }
-        function formClose() {
-            document.getElementById("addFormDisplay").style.display = "none";
-            document.getElementById("deleteFormDisplay").style.display = "none";
-        }
-        const formadd = document.querySelector("#addFormDisplay");
-        const formdelete = document.querySelector("#deleteFormDisplay");
+  const birthdayError = document.querySelector(".birthday.error");
+  formadd.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    //reset errors
+    emailError.textContent = "";
+    passwordError.textContent = "";
+    usernameError.textContent = "";
+    birthdayError.textContent = "";
+    // get values
+    const username = formadd.username.value;
+    const email = formadd.email.value;
+    const password = formadd.password.value;
+    const confirmPassword = formadd.confirmPassword.value;
+    const firstname = formadd.firstname.value;
+    const lastname = formadd.lastname.value;
+    const birthday = formadd.birthday.value;
 
-        const emailError = document.querySelector(".email.error");
-        const passwordError = document.querySelector(".password.error");
-        const usernameError = document.querySelector(".username.error");
+    if (!isDateBeforeToday(birthday)) {
+      birthdayError.textContent = "Choose Relevant Birthday ";
+    } else if (password != confirmPassword) {
+      passwordError.textContent = "not the same password";
+    } else {
+      //api call from frontend to server, sending data from form to server to save in db
+      const res = await fetch("/admin/usermanagment/addadmin", {
+        method: "POST",
+        body: JSON.stringify({ username, email, password, firstname, lastname, birthday }),
+        headers: { "Content-type": "application/json" },
+      });
 
-        const birthdayError = document.querySelector(".birthday.error");
-        formadd.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            //reset errors
-            emailError.textContent = "";
-            passwordError.textContent = "";
-            usernameError.textContent = "";
-            birthdayError.textContent = "";
-            // get values
-            const username = formadd.username.value;
-            const email = formadd.email.value;
-            const password = formadd.password.value;
-            const confirmPassword = formadd.confirmPassword.value;
-            const firstname = formadd.firstname.value;
-            const lastname = formadd.lastname.value;
-            const birthday = formadd.birthday.value;
+      //after getting response from the server
+      const data = await res.json();
+      if (data == "done") {
+        document.getElementById("successStatus").textContent = "worker added successfully";
+        emailError.textContent = "";
+        passwordError.textContent = "";
+        usernameError.textContent = "";
+        birthdayError.textContent = "";
+        formadd.username.value = "";
+        formadd.email.value = "";
+        formadd.password.value = "";
+        formadd.confirmPassword.value = "";
+        formadd.firstname.value = "";
+        formadd.lastname.value = "";
+        formadd.birthday.value = "";
+      }
+      if (data.error) {
+        // passwordError.textContent = data.error.password
+        usernameError.textContent = data.error.username;
+        emailError.textContent = data.error.email;
+      }
+    }
+  });
+  const usernameError2 = document.getElementById("failStatusDelete");
 
-            if (!isDateBeforeToday(birthday)) {
-                birthdayError.textContent = "Choose Relevant Birthday ";
-            } else if (password != confirmPassword) {
-                passwordError.textContent = "not the same password";
-            } else {
-                //api call from frontend to server, sending data from form to server to save in db
-                const res = await fetch("/admin/usermanagment/addadmin", {
-                    method: "POST",
-                    body: JSON.stringify({ username, email, password, firstname, lastname, birthday }),
-                    headers: { "Content-type": "application/json" },
-                });
+  formdelete.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const adminUsername = document.getElementById("alladmins");
+    if (adminUsername.value == "selectAdmin") {
+      console.log("what");
+      usernameError2.textContent = "please choose an worker to delete";
+    } else {
+      //api call from frontend to server, sending data from form to server to save in db
+      const res = await fetch("/admin/usermanagment/deleteadmin", {
+        method: "POST",
+        body: JSON.stringify({ username: adminUsername.value }),
+        headers: { "Content-type": "application/json" },
+      });
 
-                //after getting response from the server
-                const data = await res.json();
-                if (data == "done") {
-                    document.getElementById("successStatus").textContent = "worker added successfully";
-                    emailError.textContent = "";
-                    passwordError.textContent = "";
-                    usernameError.textContent = "";
-                    birthdayError.textContent = "";
-                    formadd.username.value = '';
-                    formadd.email.value = '';
-                    formadd.password.value = '';
-                    formadd.confirmPassword.value = '';
-                    formadd.firstname.value = '';
-                    formadd.lastname.value ='';
-                    formadd.birthday.value = '';
+      //after getting response from the server
+      const data = await res.json();
+      if (data == "done") {
+        document.getElementById("successStatusDelete").textContent = "worker deleted successfully";
+        adminUsername.value = "selectAdmin";
+      }
+    }
+  });
+  function isDateBeforeToday(dateString) {
+    // Parse the provided date string into a Date object
+    const providedDate = new Date(dateString);
 
-                }
-                if (data.error) {
-                    // passwordError.textContent = data.error.password
-                    usernameError.textContent = data.error.username;
-                    emailError.textContent = data.error.email;
-                }
-            }
-        });
-        const usernameError2 = document.getElementById("failStatusDelete");
+    // Get the current date
+    const currentDate = new Date();
 
-        formdelete.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const adminUsername = document.getElementById("alladmins");
-            if (adminUsername.value == "selectAdmin") {
-                console.log("what");
-                usernameError2.textContent = "please choose an worker to delete";
-            } else {
-                //api call from frontend to server, sending data from form to server to save in db
-                const res = await fetch("/admin/usermanagment/deleteadmin", {
-                    method: "POST",
-                    body: JSON.stringify({ username: adminUsername.value }),
-                    headers: { "Content-type": "application/json" },
-                });
+    // Set hours, minutes, seconds, and milliseconds to 0 for both dates
+    providedDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
 
-                //after getting response from the server
-                const data = await res.json();
-                if (data == "done") {
-                    document.getElementById("successStatusDelete").textContent = "worker deleted successfully";
-                    adminUsername.value = "selectAdmin";
-                }
-            }
-        });
-        function isDateBeforeToday(dateString) {
-            // Parse the provided date string into a Date object
-            const providedDate = new Date(dateString);
+    // Compare the two dates
+    return providedDate <= currentDate;
+  }
+  var users1 = `<%- JSON.stringify(users) %>`;
+  var users = JSON.parse(users1);
+  const usernames = [...new Set(users.map((item) => item.username.toLowerCase()))];
+  document.getElementById("searchBar").addEventListener("keyup", (e) => {
+    const searchData = e.target.value.toLowerCase();
+    const filteredData = users.filter((item) => {
+      return item.username.toLowerCase().includes(searchData);
+    });
 
-            // Get the current date
-            const currentDate = new Date();
+    users.forEach((user) => {
+      const userElement = document.getElementById(`${user._id}`);
+      if (filteredData.includes(user)) {
+        userElement.style.display = "table-row";
+      } else {
+        userElement.style.display = "none";
+      }
+    });
+  });
+</script>
 
-            // Set hours, minutes, seconds, and milliseconds to 0 for both dates
-            providedDate.setHours(0, 0, 0, 0);
-            currentDate.setHours(0, 0, 0, 0);
-
-            // Compare the two dates
-            return providedDate <= currentDate;
-        }
-        var users1 = `<%- JSON.stringify(users) %>`;
-        var users = JSON.parse(users1);
-        const usernames = [...new Set(users.map((item) => item.username.toLowerCase()))];
-        document.getElementById("searchBar").addEventListener("keyup", (e) => {
-            const searchData = e.target.value.toLowerCase();
-            const filteredData = users.filter((item) => {
-                return item.username.toLowerCase().includes(searchData);
-            });
-
-            users.forEach((user) => {
-                const userElement = document.getElementById(`${user._id}`);
-                if (filteredData.includes(user)) {
-                    userElement.style.display = "table-row";
-                } else {
-                    userElement.style.display = "none";
-                }
-            });
-        });
-    </script>
-
-    <%- include('partials/footer'); -%>
+<%- include('partials/footer'); -%>

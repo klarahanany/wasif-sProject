@@ -1,204 +1,187 @@
 <%- include('partials/header'); -%>
 
-    <head>
-        <title>User Profile</title>
-    </head>
+<head>
+  <title>User Profile</title>
+</head>
 
-    <body>
-        <h1>User Profile</h1>
+<body>
+  <h1>User Profile</h1>
 
-        <% if (user) { %>
-            <button onclick="removeAccount()">remove account</button>
-            <h2 style="text-align: center;">Your Information</h2>
-            <form action="/update-profile">
-                <label for="username">Username: <label id="username"><%= user.username %></label></label>
+  <% if (user) { %>
+  <button onclick="removeAccount()">remove account</button>
+  <h2 style="text-align: center">Your Information</h2>
+  <form action="/update-profile">
+    <label for="username">Username: <label id="username"><%= user.username %></label></label>
 
-                <label for="firstName">First Name:</label>
-                <input type="text" id="firstName" name="firstName" value="<%= user.firstname %>" required>
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" name="firstName" value="<%= user.firstname %>" required />
 
-                <label for="lastName">Last Name:</label>
-                <input type="text" id="lastName" name="lastName" value="<%= user.lastname %>" required>
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" name="lastName" value="<%= user.lastname %>" required />
 
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="<%= user.email %>" required>
-                <div class="email error"></div>
-                
-                <label for="phoneNumber">Phone Number:</label>
-                <input type="tel" id="phoneNumber" name="phone" pattern="[0-9]{10}" value="<%= user.phoneNumber %>" required>
-                <div class="phone error"></div>
-            
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password">
-                <div class="password strong"></div>
-                <div class="password notStrong"></div>
-                
-                <label for="birthday">Birthday:</label>
-                <input type="date" id="birthday" name="birthday" onchange="isDateBeforeToday()"
-                    value="<%= user.birthday %>" required>
-                <div class="birthday error"></div>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" value="<%= user.email %>" required />
+    <div class="email error"></div>
 
-                <button type="submit">Update Profile</button>
-                <p id="status" style="color: green; font-weight: bold;"></p>
+    <label for="phoneNumber">Phone Number:</label>
+    <input type="tel" id="phoneNumber" name="phone" pattern="[0-9]{10}" value="<%= user.phoneNumber %>" required />
+    <div class="phone error"></div>
 
-            </form>
-            <% } else { %>
-                <p>User not found.</p>
-                <% } %>
-                    <%- include('partials/footer'); -%>
-                        <script>
-                            // Get the password strong element.
-                            const passwordStrong = document.querySelector(".password.strong");
-                            // Get the password not strong element.
-                            const passwordNotStrong = document.querySelector(".password.notStrong");
-                            var user1 = `<%- JSON.stringify(user) %>`;
-                            var user = JSON.parse(user1);
-                            var birthdayDate = user.birthday
-                            const formattedDate = birthdayDate.toString().split('T')[0];
-                            // Set the value of the date input
-                            document.getElementById('birthday').value = formattedDate;
-                            const form = document.querySelector('form');
-                            form.addEventListener('submit', async (e) => {
-                                e.preventDefault();
-                                //reset errors
-                                // passwordError.textContent = ''
-                                // usernameError.textContent = ''
-                                // get values
-                                const username = document.getElementById('username').textContent
-                                const password = form.password.value;
-                                const firstname = form.firstName.value;
-                                const lastName = form.lastName.value;
-                                const birthday = form.birthday.value;
-                                const email = form.email.value;
-                                const phoneNumber = form.phone.value;
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" />
+    <div class="password strong"></div>
+    <div class="password notStrong"></div>
 
-                                const birthdayError = document.querySelector('.birthday.error')
-                                const emailError = document.querySelector('.email.error')
+    <label for="birthday">Birthday:</label>
+    <input type="date" id="birthday" name="birthday" onchange="isDateBeforeToday()" value="<%= user.birthday %>" required />
+    <div class="birthday error"></div>
 
-                                if (!isDateBeforeToday(birthday)) {
-                                    birthdayError.textContent = 'Choose Relevant Birthday'
-                                    document.getElementById("status").textContent = ""
-                                    emailError.textContent = ''
-                                }
-                                else if (!isOver21(birthday)) {
-                                    birthdayError.textContent = 'You Are Under Age'
-                                    document.getElementById("status").textContent = ""
-                                    emailError.textContent = ''
+    <button type="submit">Update Profile</button>
+    <p id="status" style="color: green; font-weight: bold"></p>
+  </form>
+  <% } else { %>
+  <p>User not found.</p>
+  <% } %> <%- include('partials/footer'); -%>
+  <script>
+    // Get the password strong element.
+    const passwordStrong = document.querySelector(".password.strong");
+    // Get the password not strong element.
+    const passwordNotStrong = document.querySelector(".password.notStrong");
+    var user1 = `<%- JSON.stringify(user) %>`;
+    var user = JSON.parse(user1);
+    var birthdayDate = user.birthday;
+    const formattedDate = birthdayDate.toString().split("T")[0];
+    // Set the value of the date input
+    document.getElementById("birthday").value = formattedDate;
+    const form = document.querySelector("form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      //reset errors
+      // passwordError.textContent = ''
+      // usernameError.textContent = ''
+      // get values
+      const username = document.getElementById("username").textContent;
+      const password = form.password.value;
+      const firstname = form.firstName.value;
+      const lastName = form.lastName.value;
+      const birthday = form.birthday.value;
+      const email = form.email.value;
+      const phoneNumber = form.phone.value;
 
-                                }
-                              
-                                else if(checkPasswordStrength(password)== "Password is strong!" ||checkPasswordStrength(password) == ""){
-                                    const res = await fetch('/profile', {
-                                        method: 'POST',
-                                        body: JSON.stringify({ username, password, firstname, lastName, birthday, email,phoneNumber }),
-                                        headers: { 'Content-type': 'application/json' }
-                                    })
+      const birthdayError = document.querySelector(".birthday.error");
+      const emailError = document.querySelector(".email.error");
 
-                                    //after getting response from the server
-                                    const data = await res.json()
-                                    if (data.status == 'done') {
-                                        document.getElementById("status").textContent = "Your Data Has Been Updated"
-                                        birthdayError.textContent = ''
-                                        emailError.textContent = ''
+      if (!isDateBeforeToday(birthday)) {
+        birthdayError.textContent = "Choose Relevant Birthday";
+        document.getElementById("status").textContent = "";
+        emailError.textContent = "";
+      } else if (!isOver21(birthday)) {
+        birthdayError.textContent = "You Are Under Age";
+        document.getElementById("status").textContent = "";
+        emailError.textContent = "";
+      } else if (checkPasswordStrength(password) == "Password is strong!" || checkPasswordStrength(password) == "") {
+        const res = await fetch("/profile", {
+          method: "POST",
+          body: JSON.stringify({ username, password, firstname, lastName, birthday, email, phoneNumber }),
+          headers: { "Content-type": "application/json" },
+        });
 
-                                    }
-                                    else if (data.status = 'emailAlreadyExist') {
-                                        document.getElementById("status").textContent = ""
-                                        birthdayError.textContent = ''
-                                        emailError.textContent = 'This Email Already Exist'
-                                    }
-                                }
-                                else if (checkPasswordStrength(password) != "Password is strong!" ) {
-                                    alert(checkPasswordStrength(password));
-                                }
+        //after getting response from the server
+        const data = await res.json();
+        if (data.status == "done") {
+          document.getElementById("status").textContent = "Your Data Has Been Updated";
+          birthdayError.textContent = "";
+          emailError.textContent = "";
+        } else if ((data.status = "emailAlreadyExist")) {
+          document.getElementById("status").textContent = "";
+          birthdayError.textContent = "";
+          emailError.textContent = "This Email Already Exist";
+        }
+      } else if (checkPasswordStrength(password) != "Password is strong!") {
+        alert(checkPasswordStrength(password));
+      }
+    });
+    const password = document.getElementById("password");
+    password.addEventListener("keyup", () => {
+      if (checkPasswordStrength(password.value) != "Password is strong!") {
+        passwordNotStrong.textContent = checkPasswordStrength(password.value);
+        passwordStrong.textContent = "";
+      } else {
+        passwordStrong.textContent = checkPasswordStrength(password.value);
+        passwordNotStrong.textContent = "";
+      }
+    });
+    function isDateBeforeToday(dateString) {
+      // Parse the provided date string into a Date object
+      const providedDate = new Date(dateString);
+      // Get the current date
+      const currentDate = new Date();
+      // Set hours, minutes, seconds, and milliseconds to 0 for both dates
+      providedDate.setHours(0, 0, 0, 0);
+      currentDate.setHours(0, 0, 0, 0);
+      // Compare the two dates
+      return providedDate <= currentDate;
+    }
+    function isOver21(birthdate) {
+      // Parse the birthdate string into a Date object
+      const birthDateObject = new Date(birthdate);
 
-                            }
-                            
-                            )
-                            const password = document.getElementById("password")
-                            password.addEventListener('keyup', () => {
-                                if (checkPasswordStrength(password.value) != "Password is strong!") {
-                                    passwordNotStrong.textContent = checkPasswordStrength(password.value)
-                                    passwordStrong.textContent = ""
-                                }
-                                else {
-                                    passwordStrong.textContent = checkPasswordStrength(password.value)
-                                    passwordNotStrong.textContent = ""
-                                }
-                            })
-                            function isDateBeforeToday(dateString) {
-                                // Parse the provided date string into a Date object
-                                const providedDate = new Date(dateString);
-                                // Get the current date
-                                const currentDate = new Date();
-                                // Set hours, minutes, seconds, and milliseconds to 0 for both dates
-                                providedDate.setHours(0, 0, 0, 0);
-                                currentDate.setHours(0, 0, 0, 0);
-                                // Compare the two dates
-                                return providedDate <= currentDate;
-                            }
-                            function isOver21(birthdate) {
-                                // Parse the birthdate string into a Date object
-                                const birthDateObject = new Date(birthdate);
+      // Get the current date
+      const currentDate = new Date();
 
-                                // Get the current date
-                                const currentDate = new Date();
+      // Calculate the age
+      const age = currentDate.getFullYear() - birthDateObject.getFullYear();
 
-                                // Calculate the age
-                                const age = currentDate.getFullYear() - birthDateObject.getFullYear();
+      // Check if the birthday has occurred for this year
+      const hasBirthdayOccurred =
+        currentDate.getMonth() > birthDateObject.getMonth() ||
+        (currentDate.getMonth() === birthDateObject.getMonth() && currentDate.getDate() >= birthDateObject.getDate());
 
-                                // Check if the birthday has occurred for this year
-                                const hasBirthdayOccurred = (
-                                    currentDate.getMonth() > birthDateObject.getMonth() ||
-                                    (currentDate.getMonth() === birthDateObject.getMonth() &&
-                                        currentDate.getDate() >= birthDateObject.getDate())
-                                );
+      // If the birthday has not occurred yet, subtract 1 from the age
+      const finalAge = hasBirthdayOccurred ? age : age - 1;
 
-                                // If the birthday has not occurred yet, subtract 1 from the age
-                                const finalAge = hasBirthdayOccurred ? age : age - 1;
+      // Check if the age is greater than or equal to 21
+      return finalAge >= 21;
+    }
+    async function removeAccount() {
+      if (confirm("Are you certain you want to delete your account?")) {
+        const res = await fetch("/profile/removeaccount", {
+          method: "POST",
+          body: JSON.stringify({ username: user.username }),
+          headers: { "Content-type": "application/json" },
+        });
+        const data = await res.json();
+        if (data.status == "done") {
+          window.location.href = "/login";
+        }
+      }
+    }
+    // Function to check password strength
+    function checkPasswordStrength(password) {
+      const minLength = 6;
+      const minUpperCase = 1;
+      const minLowerCase = 1;
+      const minNumbers = 1;
+      if (password.length == 0) {
+        return "";
+      }
+      if (password.length < minLength) {
+        return "Password must be at least 8 characters long.";
+      }
 
-                                // Check if the age is greater than or equal to 21
-                                return finalAge >= 21;
-                            }
-                            async function removeAccount() {
-                                if (confirm("Are you certain you want to delete your account?")) {
-                                    const res = await fetch('/profile/removeaccount', {
-                                        method: 'POST',
-                                        body: JSON.stringify({ username: user.username }),
-                                        headers: { 'Content-type': 'application/json' }
-                                    })
-                                    const data = await res.json()
-                                    if (data.status == 'done') {
-                                        window.location.href = '/login'
+      if (password.replace(/[^A-Z]/g, "").length < minUpperCase) {
+        return "Password must contain at least one uppercase letter.";
+      }
 
-                                    }
-                                }
-                            }
-                            // Function to check password strength
-                            function checkPasswordStrength(password) {
-                                const minLength = 6;
-                                const minUpperCase = 1;
-                                const minLowerCase = 1;
-                                const minNumbers = 1;
-                                if (password.length ==0) {
-                                    return "";
-                                }
-                                if (password.length < minLength) {
-                                    return "Password must be at least 8 characters long.";
-                                }
-                             
+      if (password.replace(/[^a-z]/g, "").length < minLowerCase) {
+        return "Password must contain at least one lowercase letter.";
+      }
 
-                                if (password.replace(/[^A-Z]/g, "").length < minUpperCase) {
-                                    return "Password must contain at least one uppercase letter.";
-                                }
+      if (password.replace(/[^0-9]/g, "").length < minNumbers) {
+        return "Password must contain at least one number.";
+      }
 
-                                if (password.replace(/[^a-z]/g, "").length < minLowerCase) {
-                                    return "Password must contain at least one lowercase letter.";
-                                }
-
-                                if (password.replace(/[^0-9]/g, "").length < minNumbers) {
-                                    return "Password must contain at least one number.";
-                                }
-
-                                return "Password is strong!"; // Password meets all criteria
-                            };
-                        </script>
+      return "Password is strong!"; // Password meets all criteria
+    }
+  </script>
+</body>

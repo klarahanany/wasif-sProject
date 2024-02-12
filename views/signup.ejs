@@ -1,189 +1,184 @@
 <%- include('partials/header'); -%>
 
-  <head>
-    <title>Signup</title>
-  </head>
+<head>
+  <title>Signup</title>
+</head>
 
-  <form action="/signup">
-    <h2>Sign up</h2>
+<form action="/signup">
+  <h2>Sign up</h2>
 
-    <!-- Username -->
-    <label for="username">Username</label>
-    <input type="text" name="username" placeholder="Enter your username" required />
-    <div class="username error"></div>
+  <!-- Username -->
+  <label for="username">Username</label>
+  <input type="text" name="username" placeholder="Enter your username" required />
+  <div class="username error"></div>
 
-    <!-- First name -->
-    <label for="firstname">First Name</label>
-    <input type="text" name="firstname" placeholder="Enter your first name" required />
+  <!-- First name -->
+  <label for="firstname">First Name</label>
+  <input type="text" name="firstname" placeholder="Enter your first name" required />
 
-    <!-- Last name -->
-    <label for="lastname">Last Name</label>
-    <input type="text" name="lastname" placeholder="Enter your last name" required />
+  <!-- Last name -->
+  <label for="lastname">Last Name</label>
+  <input type="text" name="lastname" placeholder="Enter your last name" required />
 
-    <!-- Enaul -->
-    <label for="email">Email</label>
-    <input type="text" name="email" placeholder="Enter your email" required />
-    <div class="email error"></div>
- 
-    <label for="phoneNumber">Phone Number:</label>
-    <input type="tel" id="phoneNumber" name="phone" pattern="[0-9]{10}" required>
-    <div class="phone error"></div>
+  <!-- Enaul -->
+  <label for="email">Email</label>
+  <input type="text" name="email" placeholder="Enter your email" required />
+  <div class="email error"></div>
 
-    <!-- Birth date -->
-    <label for="birthday">Birth Date</label>
-    <input type="date" id="birthday" name="birthday" required />
-    <div class="birthday error"></div>
+  <label for="phoneNumber">Phone Number:</label>
+  <input type="tel" id="phoneNumber" name="phone" pattern="[0-9]{10}" required />
+  <div class="phone error"></div>
 
-    <!-- Password & Confirm password-->
-    <label for="password">Password</label>
-    <input id="password" type="password" name="password" placeholder="Enter a password" required />
-    <div class="password strong"></div>
-    <div class="password notStrong"></div>
+  <!-- Birth date -->
+  <label for="birthday">Birth Date</label>
+  <input type="date" id="birthday" name="birthday" required />
+  <div class="birthday error"></div>
 
-    <label for="confirmPassword">Confirm Password</label>
-    <input type="password" name="confirmPassword" placeholder="Confirm password" required />
-    <div class="password error"></div>
+  <!-- Password & Confirm password-->
+  <label for="password">Password</label>
+  <input id="password" type="password" name="password" placeholder="Enter a password" required />
+  <div class="password strong"></div>
+  <div class="password notStrong"></div>
 
-    <button>Sign up</button>
-  </form>
+  <label for="confirmPassword">Confirm Password</label>
+  <input type="password" name="confirmPassword" placeholder="Confirm password" required />
+  <div class="password error"></div>
 
-  <%- include('partials/footer'); -%>
+  <button>Sign up</button>
+</form>
 
-    <script>
-      // Get the form element.
-      const form = document.querySelector("form");
+<%- include('partials/footer'); -%>
 
-      // Get the email error element.
-      const emailError = document.querySelector(".email.error");
+<script>
+  // Get the form element.
+  const form = document.querySelector("form");
 
-      // Get the password error element.
-      const passwordError = document.querySelector(".password.error");
-      // Get the password strong element.
-      const passwordStrong = document.querySelector(".password.strong");
-      // Get the password not strong element.
-      const passwordNotStrong = document.querySelector(".password.notStrong");
-      // Get the username error element.
-      const usernameError = document.querySelector(".username.error");
+  // Get the email error element.
+  const emailError = document.querySelector(".email.error");
+  // Get the password error element.
+  const passwordError = document.querySelector(".password.error");
+  // Get the password strong element.
+  const passwordStrong = document.querySelector(".password.strong");
+  // Get the password not strong element.
+  const passwordNotStrong = document.querySelector(".password.notStrong");
+  // Get the username error element.
+  const usernameError = document.querySelector(".username.error");
+  // Get the birthday error element.
+  const birthdayError = document.querySelector(".birthday.error");
+  // Add an event listener to the form submit event.
+  form.addEventListener("submit", async (e) => {
+    // Prevent the default form submission.
+    e.preventDefault();
 
-      // Get the birthday error element.
-      const birthdayError = document.querySelector(".birthday.error");
+    // Reset the error messages.
+    emailError.textContent = "";
+    passwordError.textContent = "";
+    usernameError.textContent = "";
+    birthdayError.textContent = "";
+    passwordStrong.textContent = "";
+    passwordNotStrong.textContent = "";
 
-      // Add an event listener to the form submit event.
-      form.addEventListener("submit", async (e) => {
-        // Prevent the default form submission.
-        e.preventDefault();
+    // Get the form values.
+    const username = form.username.value;
+    const email = form.email.value;
+    const password = form.password.value;
+    const confirmPassword = form.confirmPassword.value;
+    const firstname = form.firstname.value;
+    const lastname = form.lastname.value;
+    const birthday = form.birthday.value;
+    const phone = form.phone.value;
 
-        // Reset the error messages.
-        emailError.textContent = "";
-        passwordError.textContent = "";
-        usernameError.textContent = "";
-        birthdayError.textContent = "";
-        passwordStrong.textContent = "";
-        passwordNotStrong.textContent = "";
+    // Validate the birth date.
+    if (!isDateBeforeToday(birthday)) {
+      birthdayError.textContent = "Choose Relevant Birthday ";
+      return;
+    }
 
-        // Get the form values.
-        const username = form.username.value;
-        const email = form.email.value;
-        const password = form.password.value;
-        const confirmPassword = form.confirmPassword.value;
-        const firstname = form.firstname.value;
-        const lastname = form.lastname.value;
-        const birthday = form.birthday.value;
-        const phone = form.phone.value;
+    // Validate the password.
+    if (password !== confirmPassword) {
+      passwordError.textContent = "Password Not Matched!";
+      return;
+    }
+    if (checkPasswordStrength(password) != "Password is strong!") {
+      return;
+    }
+    // Make an API call to the signup endpoint.
+    const res = await fetch("/signup", {
+      method: "POST",
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+        firstname,
+        lastname,
+        birthday,
+        phone,
+      }),
+      headers: { "Content-type": "application/json" },
+    });
 
-        // Validate the birth date.
-        if (!isDateBeforeToday(birthday)) {
-          birthdayError.textContent = "Choose Relevant Birthday ";
-          return;
-        }
+    // Get the response data.
+    const data = await res.json();
 
-        // Validate the password.
-        if (password !== confirmPassword) {
-          passwordError.textContent = "Password Not Matched!";
-          return;
-        }
-        if (checkPasswordStrength(password) != "Password is strong!") {
-          return
-        }
-        // Make an API call to the signup endpoint.
-        const res = await fetch("/signup", {
-          method: "POST",
-          body: JSON.stringify({
-            username,
-            email,
-            password,
-            firstname,
-            lastname,
-            birthday,
-            phone
-          }),
-          headers: { "Content-type": "application/json" },
-        });
+    // Handle the response.
+    if (data.error) {
+      usernameError.textContent = data.error.username;
+      emailError.textContent = data.error.email;
+    } else if (data.user) {
+      location.assign("/");
+    } else if (data.status) {
+      birthdayError.textContent = data.status;
+    }
 
-        // Get the response data.
-        const data = await res.json();
+    console.log(data);
+  });
+  const password = document.getElementById("password");
+  password.addEventListener("keyup", () => {
+    if (checkPasswordStrength(password.value) != "Password is strong!") {
+      passwordNotStrong.textContent = checkPasswordStrength(password.value);
+      passwordStrong.textContent = "";
+    } else {
+      passwordStrong.textContent = checkPasswordStrength(password.value);
+      passwordNotStrong.textContent = "";
+    }
+  });
 
-        // Handle the response.
-        if (data.error) {
-          usernameError.textContent = data.error.username;
-          emailError.textContent = data.error.email;
-        } else if (data.user) {
-          location.assign("/");
-        } else if (data.status) {
-          birthdayError.textContent = data.status;
-        }
+  // Function to validate the birth date.
+  function isDateBeforeToday(dateString) {
+    // Parse the provided date string into a Date object.
+    const providedDate = new Date(dateString);
+    // Get the current date.
+    const currentDate = new Date();
+    // Set hours, minutes, seconds, and milliseconds to 0 for both dates.
+    providedDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
+    // Compare the two dates.
+    return providedDate <= currentDate;
+  }
 
-        console.log(data);
-      });
-      const password = document.getElementById("password")
-      password.addEventListener('keyup', () => {
-        if (checkPasswordStrength(password.value) != "Password is strong!") {
-          passwordNotStrong.textContent = checkPasswordStrength(password.value)
-          passwordStrong.textContent = ""
-        }
-        else {
-          passwordStrong.textContent = checkPasswordStrength(password.value)
-          passwordNotStrong.textContent = ""
-        }
-      })
-      // Function to validate the birth date.
-      function isDateBeforeToday(dateString) {
-        // Parse the provided date string into a Date object.
-        const providedDate = new Date(dateString);
+  // Function to check password strength
+  function checkPasswordStrength(password) {
+    const minLength = 6;
+    const minUpperCase = 1;
+    const minLowerCase = 1;
+    const minNumbers = 1;
 
-        // Get the current date.
-        const currentDate = new Date();
+    if (password.length < minLength) {
+      return "Password must be at least 8 characters long.";
+    }
 
-        // Set hours, minutes, seconds, and milliseconds to 0 for both dates.
-        providedDate.setHours(0, 0, 0, 0);
-        currentDate.setHours(0, 0, 0, 0);
+    if (password.replace(/[^A-Z]/g, "").length < minUpperCase) {
+      return "Password must contain at least one uppercase letter.";
+    }
 
-        // Compare the two dates.
-        return providedDate <= currentDate;
-      }
-      // Function to check password strength
-      function checkPasswordStrength(password) {
-        const minLength = 6;
-        const minUpperCase = 1;
-        const minLowerCase = 1;
-        const minNumbers = 1;
+    if (password.replace(/[^a-z]/g, "").length < minLowerCase) {
+      return "Password must contain at least one lowercase letter.";
+    }
 
-        if (password.length < minLength) {
-          return "Password must be at least 8 characters long.";
-        }
+    if (password.replace(/[^0-9]/g, "").length < minNumbers) {
+      return "Password must contain at least one number.";
+    }
 
-        if (password.replace(/[^A-Z]/g, "").length < minUpperCase) {
-          return "Password must contain at least one uppercase letter.";
-        }
-
-        if (password.replace(/[^a-z]/g, "").length < minLowerCase) {
-          return "Password must contain at least one lowercase letter.";
-        }
-
-        if (password.replace(/[^0-9]/g, "").length < minNumbers) {
-          return "Password must contain at least one number.";
-        }
-
-        return "Password is strong!"; // Password meets all criteria
-      };
-    </script>
+    return "Password is strong!"; // Password meets all criteria
+  }
+</script>

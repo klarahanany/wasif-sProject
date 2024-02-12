@@ -15,20 +15,23 @@ const bodyParser = require("body-parser");
 const { currentUser, requireAuth, currentAdminUser } = require("./middleware/authMiddware");
 const app = express();
 
-// middleware
+// Middleware
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
 app.set("view engine", "ejs");
-// database connection
+
+// Database connection
 const dbURI = "mongodb://127.0.0.1:27017/SpiritualDrinksShop";
 mongoose
   .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => app.listen(3000))
   .catch((err) => console.log(err));
+
 // Set up Multer
 const path = require("path");
+
 // Set up Multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -46,7 +49,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
   res.send("uploaded");
 });
 
-// routes
+// Routes
 app.get("*", currentUser); //apply to every route (protect routes)
 app.get("*", currentAdminUser); //apply to every route (protect routes)
 app.get("/", async (req, res) => {
@@ -70,6 +73,7 @@ app.get("/", async (req, res) => {
       accessoriesProducts.push(element);
     }
   }
+
   var accessoriesMostSold = getMostSoldProduct(accessoriesProducts);
   var wineMostSold = getMostSoldProduct(wineProducts);
   var beerMostSold = getMostSoldProduct(beerProducts);
@@ -90,6 +94,7 @@ app.get("/", async (req, res) => {
 
   res.render("home", { reviews, bestSellerItems });
 });
+
 function getMostSoldProduct(products) {
   if (!Array.isArray(products) || products.length === 0) {
     // Handle the case when the input is not a valid array or is empty
@@ -120,5 +125,4 @@ app.use("/profile", profileRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/order", orderNowRoutes);
 app.use("/admin", adminRoutes);
-
 app.use("/", authRoutes);
