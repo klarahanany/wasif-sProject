@@ -7,7 +7,7 @@
 <main class="cartContentPage">
   <h2>Shopping List</h2>
   <ul class="cartContent">
-    <% if (cartItems.length===0) { %>
+    <% if (cartItems.length===0) {%>
     <p>Your cart is empty.</p>
     <% } else { %>
     <hr />
@@ -20,8 +20,7 @@
         <br />
         <span> Price: $<%= item.price %> </span>
         <br />
-        <input type="number" class="quantity" id="quantity" name="quantity" min="1" data-id="<%= item.productId %>" value="<%" ="item.quantity" % />
-        required>
+        <input type="number" class="quantity" id="quantity" name="quantity" min="1" data-id="<%= item.productId %>" value="<%= item.quantity %>"required>
         <button class="DeleteFromCart" data-id="<%= item.productId %>" data-userid="<%= userId %>" onclick="removeItem( '<%= item.name %>')">
           <i data-id="<%= item.productId %>" data-userid="<%= userId %>" onclick="removeItem( '<%= item.name %>')" class="fa-solid fa-trash-can"></i>
         </button>
