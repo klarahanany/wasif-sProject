@@ -653,7 +653,7 @@ router.get("/revenue", requireAuthAdmin, async (req, res) => {
         beerProducts.push(element);
       } else if (element.category == "Alcohol") {
         alcoholProducts.push(element);
-      } else if (element.category == "Accessions") {
+      } else if (element.category == "Accessories") {
         accessoriesProducts.push(element);
       }
     }
