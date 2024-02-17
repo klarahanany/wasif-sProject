@@ -584,8 +584,8 @@ router.post("/allOrders/update-status/:id", async (req, res) => {
       to: order.userId.email,
       subject: "Your Order Is Ready",
       text: `Your order is ready and awaiting pickup.
-            Order Detail:
-            ${details} `,
+             Order Detail:
+             ${details} `,
     };
 
     transporter.sendMail(mailOptions, async function (error, info) {
