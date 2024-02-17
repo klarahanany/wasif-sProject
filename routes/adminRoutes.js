@@ -564,12 +564,13 @@ router.post("/allOrders/update-status/:id", async (req, res) => {
   }
   console.log(items);
   console.log("what");
+
   var details = "";
   for (let index = 0; index < order.items.length; index++) {
     const element = order.items[index];
-    details += index + ") Product Name: " + element.productId.name + ", Quantity: " + element.quantity;
-    details += "\n";
+    details += index + ") Product name: " + element.productId.name + ", Quantity: " + element.quantity + "\n";
   }
+
   if (order.status == "pending") {
     var transporter = nodemailer.createTransport({
       service: "gmail",
@@ -582,10 +583,8 @@ router.post("/allOrders/update-status/:id", async (req, res) => {
     var mailOptions = {
       from: "lart0242@gmail.com",
       to: order.userId.email,
-      subject: "Your Order Is Ready",
-      text: `Your order is ready and awaiting pickup.
-             Order Detail:
-             ${details} `,
+      subject: "Order Ready",
+      text: `Your order is ready and awaiting pickup\nOrder Detail:\n${details} `,
     };
 
     transporter.sendMail(mailOptions, async function (error, info) {

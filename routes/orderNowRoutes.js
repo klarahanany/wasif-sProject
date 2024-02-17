@@ -191,11 +191,12 @@ router.post("/cart/payment", async (req, res) => {
   var items = cartForCurrentUser.items;
   var itemsWithMoreQuantity = [];
   var orderDetails = "";
+
   for (let index = 0; index < items.length; index++) {
     const element = items[index];
     const product = await productModel.findOne({ _id: element.productId });
     var num = index + 1;
-    orderDetails += num + ") product name: " + product.name + " quantity: " + element.quantity;
+    orderDetails += num + ") Product name: " + product.name + ", Quantity: " + element.quantity + "\n";
     console.log(product.quantity);
     if (product.quantity > 0) {
       itemsWithMoreQuantity.push(element);
@@ -224,7 +225,7 @@ router.post("/cart/payment", async (req, res) => {
       if (productAfter.quantity < 10) {
         const mainadmin = await UserModel.findOne({ role: "mainadmin" });
 
-        var text = `The Product: ${productAfter.name} Quantity Is Running Low`;
+        var text = `Product quantity is running low \nProduct: ${productAfter.name} \n`;
         var transporter = nodemailer.createTransport({
           service: "gmail",
           auth: {
@@ -237,7 +238,7 @@ router.post("/cart/payment", async (req, res) => {
         var mailOptions = {
           from: "lart0242@gmail.com",
           to: mainadmin.email,
-          subject: "Product Quantity Is Running Low",
+          subject: "Product Quantity",
           text: text,
         };
 
@@ -252,9 +253,7 @@ router.post("/cart/payment", async (req, res) => {
     }
   }
   const mainadmin = await UserModel.findOne({ role: "mainadmin" });
-  var text = `customer's name:${user.firstname} ${user.lastname}
-    order details: 
-    ${orderDetails} `;
+  var text = `Customer's name: ${user.firstname} ${user.lastname} \nOrder Details: \n${orderDetails} `;
   var transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
