@@ -263,20 +263,20 @@ router.post("/cart/payment", async (req, res) => {
   });
 
   // Sending the email
-  var mailOptions = {
+  var mailOptions1 = {
     from: "lart0242@gmail.com",
     to: mainadmin.email,
     subject: "New Order",
     text: text,
   };
 
-  transporter.sendMail(mailOptions, async function (error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Email sent: " + info.response);
-    }
-  });
+  // transporter.sendMail(mailOptions1, async function (error, info) {
+  //   if (error) {
+  //     console.log(error);
+  //   } else {
+  //     console.log("Email sent: " + info.response);
+  //   }
+  // });
 
   if (paymentMethod == "creditCard") {
     if (!validatecardNumber(cardNumber)) {
@@ -288,7 +288,13 @@ router.post("/cart/payment", async (req, res) => {
     } else if (!validatecvv(cvv)) {
       res.status(400).json({ status: "cvv not valid" });
     } else {
-      console.log(cartForCurrentUser.items);
+      transporter.sendMail(mailOptions1, async function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Email sent: " + info.response);
+        }
+      });
       const newOrder = new orderModel({
         userId: cartForCurrentUser.userId, // Replace with a valid user ID from your UserModel
         // items: cartForCurrentUser.items,
@@ -326,7 +332,13 @@ router.post("/cart/payment", async (req, res) => {
       res.status(201).json("done");
     }
   } else {
-    console.log(cartForCurrentUser.items);
+    transporter.sendMail(mailOptions1, async function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
     const newOrder = new orderModel({
       userId: cartForCurrentUser.userId, // Replace with a valid user ID from your UserModel
       //items: cartForCurrentUser.items,
