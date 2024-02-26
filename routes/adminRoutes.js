@@ -563,7 +563,6 @@ router.post("/allOrders/update-status/:id", async (req, res) => {
     }
   }
   console.log(items);
-  console.log("what");
 
   var details = "";
   for (let index = 0; index < order.items.length; index++) {
