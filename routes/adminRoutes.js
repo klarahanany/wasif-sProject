@@ -91,9 +91,11 @@ router.get("/logout", async (req, res) => {
   res.cookie("jwtAdmin", "", { maxAge: 1 }); //replace the current cookie with empty string
   res.redirect("/admin");
 });
+
 router.get("/loginErrorAdmin", (req, res) => {
   res.render("loginErrorAdmin");
 });
+
 router.get("/reviews", requireAuthAdmin, async (req, res) => {
   try {
     const reviews = await Review.find({});
@@ -102,6 +104,7 @@ router.get("/reviews", requireAuthAdmin, async (req, res) => {
     console.error("Error:", err);
   }
 });
+
 router.post("/reviews/deleteItem", async (req, res) => {
   //to display the UI
   const ReviewId = req.body.ReviewId;
@@ -119,6 +122,7 @@ router.post("/reviews/deleteItem", async (req, res) => {
     // Handle the error (e.g., send an error response)
   }
 });
+
 router.get("/", (req, res) => {
   //to display the UI
   res.render("adminLogin");
@@ -155,6 +159,7 @@ router.post("/", async (req, res) => {
     res.status(400).json({ error });
   }
 });
+
 router.get("/inventory", requireAuthAdmin, async (req, res) => {
   const options = [];
   const products = await productModel.find().sort({ quantity: 1 });
@@ -164,6 +169,7 @@ router.get("/inventory", requireAuthAdmin, async (req, res) => {
   }
   res.render("adminInventory", { products, options });
 });
+
 // Add the route to download data as JSON
 router.get("/inventory/downloadProductsData", async (req, res) => {
   try {
@@ -215,6 +221,7 @@ router.get("/inventory/downloadProductsData", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
 router.post("/inventory/update-product", upload.single("image"), async (req, res) => {
   console.log(req.body);
   const { selectName, description, price, quantity, selectOption } = req.body;
@@ -248,6 +255,7 @@ router.post("/inventory/update-product", upload.single("image"), async (req, res
     res.json("done");
   }
 });
+
 router.post("/inventory/update-product/changes", async (req, res) => {
   console.log(req.body);
   const products = await productModel.find();
@@ -268,8 +276,8 @@ router.post("/inventory/delete-product", async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
-// router.use('/images', express.static(path.join(__dirname, 'images')));
 
+// router.use('/images', express.static(path.join(__dirname, 'images')));
 router.post("/inventory/add-product", upload.single("image"), async (req, res) => {
   var flag = 0;
   const { newProductName, description, selectOption, price, quantity } = req.body;
@@ -325,6 +333,7 @@ router.get("/usermanagment", requireAuthAdmin, async (req, res) => {
     res.render("adminUserManagment", { users });
   }
 });
+
 // Add the route to download data as JSON
 router.get("/usermanagment/downloadUserData", async (req, res) => {
   try {
@@ -377,6 +386,7 @@ router.get("/usermanagment/downloadUserData", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
 router.post("/usermanagment/block-user/:userId", async (req, res) => {
   const userId = req.params.userId;
   console.log(userId);
@@ -400,6 +410,7 @@ router.post("/usermanagment/block-user/:userId", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 router.post("/usermanagment/addadmin", async (req, res) => {
   const username = req.body.username;
   const email = req.body.email;
@@ -413,13 +424,13 @@ router.post("/usermanagment/addadmin", async (req, res) => {
     var transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "aff.markssh@gmail.com",
-        pass: "zcdaufonyexxotnw",
+        user: "spiritualdrinks.shop@gmail.com",
+        pass: "vnwd jpxa ztkj cpkh",
       },
     });
 
     var mailOptions = {
-      from: "lart0242@gmail.com",
+      from: "spiritualdrinks.shop@gmail.com",
       to: email,
       subject: "adding worker",
       text: `you have an account now as an worker,
@@ -443,6 +454,7 @@ router.post("/usermanagment/addadmin", async (req, res) => {
     res.status(400).json({ error });
   }
 });
+
 router.post("/usermanagment/deleteadmin", async (req, res) => {
   console.log(req.body);
   const username = req.body.username;
@@ -458,13 +470,13 @@ router.post("/usermanagment/deleteadmin", async (req, res) => {
     var transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "aff.markssh@gmail.com",
-        pass: "zcdaufonyexxotnw",
+        user: "spiritualdrinks.shop@gmail.com",
+        pass: "vnwd jpxa ztkj cpkh",
       },
     });
 
     var mailOptions = {
-      from: "lart0242@gmail.com",
+      from: "spiritualdrinks.shop@gmail.com",
       to: user.email,
       subject: "Deleting Worker",
       text: `Your account has been deactivated. You no longer have administrator privileges.`,
@@ -482,6 +494,7 @@ router.post("/usermanagment/deleteadmin", async (req, res) => {
     console.error("Error deleting user:", error);
   }
 });
+
 router.get("/allOrders", requireAuthAdmin, async (req, res) => {
   try {
     const orders = await orderModel.find({}).populate("userId", "username").populate("items.productId", "name");
@@ -493,6 +506,7 @@ router.get("/allOrders", requireAuthAdmin, async (req, res) => {
   }
   // const orders = await orderModel.find()
 });
+
 // Add the route to download data as JSON
 router.get("/allOrders/downloadOrdersData", async (req, res) => {
   try {
@@ -548,10 +562,11 @@ router.get("/allOrders/downloadOrdersData", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
 router.post("/allOrders/update-status/:id", async (req, res) => {
   console.log(req.params);
   var id = req.params.id;
-  //    const order = await orderModel.findOne({_id:req.params.id})
+  // Const order = await orderModel.findOne({_id:req.params.id})
   const orders = await orderModel.find().populate("userId", "email").populate("items.productId", "name");
   var order = {};
   var items = [];
@@ -574,13 +589,13 @@ router.post("/allOrders/update-status/:id", async (req, res) => {
     var transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "aff.markssh@gmail.com",
-        pass: "zcdaufonyexxotnw",
+        user: "spiritualdrinks.shop@gmail.com",
+        pass: "vnwd jpxa ztkj cpkh",
       },
     });
 
     var mailOptions = {
-      from: "lart0242@gmail.com",
+      from: "spiritualdrinks.shop@gmail.com",
       to: order.userId.email,
       subject: "Order Ready",
       text: `Your order is ready and awaiting pickup\nOrder Detail:\n${details} `,
@@ -611,6 +626,7 @@ router.post("/allOrders/update-status/:id", async (req, res) => {
     res.status(400).json({ status: "An email has been sent to this customer notifying him to pick up their items." });
   }
 });
+
 router.get("/revenue", requireAuthAdmin, async (req, res) => {
   try {
     var wineProducts = [];
@@ -694,7 +710,6 @@ router.get("/profile", requireAuthAdmin, async (req, res) => {
     // Optionally close the connection here if you're not using it elsewhere
   } catch (err) {
     console.error("Error:", err);
-    // Optionally close the connection here if you're not using it elsewhere
   }
   // const orders = await orderModel.find()
 });

@@ -171,7 +171,7 @@ router.post("/forgotPass", async (req, res) => {
     });
 
     var mailOptions = {
-      from: "lart0242@gmail.com",
+      from: "spiritualdrinks.shop@gmail.com",
       to: email,
       subject: "Reset Password",
       text: link,

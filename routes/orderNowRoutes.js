@@ -229,14 +229,14 @@ router.post("/cart/payment", async (req, res) => {
         var transporter = nodemailer.createTransport({
           service: "gmail",
           auth: {
-            user: "aff.markssh@gmail.com",
-            pass: "zcdaufonyexxotnw",
+            user: "spiritualdrinks.shop@gmail.com",
+            pass: "vnwd jpxa ztkj cpkh",
           },
         });
 
         // Sending the email
         var mailOptions = {
-          from: "lart0242@gmail.com",
+          from: "spiritualdrinks.shop@gmail.com",
           to: mainadmin.email,
           subject: "Product Quantity",
           text: text,
@@ -257,14 +257,14 @@ router.post("/cart/payment", async (req, res) => {
   var transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "aff.markssh@gmail.com",
-      pass: "zcdaufonyexxotnw",
+      user: "spiritualdrinks.shop@gmail.com",
+      pass: "vnwd jpxa ztkj cpkh",
     },
   });
 
   // Sending the email
   var mailOptions1 = {
-    from: "lart0242@gmail.com",
+    from: "spiritualdrinks.shop@gmail.com",
     to: mainadmin.email,
     subject: "New Order",
     text: text,
