@@ -1,53 +1,46 @@
 <%- include('partials/headerAdmin'); -%>
 
-    <head>
-        <title>Reviews</title>
-    </head>
+<head>
+  <title>Reviews</title>
+</head>
 
-    <body>
-        <h1>Reviews</h1>
+<body>
+  <h1>Reviews</h1>
 
-        <% reviews.forEach(function(review) { %>
-            <div class="review">
-                <p>
-                    <%= review.title %>
-                </p>
-                <p>Rating: <%= review.rating %>
-                </p>
-                <p>Author: <%= review.author %>
-                </p>
+  <% reviews.forEach(function(review) { %>
+  <div class="review">
+    <p><%= review.title %></p>
+    <p>Rating: <%= review.rating %></p>
+    <p>Author: <%= review.author %></p>
 
-                <p>
-                    <%= review.body %>
-                </p>
+    <p><%= review.body %></p>
 
-                <p>Date: <%= review.date.toLocaleDateString() %>
-                </p>
-                <% if(admin.role=='mainadmin' ){ %>
-                    <button class="DeleteFromCart" data-id='<%= review._id %>' 
-                        onclick="removeItem( )"><i data-id='<%= review._id %>' 
-                            onclick="removeItem( )" class="fa-solid fa-trash-can"></i></button>
-                    <% }%>
-            </div>
-            <% }); %>
+    <p>Date: <%= review.date.toLocaleDateString() %></p>
+    <% if(admin.role=='mainadmin' ){ %>
+    <button class="DeleteFromCart" data-id="<%= review._id %>" onclick="removeItem( )">
+      <i data-id="<%= review._id %>" onclick="removeItem( )" class="fa-solid fa-trash-can"></i>
+    </button>
+    <% }%>
+  </div>
+  <% }); %>
 
-                <script>
-                    document.getElementById("reviewManage").style.backgroundColor = "#f9df4b"
-                    async function removeItem() {
-                        var ReviewId = event.target.getAttribute('data-id')
-                        console.log(ReviewId)
-                        var body = { "ReviewId": ReviewId}
-                        const rawResponse = await fetch('http://localhost:3000/admin/reviews/deleteItem', {
-                            method: 'POST',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(body)
-                        });
-                        const content = await rawResponse.json();
-                        window.location.reload()
-
-                    }
-                </script>
-                <%- include('partials/footer'); -%>
+  <script>
+    document.getElementById("reviewManage").style.backgroundColor = "#f9df4b";
+    async function removeItem() {
+      var ReviewId = event.target.getAttribute("data-id");
+      console.log(ReviewId);
+      var body = { ReviewId: ReviewId };
+      const rawResponse = await fetch("http://localhost:3000/admin/reviews/deleteItem", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      const content = await rawResponse.json();
+      window.location.reload();
+    }
+  </script>
+  <%- include('partials/footer'); -%>
+</body>

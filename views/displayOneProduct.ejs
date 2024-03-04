@@ -1,62 +1,53 @@
 <%- include('partials/header'); -%>
 
-    <head>
-        <title>
-            <%= product.name %>
-        </title>
-    </head>
-    <div class="productcard" data-category="<%= product.category %>" id="<%= product._id %>" theId="<%= product._id %>"
-        onclick="goToProduct(event)">
-        <img src="/<%= product.image %>" alt="Example Image" theId="<%= product._id %>">
-        <h3 class="product-title" theId="<%= product._id %>">
-            <%= product.name %>
-        </h3>
-        <p class="product-description" theId="<%= product._id %>">
-            <%= product.description %>
-        </p>
-        <p class="product-price" theId="<%= product._id %>">Price: $<%= product.price.toFixed(2) %>
-        </p>
-        <input type="hidden" name="drinkId" value="<%= product.id %>" id="drinkId">
-        <input type="hidden" name="userId" value="<%= userId %>" id="userId">
+<head>
+  <title><%= product.name %></title>
+</head>
+<div class="productcard" data-category="<%= product.category %>" id="<%= product._id %>" theId="<%= product._id %>" onclick="goToProduct(event)">
+  <img src="/<%= product.image %>" alt="Example Image" theId="<%= product._id %>" />
+  <h3 class="product-title" theId="<%= product._id %>"><%= product.name %></h3>
+  <p class="product-description" theId="<%= product._id %>"><%= product.description %></p>
+  <p class="product-price" theId="<%= product._id %>">Price: $<%= product.price.toFixed(2) %></p>
+  <input type="hidden" name="drinkId" value="<%= product.id %>" id="drinkId" />
+  <input type="hidden" name="userId" value="<%= userId %>" id="userId" />
 
-        <% if(product.quantity==0){ %>
-            <p class="sold-out-message" style="font-size: 25px;" theId="<%= product._id %>">Sold Out</p>
-            <%}else{%>
-                <label for="quantity" theId="<%= product._id %>">Quantity</label>
-                <input type="number" id="quantity" data-item-id="<%= product.id %>" class="quantity" name="quantity"
-                    min="1" value="1" required>
-                <button class="add-to-cart" type="submit" data-item-id="<%= product.id %> " data-userId="<%= userId %>"
-                    onclick="addToCart(event)">Add to Cart</button>
+  <% if(product.quantity==0){ %>
+  <p class="sold-out-message" style="font-size: 25px" theId="<%= product._id %>">Sold Out</p>
+  <%}else{%>
+  <label for="quantity" theId="<%= product._id %>">Quantity</label>
+  <input type="number" id="quantity" data-item-id="<%= product.id %>" class="quantity" name="quantity" min="1" value="1" required />
+  <button class="add-to-cart" type="submit" data-item-id="<%= product.id %> " data-userId="<%= userId %>" onclick="addToCart(event)">
+    Add to Cart
+  </button>
 
-                <%}%>
-    </div>
-    <script>
-        async function addToCart(event) {
-            const allQuantity = document.querySelectorAll('.quantity')
-            const drinkId = event.target.getAttribute('data-item-id')
-            const userId = event.target.getAttribute('data-userid');
-            var drinkQuantity = 1;
+  <%}%>
+</div>
+<script>
+  async function addToCart(event) {
+    const allQuantity = document.querySelectorAll(".quantity");
+    const drinkId = event.target.getAttribute("data-item-id");
+    const userId = event.target.getAttribute("data-userid");
+    var drinkQuantity = 1;
 
-            await allQuantity.forEach(quantity => {
-                console.log(drinkId)
-                console.log(quantity.getAttribute('data-item-id'))
-                if (quantity.getAttribute('data-item-id').trim() == drinkId.trim()) {
-                    drinkQuantity = quantity.value;
-
-                }
-            })
-            var body = { "drinkId": drinkId, "quantity": drinkQuantity, "userId": userId }
-            const rawResponse = await fetch('http://localhost:3000/order/add-to-cart', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            });
-            const content = await rawResponse.json();
-            console.log("the content : ")
-            console.log(content)
-        }
-    </script>
-    <%- include('partials/footer'); -%>
+    await allQuantity.forEach((quantity) => {
+      console.log(drinkId);
+      console.log(quantity.getAttribute("data-item-id"));
+      if (quantity.getAttribute("data-item-id").trim() == drinkId.trim()) {
+        drinkQuantity = quantity.value;
+      }
+    });
+    var body = { drinkId: drinkId, quantity: drinkQuantity, userId: userId };
+    const rawResponse = await fetch("http://localhost:3000/order/add-to-cart", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    const content = await rawResponse.json();
+    console.log("the content : ");
+    console.log(content);
+  }
+</script>
+<%- include('partials/footer'); -%>

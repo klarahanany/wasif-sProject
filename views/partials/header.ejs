@@ -2,29 +2,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <title>Document</title> -->
     <link rel="stylesheet" href="/styles.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" rel="stylesheet" />
-    <!-- <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"> -->
   </head>
 
   <body>
     <nav class="nav">
       <h2><a href="/">Spiritual Drinks Shop</a></h2>
       <ul>
+        <!-- Check if a user is logged in -->
         <% if (user) { %>
         <li class="barData"><a href="/">Home</a></li>
         <li class="barData"><a href="/order">Order Now</a></li>
         <li>
+          <!-- Cart icon link -->
           <a href="/order/cart"><i class="fa fa-cart-shopping"></i></a>
         </li>
         <li>
+          <!-- User profile icon link -->
           <a href="/profile"><i class="fa-regular fa-user"></i></a>
         </li>
 
+        <!-- Display a welcome message with the user's name -->
         <p>Welcome, <%= user.firstname %> <%= user.lastname %></p>
+        <!-- Logout -->
         <li><a href="/logout">Logout</a></li>
         <% } else { %>
+        <!-- Display login and signup links for non-logged-in users -->
         <li id="nohover"><a href="/login">Login</a></li>
         <li id="nohover"><a href="/signup" class="btn">Signup</a></li>
         <% } %>

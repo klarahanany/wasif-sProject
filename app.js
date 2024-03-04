@@ -1,6 +1,7 @@
+// Importing necessary packages and modules
 const express = require("express");
 const mongoose = require("mongoose");
-const Review = require("./models/Review"); // Assuming you have a Review model
+const Review = require("./models/Review");
 const UserModel = require("./models/userModel.js");
 const productModel = require("./models/productModel.js");
 const multer = require("multer");
@@ -50,16 +51,20 @@ app.post("/upload", upload.single("image"), (req, res) => {
 });
 
 // Routes
-app.get("*", currentUser); //apply to every route (protect routes)
-app.get("*", currentAdminUser); //apply to every route (protect routes)
+app.get("*", currentUser); // Middleware to check and set current user
+app.get("*", currentAdminUser); // Middleware to check and set current admin user
 app.get("/", async (req, res) => {
-  const reviews = await Review.find().limit(3); // Fetch reviews from your database
+  // Fetching reviews and products for the home page
+  const reviews = await Review.find().limit(3);
   const products = await productModel.find();
+
+  // Categorizing products for display
   var wineProducts = [];
   var alcoholProducts = [];
   var beerProducts = [];
   var accessoriesProducts = [];
 
+  // Sorting products based on their categories
   for (let index = 0; index < products.length; index++) {
     const element = products[index];
     if (element.category == "Wine") {
@@ -74,6 +79,7 @@ app.get("/", async (req, res) => {
     }
   }
 
+  // Retrieving most sold products for each category
   var accessoriesMostSold = getMostSoldProduct(accessoriesProducts);
   var wineMostSold = getMostSoldProduct(wineProducts);
   var beerMostSold = getMostSoldProduct(beerProducts);
@@ -92,12 +98,13 @@ app.get("/", async (req, res) => {
     bestSellerItems.push(alcoholMostSold);
   }
 
+  // Rendering the home page with reviews and best-selling items
   res.render("home", { reviews, bestSellerItems });
 });
 
+// Function to find the most sold product in an array
 function getMostSoldProduct(products) {
   if (!Array.isArray(products) || products.length === 0) {
-    // Handle the case when the input is not a valid array or is empty
     return null;
   }
 
@@ -120,7 +127,7 @@ function getMostSoldProduct(products) {
   return mostSoldProduct;
 }
 
-app.get("/smoothies", requireAuth, (req, res) => res.render("smoothies"));
+// Using various routes for different functionalities
 app.use("/profile", profileRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/order", orderNowRoutes);

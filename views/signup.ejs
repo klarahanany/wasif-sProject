@@ -20,13 +20,14 @@
   <label for="lastname">Last Name</label>
   <input type="text" name="lastname" placeholder="Enter your last name" required />
 
-  <!-- Enaul -->
+  <!-- Email -->
   <label for="email">Email</label>
   <input type="text" name="email" placeholder="Enter your email" required />
   <div class="email error"></div>
 
-  <label for="phoneNumber">Phone Number:</label>
-  <input type="tel" id="phoneNumber" name="phone" pattern="[0-9]{10}" required />
+  <!-- Phone number -->
+  <label for="phoneNumber">Phone Number</label>
+  <input type="tel" id="phoneNumber" name="phone" pattern="[0-9]{10}" placeholder="Enter your phone number" required />
   <div class="phone error"></div>
 
   <!-- Birth date -->
@@ -52,7 +53,6 @@
 <script>
   // Get the form element.
   const form = document.querySelector("form");
-
   // Get the email error element.
   const emailError = document.querySelector(".email.error");
   // Get the password error element.
@@ -96,10 +96,10 @@
 
     // Validate the password.
     if (password !== confirmPassword) {
-      passwordError.textContent = "Password Not Matched!";
+      passwordError.textContent = "Password Doesn't Match";
       return;
     }
-    if (checkPasswordStrength(password) != "Password is strong!") {
+    if (checkPasswordStrength(password) != "Password is Strong!") {
       return;
     }
     // Make an API call to the signup endpoint.

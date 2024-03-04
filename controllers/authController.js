@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
-
 // Error handler
 const handleErrors = (err, usernameValue, emailValue) => {
   let errors = { username: "", email: "", password: "" };
@@ -25,12 +24,12 @@ const handleErrors = (err, usernameValue, emailValue) => {
   if (
     err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: username_1 dup key: { username: "${usernameValue}" }`
   ) {
-    errors.username = "that username is already registered";
+    errors.username = "this username is already registered";
     return errors;
   }
   //
   if (err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: email_1 dup key: { email: "${emailValue}" }`) {
-    errors.email = "that email is already registered";
+    errors.email = "this email is already registered 1";
     return errors;
   }
   // Validation errors
@@ -72,7 +71,7 @@ const signup_post = async (req, res) => {
       res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
       res.status(201).json({ user: user._id }); // send back to frontend as json body
     } else {
-      res.status(400).json({ status: "You Are Under Age" });
+      res.status(400).json({ status: "You are Underage" });
     }
   } catch (e) {
     const error = handleErrors(e, username, email);

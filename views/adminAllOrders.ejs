@@ -1,163 +1,137 @@
 <%- include('partials/headerAdmin'); -%>
 
-  <head>
-    <title>Orders Managmenet</title>
-  </head>
+<head>
+  <title>Orders Managmenet</title>
+</head>
 
-  <body>
-    <h1>All Orders</h1>
+<body>
+  <h1>All Orders</h1>
 
-    <% if (orders.length===0) { %>
-      <p>No orders found.</p>
-      <% } else { %>
-        <form id="formDownload" action="/admin/allOrders/downloadOrdersData" method="get">
-          <button type="submit">Download Orders Data</button>
-        </form>
-        <label class="filterLabel">Filter by Status:</label>
-        <form id="statusFilterForm" dir="ltr" class="filter-form">
-          <label>
-            <input id="Ready" type="checkbox" name="category" value="ready">Ready
-          </label>
-          <label>
-            <input id="Pending" type="checkbox" name="category" value="pending">Pending
-          </label>
-        </form>
-        <p id="status" style="color: red"></p>
-        <table>
-          <thead>
-            <tr>
-              <!-- <th>Order ID</th> -->
-              <th>Order Date</th>
-              <th>username</th>
-              <th>Total Amount</th>
-              <th>Payment Method</th>
+  <% if (orders.length===0) { %>
+  <p>No orders found.</p>
+  <% } else { %>
+  <form id="formDownload" action="/admin/allOrders/downloadOrdersData" method="get">
+    <button type="submit">Download Orders Data</button>
+  </form>
+  <label class="filterLabel">Filter by Status:</label>
+  <form id="statusFilterForm" dir="ltr" class="filter-form">
+    <label> <input id="Ready" type="checkbox" name="category" value="ready" />Ready </label>
+    <label> <input id="Pending" type="checkbox" name="category" value="pending" />Pending </label>
+  </form>
+  <p id="status" style="color: red"></p>
+  <table>
+    <thead>
+      <tr>
+        <!-- <th>Order ID</th> -->
+        <th>Order Date</th>
+        <th>username</th>
+        <th>Total Amount</th>
+        <th>Payment Method</th>
 
-              <th>Order Details</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% orders.forEach(order=> { %>
-              <tr id="<%=order._id%>">
-                <td>
-                  <%= order.order_date.toLocaleDateString() %>
-                </td>
-                <td>
-                  <%= order.userId.username %>
-                </td>
+        <th>Order Details</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% orders.forEach(order=> { %>
+      <tr id="<%=order._id%>">
+        <td><%= order.order_date.toLocaleDateString() %></td>
+        <td><%= order.userId.username %></td>
 
-                <td>$<%= order.total_amount.toFixed(2) %>
-                </td>
-                <td>
-                  <%= order.payment.payment_method %>
-                </td>
+        <td>$<%= order.total_amount.toFixed(2) %></td>
+        <td><%= order.payment.payment_method %></td>
 
-                <td>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <% order.items.forEach(item=> { %>
-                        <tr>
-                          <td>
-                            <%= item.productId.name %>
-                          </td>
-                          <td>
-                            <%= item.quantity %>
-                          </td>
-                        </tr>
-                        <% }) %>
-                    </tbody>
-                  </table>
-                </td>
-                <td>
-                  <%= order.status %>
-                </td>
-                <td>
-                  <form class="MarkasReady" id="MarkasReady">
-                    <button type="submit" data-id="<%= order._id %>" onclick="MarkasReady(event)">Mark as Ready</button>
-                  </form>
-                </td>
+        <td>
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% order.items.forEach(item=> { %>
+              <tr>
+                <td><%= item.productId.name %></td>
+                <td><%= item.quantity %></td>
               </tr>
               <% }) %>
-          </tbody>
-        </table>
-        <% } %>
-          <script>
-            document.getElementById("orderManage").style.backgroundColor = "#f9df4b"
-            var orders1 = `<%- JSON.stringify(orders) %>`;
-            var orders = JSON.parse(orders1);
-            var admin1 = `<%- JSON.stringify(admin) %>`;
-            var admin = JSON.parse(admin1);
-            if (admin.role == "mainadmin") {
+            </tbody>
+          </table>
+        </td>
+        <td><%= order.status %></td>
+        <td>
+          <form class="MarkasReady" id="MarkasReady">
+            <button type="submit" data-id="<%= order._id %>" onclick="MarkasReady(event)">Mark as Ready</button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+  <script>
+    document.getElementById("orderManage").style.backgroundColor = "#f9df4b";
+    var orders1 = `<%- JSON.stringify(orders) %>`;
+    var orders = JSON.parse(orders1);
+    var admin1 = `<%- JSON.stringify(admin) %>`;
+    var admin = JSON.parse(admin1);
+    if (admin.role == "mainadmin") {
+      document.getElementById("formDownload").style.display = "block";
+    } else if (admin.role == "worker") {
+      document.getElementById("formDownload").style.display = "none";
+    }
+    async function MarkasReady(event) {
+      event.preventDefault();
+      const status = document.getElementById("status");
+      const id = event.target.getAttribute("data-id");
+      console.log(id);
+      status.textContent = "";
+      //api call from frontend to server, sending data from form to server to save in db
+      const res = await fetch(`http://localhost:3000/admin/allOrders/update-status/${id}`, {
+        method: "POST",
+        body: JSON.stringify(),
+        headers: { "Content-type": "application/json" },
+      });
 
-              document.getElementById("formDownload").style.display = "block";
-            } else if (admin.role == "worker") {
+      //after getting response from the server
+      const data = await res.json();
+      if (data.status) {
+        status.textContent = data.status;
+      } else if (data == "success") {
+        window.location.reload();
+      }
+    }
+    const statusFilterForm = document.getElementById("statusFilterForm");
 
-              document.getElementById("formDownload").style.display = "none";
-            }
-            async function MarkasReady(event) {
-              event.preventDefault();
-              const status = document.getElementById("status");
-              const id = event.target.getAttribute("data-id");
-              console.log(id);
-              status.textContent = "";
-              //api call from frontend to server, sending data from form to server to save in db
-              const res = await fetch(`http://localhost:3000/admin/allOrders/update-status/${id}`, {
-                method: "POST",
-                body: JSON.stringify(),
-                headers: { "Content-type": "application/json" },
-              });
+    statusFilterForm.addEventListener("change", () => {
+      const selectedstatus = Array.from(statusFilterForm.querySelectorAll('input[name="category"]:checked')).map((input) => input.value);
+      if (selectedstatus.length > 0) {
+        filteredData = [];
+        console.log(selectedstatus);
+        orders.forEach((order) => {
+          console.log(order.status);
+          if (selectedstatus.includes(order.status)) {
+            filteredData.push(order);
+          }
+        });
+        orders.forEach((order) => {
+          const orderElement = document.getElementById(`${order._id}`);
+          if (filteredData.includes(order)) {
+            orderElement.style.display = "table-row";
+          } else {
+            orderElement.style.display = "none";
+          }
+        });
+      } else {
+        orders.forEach((order) => {
+          const orderElement = document.getElementById(`${order._id}`);
+          orderElement.style.display = "table-row";
+        });
+      }
+    });
+  </script>
+</body>
 
-              //after getting response from the server
-              const data = await res.json();
-              if (data.status) {
-                status.textContent = data.status;
-              } else if (data == "success") {
-                window.location.reload();
-              }
-            }
-            const statusFilterForm = document.getElementById('statusFilterForm');
-
-            statusFilterForm.addEventListener('change', () => {
-              const selectedstatus = Array.from(statusFilterForm.querySelectorAll('input[name="category"]:checked')).map(input => input.value);
-              if (selectedstatus.length > 0) {
-
-                filteredData = []
-                console.log(selectedstatus)
-                orders.forEach((order) => {
-                  console.log(order.status)
-                  if (selectedstatus.includes(order.status)) {
-                    filteredData.push(order)
-                  }
-                })
-                orders.forEach((order) => {
-                  const orderElement = document.getElementById(`${order._id}`);
-                  if (filteredData.includes(order)) {
-                    orderElement.style.display = "table-row";
-                  } else {
-                    orderElement.style.display = "none";
-                  }
-                });
-              }
-              else {
-                orders.forEach((order) => {
-                  const orderElement = document.getElementById(`${order._id}`);
-                  orderElement.style.display = "table-row";
-
-                });
-              }
-
-
-
-
-            });
-          </script>
-  </body>
-
-  <%- include('partials/footer'); -%>
+<%- include('partials/footer'); -%>

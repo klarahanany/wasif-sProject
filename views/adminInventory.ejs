@@ -203,15 +203,11 @@
       statusUpdate.textContent = "please choose relevante quantity";
       document.getElementById("statusSuccess").textContent = "";
     } else {
-      // var body = { "selectedValue": value, "description": description.value, "price": price.value, "quantity": quantity.value, "category": category.value }
       const formData = new FormData(formUpdate);
 
       const rawResponse = await fetch("http://localhost:3000/admin/inventory/update-product", {
         method: "POST",
-        // headers: {
-        //     'Accept': 'application/json',
-        //     'Content-Type': 'application/json'
-        // },
+
         body: formData,
       });
       const content = await rawResponse.json();

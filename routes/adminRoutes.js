@@ -44,12 +44,12 @@ const handleErrors = (err) => {
 
   // Incorrect user/admin
   if (err === "incorrect username") {
-    errors.username = "you are not an admin";
+    errors.username = "You are Not an Admin";
   }
 
   // Incorrect password admin
   if (err == "incorrect password") {
-    errors.password = "incorrect password";
+    errors.password = "Incorrect Password";
   }
 
   // validation errors
@@ -69,13 +69,13 @@ const handleErrors2 = (err, usernameValue, emailValue) => {
   if (
     err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: username_1 dup key: { username: "${usernameValue}" }`
   ) {
-    errors.username = "that username is already registered";
+    errors.username = "This Username is Already Registered";
     return errors;
   }
 
   // Duplicate email error
   if (err.message === `E11000 duplicate key error collection: SpiritualDrinksShop.users index: email_1 dup key: { email: "${emailValue}" }`) {
-    errors.email = "that email is already registered";
+    errors.email = "This Email is Already Registered";
     return errors;
   }
 

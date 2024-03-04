@@ -155,7 +155,7 @@
     if (!isDateBeforeToday(birthday)) {
       birthdayError.textContent = "Choose Relevant Birthday ";
     } else if (password != confirmPassword) {
-      passwordError.textContent = "not the same password";
+      passwordError.textContent = "Password Doesn't Match";
     } else {
       //api call from frontend to server, sending data from form to server to save in db
       const res = await fetch("/admin/usermanagment/addadmin", {
@@ -167,7 +167,7 @@
       //after getting response from the server
       const data = await res.json();
       if (data == "done") {
-        document.getElementById("successStatus").textContent = "worker added successfully";
+        document.getElementById("successStatus").textContent = "Worker added successfully";
         emailError.textContent = "";
         passwordError.textContent = "";
         usernameError.textContent = "";
