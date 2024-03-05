@@ -6,46 +6,63 @@
 
 <body>
   <h1>User Management</h1>
+
+  <!-- Download Users Data Form -->
   <form id="formDownload" action="/admin/usermanagment/downloadUserData" method="get">
     <button type="submit">Download Users Data</button>
   </form>
 
+  <!-- Add/Delete Buttons Section -->
   <div class="addDelButtons">
     <button onclick="addFormDisplay()" id="addNewAdmin">add new Worker</button>
     <button onclick="deleteFormDisplay()" id="deleteAdmin">delete Worker</button>
   </div>
 
+  <!-- Add Worker Form -->
   <form id="addFormDisplay" style="display: none">
     <a href="" onclick="formClose()" style="float: right"><i class="fa-solid fa-x"></i></a>
 
+    <!-- Username -->
     <label for="username">Username</label>
-    <input type="text" name="username" required />
+    <input type="text" name="username" placeholder="Enter your username" required />
     <div class="username error"></div>
 
+    <!-- First name -->
     <label for="firstname">First Name</label>
-    <input type="text" name="firstname" required />
+    <input type="text" name="firstname" placeholder="Enter your first name" required />
 
+    <!-- Last name -->
     <label for="lastname">Last Name</label>
-    <input type="text" name="lastname" required />
+    <input type="text" name="lastname" placeholder="Enter your last name" required />
 
+    <!-- Email -->
     <label for="email">Email</label>
-    <input type="text" name="email" required />
+    <input type="text" name="email" placeholder="Enter your email" required />
     <div class="email error"></div>
 
-    <label for="birthday">Birthday:</label>
+    <!-- Phone number -->
+    <label for="phoneNumber">Phone Number</label>
+    <input type="tel" id="phoneNumber" name="phone" pattern="[0-9]{10}" placeholder="Enter your phone number" required />
+    <div class="phone error"></div>
+
+    <!-- Birth date -->
+    <label for="birthday">Birth Date</label>
     <input type="date" id="birthday" name="birthday" required />
     <div class="birthday error"></div>
 
+    <!-- Password & Confirm password-->
     <label for="password">Password</label>
-    <input type="password" name="password" required />
+    <input type="password" name="password" placeholder="Enter a password" required />
+
     <label for="confirmPassword">Confirm Password</label>
-    <input type="password" name="confirmPassword" required />
+    <input type="password" name="confirmPassword" placeholder="Confirm password" required />
     <div class="password error"></div>
 
     <button type="submit">Add Worker</button>
     <p id="successStatus" style="color: green; font-weight: bold"></p>
   </form>
 
+  <!-- Delete Worker Form -->
   <form id="deleteFormDisplay" style="display: none">
     <a href="" onclick="formClose()" style="float: right"><i class="fa-solid fa-x"></i></a>
     <label for="username">Username</label>
@@ -55,20 +72,27 @@
       <option value="<%= option.username %>"><%= option.username %></option>
       <% }}); %>
     </select>
-    <p id="failStatusDelete" style="color: red; font-weight: bold"></p>
 
+    <!-- Error Messages and Submit Button -->
+    <p id="failStatusDelete" style="color: red; font-weight: bold"></p>
     <button type="submit">Delete Worker</button>
 
+    <!-- Success Status -->
     <p id="successStatusDelete" style="color: green; font-weight: bold"></p>
   </form>
+
+  <!-- Users List Title and Search Bar -->
   <h2 style="margin-top: 10px">Users List</h2>
   <div class="searchBarContainer">
     <input id="searchBar" type="text" placeholder="Search.." />
     <i class="fa-solid fa-magnifying-glass"></i>
   </div>
+
+  <!-- Users List Table -->
   <div class="usermanagment">
     <table>
       <thead>
+        <!-- Table Headers -->
         <tr>
           <th>Username</th>
           <th>First Name</th>
@@ -81,6 +105,7 @@
         </tr>
       </thead>
       <tbody>
+        <!-- User Rows -->
         <% users.forEach(function(user) { %>
         <tr id="<%=user._id%>">
           <td><%= user.username %></td>
@@ -100,13 +125,15 @@
       </tbody>
     </table>
   </div>
-
-  <!-- Table to display all users -->
 </body>
+
 <script>
   document.getElementById("userManage").style.backgroundColor = "#f9df4b";
+
   var admin1 = `<%- JSON.stringify(admin) %>`;
   var admin = JSON.parse(admin1);
+
+  // Displaying add/delete buttons based on admin role
   if (admin.role == "mainadmin") {
     document.getElementById("addNewAdmin").style.display = "block";
     document.getElementById("deleteAdmin").style.display = "block";
@@ -116,34 +143,42 @@
     document.getElementById("deleteAdmin").style.display = "none";
     document.getElementById("formDownload").style.display = "none";
   }
+
+  // Functions to toggle display of add and delete forms
   function addFormDisplay() {
     document.getElementById("addFormDisplay").style.display = "block";
     document.getElementById("deleteFormDisplay").style.display = "none";
   }
+
   function deleteFormDisplay() {
     document.getElementById("deleteFormDisplay").style.display = "block";
     document.getElementById("addFormDisplay").style.display = "none";
   }
+
   function formClose() {
     document.getElementById("addFormDisplay").style.display = "none";
     document.getElementById("deleteFormDisplay").style.display = "none";
   }
+
+  // Accessing form elements and error messages
   const formadd = document.querySelector("#addFormDisplay");
   const formdelete = document.querySelector("#deleteFormDisplay");
 
   const emailError = document.querySelector(".email.error");
   const passwordError = document.querySelector(".password.error");
   const usernameError = document.querySelector(".username.error");
-
   const birthdayError = document.querySelector(".birthday.error");
+
+  // Event listener for add form submission
   formadd.addEventListener("submit", async (e) => {
     e.preventDefault();
-    //reset errors
+    // Resetting error messages
     emailError.textContent = "";
     passwordError.textContent = "";
     usernameError.textContent = "";
     birthdayError.textContent = "";
-    // get values
+
+    // Extracting values from the form
     const username = formadd.username.value;
     const email = formadd.email.value;
     const password = formadd.password.value;
@@ -152,19 +187,20 @@
     const lastname = formadd.lastname.value;
     const birthday = formadd.birthday.value;
 
+    // Validating form data
     if (!isDateBeforeToday(birthday)) {
       birthdayError.textContent = "Choose Relevant Birthday ";
     } else if (password != confirmPassword) {
       passwordError.textContent = "Password Doesn't Match";
     } else {
-      //api call from frontend to server, sending data from form to server to save in db
+      // Making an API call to the server to add a new worker
       const res = await fetch("/admin/usermanagment/addadmin", {
         method: "POST",
         body: JSON.stringify({ username, email, password, firstname, lastname, birthday }),
         headers: { "Content-type": "application/json" },
       });
 
-      //after getting response from the server
+      // Processing the response from the server
       const data = await res.json();
       if (data == "done") {
         document.getElementById("successStatus").textContent = "Worker added successfully";
@@ -181,28 +217,33 @@
         formadd.birthday.value = "";
       }
       if (data.error) {
-        // passwordError.textContent = data.error.password
+        // Displaying errors returned by the server
         usernameError.textContent = data.error.username;
         emailError.textContent = data.error.email;
       }
     }
   });
+
+  // Accessing elements for delete form handling
   const usernameError2 = document.getElementById("failStatusDelete");
 
+  // Event listener for delete form submission
   formdelete.addEventListener("submit", async (e) => {
     e.preventDefault();
     const adminUsername = document.getElementById("alladmins");
+
+    // Validating if a worker is selected for deletion
     if (adminUsername.value == "selectAdmin") {
       usernameError2.textContent = "please choose an worker to delete";
     } else {
-      //api call from frontend to server, sending data from form to server to save in db
+      // Making an API call to the server to delete a worker
       const res = await fetch("/admin/usermanagment/deleteadmin", {
         method: "POST",
         body: JSON.stringify({ username: adminUsername.value }),
         headers: { "Content-type": "application/json" },
       });
 
-      //after getting response from the server
+      // Processing the response from the server
       const data = await res.json();
       if (data == "done") {
         document.getElementById("successStatusDelete").textContent = "worker deleted successfully";
@@ -210,6 +251,8 @@
       }
     }
   });
+
+  // Function to check if a date is before today
   function isDateBeforeToday(dateString) {
     // Parse the provided date string into a Date object
     const providedDate = new Date(dateString);
@@ -224,8 +267,12 @@
     // Compare the two dates
     return providedDate <= currentDate;
   }
+
+  // Extracting user information from the server-side
   var users1 = `<%- JSON.stringify(users) %>`;
   var users = JSON.parse(users1);
+
+  // Handling search functionality
   const usernames = [...new Set(users.map((item) => item.username.toLowerCase()))];
   document.getElementById("searchBar").addEventListener("keyup", (e) => {
     const searchData = e.target.value.toLowerCase();
