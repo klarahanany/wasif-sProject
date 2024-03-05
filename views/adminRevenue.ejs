@@ -3,52 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <title>Revenue Chart</title>
-  <!-- Include necessary libraries for charts, e.g., Chart.js -->
 </head>
 
 <body>
   <div class="containerOfRevenue">
     <div>
       <br />
+      <!-- Display top-selling products within each category -->
       <h4>Top-selling products within each category</h4>
+
+      <!-- Display Wine category information if available -->
       <%if(wineMostSold){%>
       <div id="Category1-div" class="category">
-        <strong> WINE </strong>:
+        <strong> WINE </strong>
         <br />
         <img class="revenueImage" src="/<%= wineMostSold.image %>" alt="" />
-        <p>name: <%= wineMostSold.name %></p>
-        <p>selling amount: <%= wineMostSold.purchaseQuantity %></p>
+        <p><%= wineMostSold.name %></p>
+        <p>Selling amount: <%= wineMostSold.purchaseQuantity %></p>
       </div>
-      <%}%> <%if(beerMostSold){%>
 
+      <!-- Display Beer category information if available -->
+      <%}%> <%if(beerMostSold){%>
       <div id="Category2-div" class="category">
-        <strong> BEER </strong>:
+        <strong> BEER </strong>
         <br />
         <img class="revenueImage" src="/<%= beerMostSold.image %>" alt="" />
-        <p>name: <%= beerMostSold.name %></p>
-        <p>selling amount: <%= beerMostSold.purchaseQuantity %></p>
+        <p><%= beerMostSold.name %></p>
+        <p>Selling amount: <%= beerMostSold.purchaseQuantity %></p>
       </div>
       <br />
-      <%}%> <%if(accessoriesMostSold){%>
 
+      <!-- Display Accessories category information if available -->
+      <%}%> <%if(accessoriesMostSold){%>
       <div id="Category3-div" class="category2">
         <strong> ACCESSORIES </strong>:
         <br />
         <img class="revenueImage" src="/<%= accessoriesMostSold.image %>" alt="" />
-        <p>name: <%= accessoriesMostSold.name %></p>
-        <p>selling amount: <%= accessoriesMostSold.purchaseQuantity %></p>
+        <p><%= accessoriesMostSold.name %></p>
+        <p>Selling amount: <%= accessoriesMostSold.purchaseQuantity %></p>
       </div>
-      <%}%> <%if(alcoholMostSold){%>
 
+      <!-- Display Alcohol category information if available -->
+      <%}%> <%if(alcoholMostSold){%>
       <div id="Category3-div" class="category2">
-        <strong> ALCOHOL </strong>:
+        <strong> ALCOHOL </strong>
         <br />
         <img class="revenueImage" src="/<%= alcoholMostSold.image %>" alt="" />
-        <p>name: <%= alcoholMostSold.name %></p>
-        <p>selling amount: <%= alcoholMostSold.purchaseQuantity %></p>
+        <p><%= alcoholMostSold.name %></p>
+        <p>Selling amount: <%= alcoholMostSold.purchaseQuantity %></p>
       </div>
       <%}%>
     </div>
+
+    <!-- Create canvas for the chart -->
     <div class="theChart">
       <br />
       <h4>Revenue Chart</h4>
@@ -57,14 +64,18 @@
       </div>
     </div>
   </div>
+
   <script>
+    //Creating the Revenue Chart
     document.getElementById("revenueManage").style.backgroundColor = "#f9df4b";
     document.addEventListener("DOMContentLoaded", async function () {
-      // Replace the following with your actual data
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
 
+      // Parse revenueData from JSON format
       const revenueData1 = await "<%= JSON.stringify(revenueData) %>";
       var revenueData = JSON.parse(revenueData1);
+
+      // Create the Revenue Chart using Chart.js
       console.log(revenueData);
       const ctx = document.getElementById("revenueChart").getContext("2d");
       const chart = new Chart(ctx, {
@@ -92,5 +103,6 @@
     });
   </script>
   <br />
+
   <%- include('partials/footer'); -%>
 </body>
