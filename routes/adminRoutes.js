@@ -418,9 +418,11 @@ router.post("/usermanagment/addadmin", async (req, res) => {
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
   const birthday = req.body.birthday;
-  const phoneNumber = "0000000000";
+  const phoneNumber = req.body.phoneNumber;
   try {
+    console.log(phoneNumber)
     const user = await userModel.create({ username, email, password, firstname, lastname, birthday, phoneNumber, role: "worker" });
+    console.log(phoneNumber)
     var transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -497,7 +499,8 @@ router.post("/usermanagment/deleteadmin", async (req, res) => {
 
 router.get("/allOrders", requireAuthAdmin, async (req, res) => {
   try {
-    const orders = await orderModel.find({}).populate("userId", "username").populate("items.productId", "name");
+    const orders = await orderModel.find({}).populate("userId", "username phoneNumber").populate("items.productId", "name");
+    
     res.render("adminAllOrders", { orders });
     // Optionally close the connection here if you're not using it elsewhere
   } catch (err) {

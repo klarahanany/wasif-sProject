@@ -1,97 +1,103 @@
 <%- include('partials/header'); -%>
 
-<head>
-  <title>Shopping List</title>
-</head>
-<header></header>
-<main class="cartContentPage">
-  <h2>Shopping List</h2>
-  <ul class="cartContent">
-    <% if (cartItems.length===0) {%>
-    <p>Your cart is empty.</p>
-    <% } else { %>
-    <hr />
-    <% cartItems.forEach((item)=> { %>
-    <li class="cartItem">
-      <div>
-        <img src="/<%= item.image%>" alt="" />
-        <br />
-        <span> <%= item.name %> </span>
-        <br />
-        <span> Price: $<%= item.price %> </span>
-        <br />
-        <input type="number" class="quantity" id="quantity" name="quantity" min="1" data-id="<%= item.productId %>" value="<%= item.quantity %>"required>
-        <button class="DeleteFromCart" data-id="<%= item.productId %>" data-userid="<%= userId %>" onclick="removeItem( '<%= item.name %>')">
-          <i data-id="<%= item.productId %>" data-userid="<%= userId %>" onclick="removeItem( '<%= item.name %>')" class="fa-solid fa-trash-can"></i>
-        </button>
-        <!-- Add functionality to remove items from the cart -->
-      </div>
-      <%if(item.allQuantity==0){%>
-      <img class="overlay-image" src="/soldOut.png" alt="Your Image" />
-      <%}%>
-    </li>
-    <hr />
-    <% }); %>
+  <head>
+    <title>Shopping List</title>
+  </head>
+  <header></header>
+  <main class="cartContentPage">
+    <h2>Shopping List</h2>
+    <ul class="cartContent">
+      <% if (cartItems.length===0) {%>
+        <p>Your cart is empty.</p>
+        <% } else { %>
+          <hr />
+          <% cartItems.forEach((item)=> { %>
+            <li class="cartItem">
+              <div>
+                <img src="/<%= item.image%>" alt="" />
+                <br />
+                <span>
+                  <%= item.name %>
+                </span>
+                <br />
+                <span> Price: $<%= item.price %> </span>
+                <br />
+                <input type="number" class="quantity" id="quantity" name="quantity" min="1"
+                  data-id="<%= item.productId %>" value="<%= item.quantity %>" required>
+                <button class="DeleteFromCart" data-id="<%= item.productId %>" data-userid="<%= userId %>"
+                  onclick="removeItem( '<%= item.name %>')">
+                  <i data-id="<%= item.productId %>" data-userid="<%= userId %>"
+                    onclick="removeItem( '<%= item.name %>')" class="fa-solid fa-trash-can"></i>
+                </button>
+                <!-- Add functionality to remove items from the cart -->
+              </div>
+              <%if(item.allQuantity==0){%>
+                <img class="overlay-image" src="/soldOut.png" alt="Your Image" />
+                <%}%>
+            </li>
+            <hr />
+            <% }); %>
 
-    <p class="total">Total: $<%= total %></p>
-    <button id="payButton" herf>Checkout</button>
+              <p class="total">Total: $<%= total %>
+              </p>
+              <button id="payButton" herf>Checkout</button>
 
-    <% } %>
-  </ul>
-</main>
+              <% } %>
+    </ul>
+  </main>
 
-<%- include('partials/footer'); -%>
+  <%- include('partials/footer'); -%>
 
-<script>
-  var cartItems1 = `<%- JSON.stringify(cartItems) %>`;
-  var cartItems = JSON.parse(cartItems1);
-  document.getElementById("payButton").addEventListener("click", function () {
-    window.location.href = "/order/cart/payment"; // Navigate to the desired URL
-  });
-  async function removeItem(nameItem) {
-    var ItemId = event.target.getAttribute("data-id");
-    var userId = event.target.getAttribute("data-userid");
+    <script>
+      var cartItems1 = `<%- JSON.stringify(cartItems) %>`;
+      var cartItems = JSON.parse(cartItems1);
+      document.getElementById("payButton").addEventListener("click", function () {
+        window.location.href = "/order/cart/payment"; // Navigate to the desired URL
+      });
+      async function removeItem(nameItem) {
+        var ItemId = event.target.getAttribute("data-id");
+        var userId = event.target.getAttribute("data-userid");
 
-    // Find the index of the item to be removed in the cartItems array
-    const itemIndex = cartItems.findIndex((item) => item.name === nameItem);
-    // If the item was found in the cartItems array, remove it
-    if (itemIndex !== -1) {
-      cartItems.splice(itemIndex, 1);
-    }
-    console.log(ItemId);
-    var body = { itemID: ItemId, userId: userId };
-    const rawResponse = await fetch("http://localhost:3000/order/cart/deleteItem", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    const content = await rawResponse.json();
-    // Re-render the cart to reflect the updated cartItems
-    renderCart();
-  }
-  // Function to render the cart after an item is removed
-  function renderCart() {
-    // Select the <ul> element in your HTML where cart items are displayed
-    const cartList = document.querySelector(".cartContent");
-    // Clear the cart items currently displayed
-    cartList.innerHTML = "";
-    // Iterate through the updated cartItems and re-render them
-    if (cartItems.length === 0) {
-      const p = document.createElement("p");
-      p.textContent = "Your cart is empty.";
-      cartList.appendChild(p);
-    } else {
-      cartItems.forEach((item) => {
-        console.log(item.allQuantity);
-        var userId = "<%= userId %>";
-        const listItem = document.createElement("li");
-        // const listItem2 = document.createElement('li');
-        listItem.className = "cartItem";
-        if (item.allQuantity != 0) {
-          listItem.innerHTML = `
+        // Find the index of the item to be removed in the cartItems array
+        const itemIndex = cartItems.findIndex((item) => item.name === nameItem);
+        // If the item was found in the cartItems array, remove it
+        if (itemIndex !== -1) {
+          cartItems.splice(itemIndex, 1);
+        }
+        console.log(ItemId);
+        var body = { itemID: ItemId, userId: userId };
+        const rawResponse = await fetch("http://localhost:3000/order/cart/deleteItem", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+        const content = await rawResponse.json();
+        // Re-render the cart to reflect the updated cartItems
+        renderCart();
+      }
+      // Function to render the cart after an item is removed
+      function renderCart() {
+        // Select the <ul> element in your HTML where cart items are displayed
+        const cartList = document.querySelector(".cartContent");
+        // Clear the cart items currently displayed
+        cartList.innerHTML = "";
+        // Iterate through the updated cartItems and re-render them
+        if (cartItems.length === 0) {
+          const p = document.createElement("p");
+          p.textContent = "Your cart is empty.";
+          cartList.appendChild(p);
+        } else {
+          cartItems.forEach((item) => {
+            console.log(item.allQuantity);
+            var userId = "<%= userId %>";
+            const listItem = document.createElement("li");
+            // const listItem2 = document.createElement('li');
+            listItem.className = "cartItem";
+            if (item.allQuantity != 0) {
+              listItem.innerHTML = `
                             <div>
                             <img src="/${item.image}" alt="">
                             <br>
@@ -103,8 +109,8 @@
                         <button class="DeleteFromCart" data-id='${item.productId}' data-userid = '${userId}' onclick="removeItem('${item.name}')"><i data-id='${item.productId}' data-userid='${userId}'
                                     onclick="removeItem( '${item.name}')"  class="fa-solid fa-trash-can"></i></button>
                          </div>`;
-        } else {
-          listItem.innerHTML = `
+            } else {
+              listItem.innerHTML = `
                             <div>
                             <img src="/${item.image}" alt="">
                             <br>
@@ -117,75 +123,78 @@
                                     onclick="removeItem( '${item.name}')"  class="fa-solid fa-trash-can"></i></button>
                          </div>
                          <img class="overlay-image" src="/soldOut.png"alt="Your Image">`;
+            }
+
+            cartList.appendChild(listItem);
+            const hr = document.createElement("hr");
+            cartList.appendChild(hr);
+          });
+          const p = document.createElement("p");
+          p.className = "total";
+          p.textContent = calculateTotal();
+          const checkout = document.createElement("button");
+          checkout.textContent = "Checkout";
+          checkout.id = "payButton";
+          checkout.addEventListener("click", function () {
+            window.location.href = "/order/cart/payment"; // Navigate to the desired URL
+          })
+          cartList.appendChild(p);
+          cartList.appendChild(checkout);
+          // Update the total price if needed
+          const totalElement = document.querySelector(".total");
+          totalElement.textContent = `Total: $${calculateTotal(cartItems)}`;
+          const quantity = document.querySelectorAll(".quantity");
+          onchangeQuantity();
         }
+      }
+   
+      // Function to calculate the total price of items in the cart
+      function calculateTotal() {
+        var total = cartItems.reduce((total, item) => {
+          // Check a condition before adding to the total
+          if (item.allQuantity > 0) {
+            // Only add to the total if the quantity is greater than 0
+            total += item.price * item.quantity;
+          }
 
-        cartList.appendChild(listItem);
-        const hr = document.createElement("hr");
-        cartList.appendChild(hr);
-      });
-      const p = document.createElement("p");
-      p.className = "total";
-      p.textContent = calculateTotal();
-      const checkout = document.createElement("button");
-      checkout.textContent = "Checkout";
-      checkout.id = "payButton";
-      cartList.appendChild(p);
-      cartList.appendChild(checkout);
-      // Update the total price if needed
-      const totalElement = document.querySelector(".total");
-      totalElement.textContent = `Total: $${calculateTotal(cartItems)}`;
-      const quantity = document.querySelectorAll(".quantity");
-      onchangeQuantity();
-    }
-  }
-
-  // Function to calculate the total price of items in the cart
-  function calculateTotal() {
-    var total = cartItems.reduce((total, item) => {
-      // Check a condition before adding to the total
-      if (item.allQuantity > 0) {
-        // Only add to the total if the quantity is greater than 0
-        total += item.price * item.quantity;
+          return total;
+        }, 0);
+        return total.toFixed(2);
       }
 
-      return total;
-    }, 0);
-    return total.toFixed(2);
-  }
-
-  function onchangeQuantity() {
-    var userId = "<%= userId %>";
-    const quantity = document.querySelectorAll(".quantity");
-    quantity.forEach((quan) => {
-      quan.addEventListener("change", async () => {
-        var productId = quan.getAttribute("data-id");
-        for (let index = 0; index < cartItems.length; index++) {
-          const element = cartItems[index];
-          if (element.productId === productId) {
-            if (quan.value > element.allQuantity) {
-              console.log(element.allQuantity);
-              quan.value = element.allQuantity;
-              alert(`Warning: ${element.name} has less quantity than that`);
-            } else {
-              element.quantity = quan.value;
-              var body = { cartItems: cartItems, userId: userId, productId: productId, newQuan: quan.value };
-              const rawResponse = await fetch("http://localhost:3000/order/cart/changeQuan", {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-              });
-              const content = await rawResponse.json();
+      function onchangeQuantity() {
+        var userId = "<%= userId %>";
+        const quantity = document.querySelectorAll(".quantity");
+        quantity.forEach((quan) => {
+          quan.addEventListener("change", async () => {
+            var productId = quan.getAttribute("data-id");
+            for (let index = 0; index < cartItems.length; index++) {
+              const element = cartItems[index];
+              if (element.productId === productId) {
+                if (quan.value > element.allQuantity) {
+                  console.log(element.allQuantity);
+                  quan.value = element.allQuantity;
+                  alert(`Warning: ${element.name} has less quantity than that`);
+                } else {
+                  element.quantity = quan.value;
+                  var body = { cartItems: cartItems, userId: userId, productId: productId, newQuan: quan.value };
+                  const rawResponse = await fetch("http://localhost:3000/order/cart/changeQuan", {
+                    method: "POST",
+                    headers: {
+                      Accept: "application/json",
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(body),
+                  });
+                  const content = await rawResponse.json();
+                }
+              }
             }
-          }
-        }
 
-        const totalElement = document.querySelector(".total");
-        totalElement.textContent = `Total: $${calculateTotal()}`;
-      });
-    });
-  }
-  onchangeQuantity();
-</script>
+            const totalElement = document.querySelector(".total");
+            totalElement.textContent = `Total: $${calculateTotal()}`;
+          });
+        });
+      }
+      onchangeQuantity();
+    </script>
