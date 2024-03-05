@@ -7,27 +7,35 @@
 <body>
   <h1>All Orders</h1>
 
+  <!-- Display a message if no orders are found -->
   <% if (orders.length===0) { %>
   <p>No orders found.</p>
   <% } else { %>
+
+  <!-- Form to download orders data (visible only to main admin) -->
   <form id="formDownload" action="/admin/allOrders/downloadOrdersData" method="get">
     <button type="submit">Download Orders Data</button>
   </form>
+
+  <!-- Form for filtering orders by status -->
   <label class="filterLabel">Filter by Status:</label>
   <form id="statusFilterForm" dir="ltr" class="filter-form">
     <label> <input id="Ready" type="checkbox" name="category" value="ready" />Ready </label>
     <label> <input id="Pending" type="checkbox" name="category" value="pending" />Pending </label>
   </form>
+
+  <!-- Display status message -->
   <p id="status" style="color: red"></p>
+
+  <!-- Table to display order details -->
   <table>
     <thead>
       <tr>
-        <!-- <th>Order ID</th> -->
         <th>Order Date</th>
-        <th>username</th>
+        <th>Username</th>
+        <th>Phone Number</th>
         <th>Total Amount</th>
         <th>Payment Method</th>
-
         <th>Order Details</th>
         <th>Status</th>
         <th>Action</th>
@@ -36,12 +44,18 @@
     <tbody>
       <% orders.forEach(order=> { %>
       <tr id="<%=order._id%>">
+        <!-- Date -->
         <td><%= order.order_date.toLocaleDateString() %></td>
+        <!-- Username -->
         <td><%= order.userId.username %></td>
-
+        <!-- Phone number -->
+        <td><% /* Add phone number here */ %></td>
+        <!-- Total amount -->
         <td>$<%= order.total_amount.toFixed(2) %></td>
+        <!-- Payment method -->
         <td><%= order.payment.payment_method %></td>
 
+        <!-- Order details (Product and Quantity) -->
         <td>
           <table>
             <thead>
@@ -60,6 +74,8 @@
             </tbody>
           </table>
         </td>
+
+        <!-- Display order status and provide an action button to mark as ready -->
         <td><%= order.status %></td>
         <td>
           <form class="MarkasReady" id="MarkasReady">
@@ -71,31 +87,38 @@
     </tbody>
   </table>
   <% } %>
+
   <script>
     document.getElementById("orderManage").style.backgroundColor = "#f9df4b";
+    // Parse orders and admin data from JSON format
     var orders1 = `<%- JSON.stringify(orders) %>`;
     var orders = JSON.parse(orders1);
     var admin1 = `<%- JSON.stringify(admin) %>`;
     var admin = JSON.parse(admin1);
+
+    // Show/hide download form based on admin role
     if (admin.role == "mainadmin") {
       document.getElementById("formDownload").style.display = "block";
     } else if (admin.role == "worker") {
       document.getElementById("formDownload").style.display = "none";
     }
+
+    // Function to mark an order as ready
     async function MarkasReady(event) {
       event.preventDefault();
       const status = document.getElementById("status");
       const id = event.target.getAttribute("data-id");
       console.log(id);
       status.textContent = "";
-      //api call from frontend to server, sending data from form to server to save in db
+
+      // API call from frontend to server to update order status
       const res = await fetch(`http://localhost:3000/admin/allOrders/update-status/${id}`, {
         method: "POST",
         body: JSON.stringify(),
         headers: { "Content-type": "application/json" },
       });
 
-      //after getting response from the server
+      // After getting response from the server
       const data = await res.json();
       if (data.status) {
         status.textContent = data.status;
@@ -103,8 +126,9 @@
         window.location.reload();
       }
     }
-    const statusFilterForm = document.getElementById("statusFilterForm");
 
+    // Filter orders based on selected status
+    const statusFilterForm = document.getElementById("statusFilterForm");
     statusFilterForm.addEventListener("change", () => {
       const selectedstatus = Array.from(statusFilterForm.querySelectorAll('input[name="category"]:checked')).map((input) => input.value);
       if (selectedstatus.length > 0) {
