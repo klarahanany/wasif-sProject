@@ -130,9 +130,14 @@
     // Filter orders based on selected status
     const statusFilterForm = document.getElementById("statusFilterForm");
     statusFilterForm.addEventListener("change", () => {
+      // Get selected status values from the checkboxes
       const selectedstatus = Array.from(statusFilterForm.querySelectorAll('input[name="category"]:checked')).map((input) => input.value);
+
+      // Check if any status is selected
       if (selectedstatus.length > 0) {
         filteredData = [];
+
+        // Filter orders based on selected status
         console.log(selectedstatus);
         orders.forEach((order) => {
           console.log(order.status);
@@ -140,6 +145,8 @@
             filteredData.push(order);
           }
         });
+
+        // Show/hide table rows based on filtered data
         orders.forEach((order) => {
           const orderElement = document.getElementById(`${order._id}`);
           if (filteredData.includes(order)) {
@@ -149,6 +156,7 @@
           }
         });
       } else {
+        // If no status is selected, show all orders
         orders.forEach((order) => {
           const orderElement = document.getElementById(`${order._id}`);
           orderElement.style.display = "table-row";
