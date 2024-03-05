@@ -20,14 +20,15 @@
   </div>
 
   <!-- Product Update, Delete, and Add Forms -->
+
+  <!-- Update Product -->
   <div id="updateForm" style="display: none">
     <h2>Update Product</h2>
     <form id="formUpdate">
       <img id="updateImage" alt="Example Image" style="display: none" />
 
-      <!-- Input fields for product update -->
-      <label for="productName">Product Name:</label>
-
+      <!-- Product name -->
+      <label for="productName">Product Name</label>
       <!-- Dropdown for selecting product to update -->
       <select id="selectOption" name="selectName" onchange="changeProductForUpdate()">
         <option value="selectProduct">Select Product To Update</option>
@@ -36,12 +37,16 @@
         <% }); %>
       </select>
 
-      <!-- Input fields for updating product details -->
-      <label for="productImage">Product image:</label>
+      <!-- Product image -->
+      <label for="productImage">Product Image</label>
       <input type="file" name="image" id="imageInput" />
-      <label for="description">Product Description:</label>
+
+      <!-- Product description -->
+      <label for="description">Product Description</label>
       <input type="text" id="descriptionForProductUpdate" name="description" required /><br />
-      <label for="category">Product Category:</label>
+
+      <!-- Product category -->
+      <label for="category">Product Category</label>
       <select id="categoryForProductUpdate" name="selectOption">
         <option value="selectCategory">Select Category</option>
         <option value="Wine">Wine</option>
@@ -50,49 +55,58 @@
         <option value="Accessories">Accessories</option>
       </select>
       <br />
-      <label for="price">Product Price:</label>
+
+      <!-- Product price -->
+      <label for="price">Product Price</label>
       <input type="text" id="priceForProductUpdate" name="price" required /><br />
-      <label for="quantity">Product Quantity:</label>
+
+      <!-- Product quantity -->
+      <label for="quantity">Product Quantity</label>
       <input type="number" min="0" id="quantityForProductUpdate" name="quantity" required /><br />
 
-      <!-- Add more fields as needed -->
       <p id="statusUpdate" style="color: red; font-weight: bold"></p>
       <p id="statusSuccess" style="color: green; font-weight: bold"></p>
       <button type="submit" id="updateButton">Update</button>
     </form>
   </div>
 
+  <!-- Delete Product -->
   <div id="deleteForm" style="display: none">
     <h2>Delete Product</h2>
     <form>
-      <label for="productName">Product Name:</label>
-
+      <!-- Product name -->
+      <label for="productName">Product Name</label>
       <select id="selectOptionForDelete" name="selectOption">
         <option value="selectProduct">Select Product</option>
         <% options.forEach(function(option) { %>
         <option value="<%= option.value %>"><%= option.label %></option>
         <% }); %>
       </select>
+
       <p id="statusDelete" style="color: red; font-weight: bold"></p>
       <p id="statusSuccessForDelete" style="color: green; font-weight: bold"></p>
       <button id="deleteButton" type="submit">Delete</button>
     </form>
   </div>
 
+  <!-- Add Product -->
   <div id="addForm" style="display: none">
     <h2>Add Product</h2>
     <form id="addingForm" action="/admin/inventory/add-product" method="post" enctype="multipart/form-data">
-      <label for="newProductImage">Product Image:</label>
-
+      <!-- Product image -->
+      <label for="newProductImage">Product Image</label>
       <input id="file" type="file" name="image" required />
 
-      <!-- Input fields for new product -->
-      <!-- Replace with your specific fields (e.g., name, price, description) -->
-      <label for="newProductName">Product Name:</label>
+      <!-- Product name -->
+      <label for="newProductName">Product Name</label>
       <input type="text" id="newProductName" name="newProductName" required /><br />
-      <label for="description">Product Description:</label>
+
+      <!-- Product description -->
+      <label for="description">Product Description</label>
       <input type="text" id="descriptionForProductAdd" name="description" required /><br />
-      <label for="category">Product Category:</label>
+
+      <!-- Product category -->
+      <label for="category">Product Category</label>
       <select id="categoryForProductAdd" name="selectOption">
         <option value="selectCategory">Select Category</option>
         <option value="Wine">Wine</option>
@@ -101,18 +115,18 @@
         <option value="Accessions">Accessories</option>
       </select>
       <br />
-      <label for="price">Product Price:</label>
+
+      <!-- Product price -->
+      <label for="price">Product Price</label>
       <input type="text" id="priceForProductAdd" name="price" required /><br />
-      <label for="quantity">Product Quantity:</label>
+
+      <!-- Product quantity -->
+      <label for="quantity">Product Quantity</label>
       <input type="number" min="0.0" id="quantityForProductAdd" name="quantity" required /><br />
 
-      <!-- Add more fields as needed -->
       <p id="statusAdd" style="color: red; font-weight: bold"></p>
       <p id="statusSuccessForAdd" style="color: green; font-weight: bold"></p>
-      <!-- Add more fields as needed -->
       <input class="btnadd" type="submit" id="addButton" value="ADD" />
-
-      <!-- <button type="submit" id="addButton">Add</button> -->
     </form>
   </div>
 
@@ -132,10 +146,9 @@
           <th>Product Category</th>
           <th>Product Quantity</th>
           <th>Product Price</th>
-
-          <!-- Add more table headers for other product attributes -->
         </tr>
       </thead>
+
       <tbody>
         <% products.forEach(function(product) { %>
         <tr id="<%=product._id%>">
@@ -151,8 +164,6 @@
           <td><%= product.quantity %></td>
           <%}%>
           <td>$<%= product.price %></td>
-
-          <!-- Add more table data cells for other product attributes -->
         </tr>
         <% }); %>
       </tbody>
@@ -160,30 +171,35 @@
   </div>
 </main>
 
-<!-- JavaScript to show/hide forms based on button clicks -->
 <script>
   var products1 = `<%- JSON.stringify(products) %>`;
   var products = JSON.parse(products1);
   var admin1 = `<%- JSON.stringify(admin) %>`;
   var admin = JSON.parse(admin1);
+
+  // Adjusting visibility of buttons based on the admin's role
+  // Mainadmin
   if (admin.role == "mainadmin") {
     document.getElementById("addBtn").style.display = "block";
     document.getElementById("deleteBtn").style.display = "block";
     document.getElementById("updateBtn").style.display = "block";
     document.getElementById("formDownload").style.display = "block";
-  } else if (admin.role == "worker") {
+  }
+  // Worker
+  else if (admin.role == "worker") {
     document.getElementById("addBtn").style.display = "none";
     document.getElementById("deleteBtn").style.display = "none";
     document.getElementById("updateBtn").style.display = "none";
     document.getElementById("formDownload").style.display = "none";
   }
+  // Highlighting the selected navigation tab
   document.getElementById("productManage").style.backgroundColor = "#f9df4b";
+
+  // Event listener for the product update form
   const formUpdate = document.getElementById("formUpdate");
   formUpdate.addEventListener("submit", async (e) => {
     e.preventDefault();
-    // const updateButton = document.getElementById('updateButton');
-    // updateButton.addEventListener('click', async (e) => {
-    //     e.preventDefault()
+    // Retrieving form values
     const value = document.getElementById("selectOption").value;
     const name = document.getElementById("selectOption");
     const description = document.getElementById("descriptionForProductUpdate");
@@ -191,6 +207,8 @@
     const quantity = document.getElementById("quantityForProductUpdate");
     const category = document.getElementById("categoryForProductUpdate");
     var statusUpdate = document.getElementById("statusUpdate");
+
+    // Validation checks
     if (value == "selectProduct") {
       statusUpdate.textContent = "please select product";
       document.getElementById("statusSuccess").textContent = "";
@@ -204,15 +222,15 @@
       statusUpdate.textContent = "please choose relevante quantity";
       document.getElementById("statusSuccess").textContent = "";
     } else {
+      // Sending update request to the server
       const formData = new FormData(formUpdate);
-
       const rawResponse = await fetch("http://localhost:3000/admin/inventory/update-product", {
         method: "POST",
-
         body: formData,
       });
       const content = await rawResponse.json();
 
+      // Handling server response
       if (content == "done") {
         description.value = "";
         quantity.value = "";
@@ -226,15 +244,20 @@
       }
     }
   });
+
+  // Event listener for the delete product button
   const deleteButton = document.getElementById("deleteButton");
   deleteButton.addEventListener("click", async (e) => {
     e.preventDefault();
+    // Retrieving selected product for deletion
     const name = document.getElementById("selectOptionForDelete");
-
     var statusDelete = document.getElementById("statusDelete");
+
+    // Validation checks
     if (name.value == "selectProduct") {
       statusDelete.textContent = "please select product";
     } else {
+      // Sending delete request to the server
       var body = { selectedValue: name.value };
       const rawResponse = await fetch("http://localhost:3000/admin/inventory/delete-product", {
         method: "POST",
@@ -246,6 +269,7 @@
       });
       const content = await rawResponse.json();
 
+      // Handling server response
       if (content == "done") {
         name.value = "selectProduct";
         statusDelete.textContent = "";
@@ -253,6 +277,8 @@
       }
     }
   });
+
+  // Event listener for the add product form
   const form = document.getElementById("addingForm");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -264,14 +290,15 @@
     const category = document.getElementById("categoryForProductAdd");
     var statusAdd = document.getElementById("statusAdd");
 
+    // Sending add product request to the server
     const formData = new FormData(form);
     const rawResponse = await fetch(form.action, {
       method: form.method,
       body: formData,
     });
-
     const content = await rawResponse.json();
 
+    // Handling server response
     if (content.error) {
       statusAdd.textContent = content.error;
       document.getElementById("statusSuccessForAdd").textContent = "";
@@ -285,10 +312,9 @@
       document.getElementById("file").value = "";
       document.getElementById("statusSuccessForAdd").textContent = content.status;
     }
-
-    // }
-    // }
   });
+
+  // Functions to show respective forms
   function showUpdateForm() {
     document.getElementById("updateForm").style.display = "block";
     document.getElementById("deleteForm").style.display = "none";
@@ -307,6 +333,7 @@
     document.getElementById("addForm").style.display = "block";
   }
 
+  // Function to handle product selection for update
   async function changeProductForUpdate() {
     const updateImage = document.getElementById("updateImage");
     const value = document.getElementById("selectOption").value;
@@ -314,6 +341,7 @@
     const price = document.getElementById("priceForProductUpdate");
     const quantity = document.getElementById("quantityForProductUpdate");
     const category = document.getElementById("categoryForProductUpdate");
+
     if (value != "selectProduct") {
       updateImage.style.display = "block";
       var body = { what: "what" };
@@ -343,6 +371,8 @@
       updateImage.style.display = "none";
     }
   }
+
+  // Event listener for the product search bar
   document.getElementById("searchBar").addEventListener("keyup", (e) => {
     const searchData = e.target.value.toLowerCase();
     const filteredData = products.filter((item) => {
