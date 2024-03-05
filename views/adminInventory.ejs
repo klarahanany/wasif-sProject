@@ -6,6 +6,8 @@
 
 <main>
   <h1>Product Management</h1>
+
+  <!-- Form for downloading product data -->
   <form id="formDownload" action="/admin/inventory/downloadProductsData" method="get">
     <button type="submit">Download Products Data</button>
   </form>
@@ -17,26 +19,26 @@
     <button id="deleteBtn" onclick="showDeleteForm()">delete product</button>
   </div>
 
-  <!-- Product Update, Delete, and Add Forms (Initially hidden) -->
+  <!-- Product Update, Delete, and Add Forms -->
   <div id="updateForm" style="display: none">
     <h2>Update Product</h2>
     <form id="formUpdate">
       <img id="updateImage" alt="Example Image" style="display: none" />
 
       <!-- Input fields for product update -->
-      <!-- Replace with your specific fields (e.g., name, price, description) -->
       <label for="productName">Product Name:</label>
 
+      <!-- Dropdown for selecting product to update -->
       <select id="selectOption" name="selectName" onchange="changeProductForUpdate()">
         <option value="selectProduct">Select Product To Update</option>
         <% options.forEach(function(option) { %>
         <option value="<%= option.value %>"><%= option.label %></option>
         <% }); %>
       </select>
+
+      <!-- Input fields for updating product details -->
       <label for="productImage">Product image:</label>
-
       <input type="file" name="image" id="imageInput" />
-
       <label for="description">Product Description:</label>
       <input type="text" id="descriptionForProductUpdate" name="description" required /><br />
       <label for="category">Product Category:</label>
@@ -47,7 +49,6 @@
         <option value="Alcohol">Alcohol</option>
         <option value="Accessions">Accessories</option>
       </select>
-      <!-- <input type="text" id="categoryForProductUpdate" name="category" required>-->
       <br />
       <label for="price">Product Price:</label>
       <input type="text" id="priceForProductUpdate" name="price" required /><br />

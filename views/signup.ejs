@@ -65,6 +65,7 @@
   const usernameError = document.querySelector(".username.error");
   // Get the birthday error element.
   const birthdayError = document.querySelector(".birthday.error");
+
   // Add an event listener to the form submit event.
   form.addEventListener("submit", async (e) => {
     // Prevent the default form submission.
@@ -132,6 +133,8 @@
 
     console.log(data);
   });
+
+  // Add event listener to password input for real-time password strength feedback.
   const password = document.getElementById("password");
   password.addEventListener("keyup", () => {
     if (checkPasswordStrength(password.value) != "Password is strong!") {
