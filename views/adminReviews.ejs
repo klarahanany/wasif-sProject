@@ -7,15 +7,16 @@
 <body>
   <h1>Reviews</h1>
 
+  <!-- Loop through reviews and display each review with relevant details -->
   <% reviews.forEach(function(review) { %>
   <div class="review">
     <p><%= review.title %></p>
     <p>Rating: <%= review.rating %></p>
     <p>Author: <%= review.author %></p>
-
-    <p><%= review.body %></p>
-
+    <p>Description: <%= review.body %></p>
     <p>Date: <%= review.date.toLocaleDateString() %></p>
+
+    <!-- Display delete button if the logged-in admin is the main admin -->
     <% if(admin.role=='mainadmin' ){ %>
     <button class="DeleteFromCart" data-id="<%= review._id %>" onclick="removeItem( )">
       <i data-id="<%= review._id %>" onclick="removeItem( )" class="fa-solid fa-trash-can"></i>
@@ -26,10 +27,17 @@
 
   <script>
     document.getElementById("reviewManage").style.backgroundColor = "#f9df4b";
+
+    // Function to remove a review
     async function removeItem() {
+      // Get the review ID from the clicked button's data-id attribute
       var ReviewId = event.target.getAttribute("data-id");
       console.log(ReviewId);
+
+      // Create a body object with the review ID
       var body = { ReviewId: ReviewId };
+
+      // Send a request to the server to delete the review
       const rawResponse = await fetch("http://localhost:3000/admin/reviews/deleteItem", {
         method: "POST",
         headers: {
@@ -38,9 +46,14 @@
         },
         body: JSON.stringify(body),
       });
+
+      // Parse the response from the server
       const content = await rawResponse.json();
+
+      // Reload the page after deleting the review
       window.location.reload();
     }
   </script>
+
   <%- include('partials/footer'); -%>
 </body>

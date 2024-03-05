@@ -11,37 +11,51 @@
   <button onclick="removeAccount()">remove account</button>
   <h2 style="text-align: center">Your Information</h2>
   <form action="/update-profile">
-    <label for="username">Username: <label id="username"><%= user.username %></label></label>
+    <!-- Display current username -->
+    <label for="username">Username </label>
+    <label id="username"><%= user.username %></label>
 
-    <label for="firstName">First Name:</label>
+    <!-- First name -->
+    <label for="firstName">First Name</label>
     <input type="text" id="firstName" name="firstName" value="<%= user.firstname %>" required />
 
-    <label for="lastName">Last Name:</label>
+    <!-- Last name -->
+    <label for="lastName">Last Name</label>
     <input type="text" id="lastName" name="lastName" value="<%= user.lastname %>" required />
 
-    <label for="email">Email:</label>
+    <!-- Email -->
+    <label for="email">Email</label>
     <input type="email" id="email" name="email" value="<%= user.email %>" required />
     <div class="email error"></div>
 
-    <label for="phoneNumber">Phone Number:</label>
+    <!-- Phone number -->
+    <label for="phoneNumber">Phone Number</label>
     <input type="tel" id="phoneNumber" name="phone" pattern="[0-9]{10}" value="<%= user.phoneNumber %>" required />
     <div class="phone error"></div>
 
-    <label for="password">Password:</label>
+    <!-- Birth date -->
+    <label for="birthday">Birth Date</label>
+    <input type="date" id="birthday" name="birthday" onchange="isDateBeforeToday()" value="<%= user.birthday %>" required />
+    <div class="birthday error"></div>
+
+    <!-- Password -->
+    <label for="password">Password</label>
     <input type="password" id="password" name="password" />
     <div class="password strong"></div>
     <div class="password notStrong"></div>
 
-    <label for="birthday">Birthday:</label>
-    <input type="date" id="birthday" name="birthday" onchange="isDateBeforeToday()" value="<%= user.birthday %>" required />
-    <div class="birthday error"></div>
-
     <button type="submit">Update Profile</button>
     <p id="status" style="color: green; font-weight: bold"></p>
   </form>
+
   <% } else { %>
+  <!-- Display message if user not found -->
   <p>User not found.</p>
-  <% } %> <%- include('partials/footer'); -%>
+  <% } %>
+
+  <!-- Footer -->
+  <%- include('partials/footer'); -%>
+
   <script>
     // Get the password strong element.
     const passwordStrong = document.querySelector(".password.strong");
