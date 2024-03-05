@@ -344,7 +344,7 @@
 
     if (value != "selectProduct") {
       updateImage.style.display = "block";
-      var body = { what: "what" };
+      var body = { send: "empty " };
       const rawResponse = await fetch("http://localhost:3000/admin/inventory/update-product/changes", {
         method: "POST",
         headers: {
