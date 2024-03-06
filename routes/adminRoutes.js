@@ -420,9 +420,9 @@ router.post("/usermanagment/addadmin", async (req, res) => {
   const birthday = req.body.birthday;
   const phoneNumber = req.body.phoneNumber;
   try {
-    console.log(phoneNumber)
+    console.log(phoneNumber);
     const user = await userModel.create({ username, email, password, firstname, lastname, birthday, phoneNumber, role: "worker" });
-    console.log(phoneNumber)
+    console.log(phoneNumber);
     var transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -500,7 +500,7 @@ router.post("/usermanagment/deleteadmin", async (req, res) => {
 router.get("/allOrders", requireAuthAdmin, async (req, res) => {
   try {
     const orders = await orderModel.find({}).populate("userId", "username phoneNumber").populate("items.productId", "name");
-    
+
     res.render("adminAllOrders", { orders });
     // Optionally close the connection here if you're not using it elsewhere
   } catch (err) {
@@ -585,7 +585,8 @@ router.post("/allOrders/update-status/:id", async (req, res) => {
   var details = "";
   for (let index = 0; index < order.items.length; index++) {
     const element = order.items[index];
-    details += index + ") Product name: " + element.productId.name + ", Quantity: " + element.quantity + "\n";
+    var num = index + 1;
+    details += num + ") Product name: " + element.productId.name + ", Quantity: " + element.quantity + "\n";
   }
 
   if (order.status == "pending") {
