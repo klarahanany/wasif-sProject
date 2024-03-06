@@ -32,7 +32,6 @@
       <input id="accession" type="checkbox" name="category" value="Accessories" />
       Accessories
     </label>
-    <!-- <button type="reset">Reset</button> -->
   </form>
 </div>
 <main class="contentPage">
@@ -55,12 +54,12 @@
       <button class="add-to-cart" type="submit" data-item-id="<%= drink.id %> " data-userId="<%= userId %>" onclick="addToCart(event)">
         Add to Cart
       </button>
-
       <%}%>
     </li>
     <% }); %>
   </ul>
 </main>
+
 <script>
   var products1 = `<%- JSON.stringify(drinks) %>`;
   var product = JSON.parse(products1);
