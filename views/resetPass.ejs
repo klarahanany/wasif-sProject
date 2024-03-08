@@ -9,23 +9,26 @@
   <body>
     <h1><%= email%></h1>
     <form action="" method="post" onsubmit="return validateForm()">
-      <!-- Password & Confirm password -->
+      <!-- Password -->
       <label for="passsword">Password</label>
       <input type="password" name="password" id="password" placeholder="Enter your new password" /><br />
       <div class="password strong"></div>
       <div class="password notStrong"></div>
 
+      <!-- Confirm password -->
       <label for="confirm-password">Confirm Password</label>
       <input type="password" name="confirmpassword" id="confirm-password" placeholder="Confirm your new password" /><br />
 
       <input type="submit" value="RESET" class="btnadd" />
     </form>
   </body>
+
   <script>
-    // Get the password strong element.
+    // Get the password strong element
     const passwordStrong = document.querySelector(".password.strong");
-    // Get the password not strong element.
     const passwordNotStrong = document.querySelector(".password.notStrong");
+
+    // Event listener for password input
     const password = document.getElementById("password");
     password.addEventListener("keyup", () => {
       if (checkPasswordStrength(password.value) != "Password is strong!") {
@@ -79,8 +82,9 @@
 
       return true; // Allow form submission
     }
-    var status = `<%- JSON.stringify(status) %>`;
 
+    // Check the status for account verification
+    var status = `<%- JSON.stringify(status) %>`;
     if (JSON.parse(status) === "verified") {
       if (confirm("Do you want to login?")) {
         window.location.href = "http://localhost:3000/login";
