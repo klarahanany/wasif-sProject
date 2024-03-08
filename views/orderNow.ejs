@@ -6,11 +6,13 @@
 <h1>Spiritual Drinks Menu</h1>
 
 <div class="filters">
+  <!-- Search bar -->
   <div class="searchBar">
     <input id="searchBar" type="text" placeholder="Search.." />
     <i class="fa-solid fa-magnifying-glass"></i>
   </div>
 
+  <!-- Filter by price -->
   <label class="filterLabel" for="filter">Filter by price:</label>
   <select id="filter">
     <option value="all">All</option>
@@ -20,6 +22,8 @@
     <option value="30">Under $30</option>
     <option value="40">Under $40</option>
   </select>
+
+  <!-- Filter by categories -->
   <label class="filterLabel">Filter by Categories:</label>
   <form id="categoryFilterForm" dir="ltr" class="filter-form">
     <label> <input id="wine" type="checkbox" name="category" value="Wine" />Wine </label>
@@ -34,21 +38,31 @@
     </label>
   </form>
 </div>
+
+<!-- Main content area for displaying products -->
 <main class="contentPage">
   <h2>Our Products</h2>
+
+  <!-- Product container list -->
   <ul class="productsContainer" id="productsContainer">
     <% drinks.forEach((drink)=> { %>
+    <!-- Individual product card -->
     <li class="product-card" data-category="<%= drink.category %>" id="<%= drink._id %>" theId="<%= drink._id %>" onclick="goToProduct(event)">
+      <!-- Product image -->
       <img src="/<%= drink.image %>" alt="Example Image" theId="<%= drink._id %>" />
+      <!-- Product details -->
       <h3 class="product-title" theId="<%= drink._id %>"><%= drink.name %></h3>
       <p class="product-description" theId="<%= drink._id %>"><%= drink.description %></p>
       <p class="product-price" theId="<%= drink._id %>">Price: $<%= drink.price.toFixed(2) %></p>
+
       <input type="hidden" name="drinkId" value="<%= drink.id %>" id="drinkId" />
       <input type="hidden" name="userId" value="<%= userId %>" id="userId" />
 
+      <!-- Check if the drink is sold out or available -->
       <% if(drink.quantity==0){ %>
       <p class="sold-out-message" style="font-size: 25px" theId="<%= drink._id %>">Sold Out</p>
       <%}else{%>
+      <!-- Quantity input and Add to Cart button -->
       <label for="quantity" theId="<%= drink._id %>">Quantity</label>
       <input type="number" id="quantity" data-item-id="<%= drink.id %>" class="quantity" name="quantity" min="1" value="1" required />
       <button class="add-to-cart" type="submit" data-item-id="<%= drink.id %> " data-userId="<%= userId %>" onclick="addToCart(event)">
@@ -61,10 +75,13 @@
 </main>
 
 <script>
+  // Parsing data from the server-side
   var products1 = `<%- JSON.stringify(drinks) %>`;
   var product = JSON.parse(products1);
   var category1 = `<%- JSON.stringify(category) %>`;
   var category = JSON.parse(category1);
+
+  // Checking if a specific category is selected
   if (category != "all") {
     const checkbox = document.getElementById(category);
     // Check the checkbox programmatically
@@ -74,6 +91,8 @@
     const selectedCategories = Array.from(categoryFilterForm.querySelectorAll('input[name="category"]:checked')).map((input) => input.value);
     const filteredProducts = document.getElementById("productsContainer");
     console.log(selectedCategories);
+
+    // Filtering products based on selected categories
     if (selectedCategories.length > 0) {
       products.forEach((product) => (product.style.display = "none"));
       console.log(selectedCategories);
@@ -83,6 +102,7 @@
       });
     }
   }
+
   const categories = [
     ...new Set(
       product.map((item) => {
@@ -90,6 +110,8 @@
       })
     ),
   ];
+
+  // Event listener for changing product view
   const filterSelectPrice = document.getElementById("filter");
   const categoryFilter = document.getElementById("categoryFilterForm");
   async function goToProduct(event) {
@@ -100,6 +122,7 @@
     }
   }
 
+  // Event listener for searching products
   document.getElementById("searchBar").addEventListener("keyup", (e) => {
     const searchData = e.target.value.toLowerCase();
     const filteredData = categories.filter((item) => {
@@ -145,6 +168,8 @@
       }
     }
   });
+
+  // Event listener for adding items to the cart
   async function addToCart(event) {
     const allQuantity = document.querySelectorAll(".quantity");
     const drinkId = event.target.getAttribute("data-item-id");
@@ -158,6 +183,7 @@
         drinkQuantity = quantity.value;
       }
     });
+
     var body = { drinkId: drinkId, quantity: drinkQuantity, userId: userId };
     const rawResponse = await fetch("http://localhost:3000/order/add-to-cart", {
       method: "POST",
@@ -170,6 +196,8 @@
     const content = await rawResponse.json();
     alert("Item has added");
   }
+
+  // Event listener for filtering products by price
   const filterSelect = document.getElementById("filter");
   const products = document.querySelectorAll(".product-card");
 
@@ -186,6 +214,7 @@
         product.style.display = "none";
       }
     });
+
     const selectedCategories = Array.from(categoryFilterForm.querySelectorAll('input[name="category"]:checked')).map((input) => input.value);
     // Hide all products by default
     if (selectedCategories.length > 0) {
@@ -200,15 +229,16 @@
       });
     }
   });
+
   const categoryFilterForm = document.getElementById("categoryFilterForm");
   const filteredProducts = document.getElementById("productsContainer");
 
+  // Event listener for changing product view based on selected categories
   categoryFilterForm.addEventListener("change", () => {
     const filterValue = filterSelect.value;
     const selectedCategories = Array.from(categoryFilterForm.querySelectorAll('input[name="category"]:checked')).map((input) => input.value);
     var array = [];
     // Hide all products by default
-    // const products = filteredProducts.querySelectorAll('.product');
     if (selectedCategories.length > 0) {
       products.forEach((product) => (product.style.display = "none"));
       console.log(selectedCategories);
