@@ -9,27 +9,34 @@
 
   <form>
     <p>Payment Method:</p>
-    <label> <input class="radio" type="radio" name="paymentMethod" value="creditCard" onchange="radioChange()" checked /> Credit Card (Visa) </label>
 
+    <!-- Cridt card or cash -->
+    <label> <input class="radio" type="radio" name="paymentMethod" value="creditCard" onchange="radioChange()" checked /> Credit Card </label>
     <label> <input class="radio" type="radio" name="paymentMethod" value="cash" onchange="radioChange()" /> Cash </label>
+
     <br />
     <hr class="visaPayment" />
-    <!-- Visa Card Details -->
-    <label for="cardNumber" class="visaPayment">Card Number:</label>
+    <!-- Credit card details -->
+    <!-- Card number -->
+    <label for="cardNumber" class="visaPayment">Card Number</label>
     <input type="text" id="cardNumber" name="cardNumber" class="visaPayment" placeholder="1234 5678 9012 3456" />
 
-    <label for="cardHolder" class="visaPayment">Card Holder:</label>
+    <!-- Card holder -->
+    <label for="cardHolder" class="visaPayment">Card Holder</label>
     <input type="text" id="cardHolder" name="cardHolder" class="visaPayment" placeholder="John Doe" />
 
-    <label for="expirationDate" class="visaPayment">Expiration Date:</label>
+    <!-- Card expiration date -->
+    <label for="expirationDate" class="visaPayment">Expiration Date</label>
     <input type="text" id="expirationDate" name="expirationDate" class="visaPayment" placeholder="MM/YY" />
 
-    <label for="cvv" class="visaPayment">CVV:</label>
+    <!-- Card ccv -->
+    <label for="cvv" class="visaPayment">CVV</label>
     <input type="text" id="cvv" name="cvv" placeholder="123" class="visaPayment" />
-    <!-- Payment Method -->
+
     <button type="submit">Finish The Order</button>
     <div class="status error"></div>
   </form>
+
   <script>
     const form = document.querySelector("form");
     const visaPayment = document.getElementsByClassName("visaPayment");
@@ -37,54 +44,57 @@
     var user1 = `<%- JSON.stringify(user) %>`;
     var user = JSON.parse(user1);
     console.log(user);
-    // const usernameError = document.querySelector('.username.error')
+
+    // Add an event listener for the form submission
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      //reset errors
+
+      // Reset errors
       statusError.textContent = "";
-      // usernameError.textContent = ''
+
+      // Check selected payment method
       if (form.paymentMethod.value == "creditCard") {
-        // get values
+        // Get values for credit card payment
         const cardNumber = form.cardNumber.value;
         const cardHolder = form.cardHolder.value;
         const expirationDate = form.expirationDate.value;
         const cvv = form.cvv.value;
 
-        // Using credit card
+        // Set payment method for credit card
         var paymentMethod = "creditCard";
 
+        // Validate credit card input data
         if (cardNumber == "" || cardHolder == "" || expirationDate == "" || cvv == "") {
           statusError.textContent = "Please Fill All Data";
         } else {
-          //api call from frontend to server, sending data from form to server to save in db
+          // API call from frontend to server, sending data from form to server to save in the database
           const res = await fetch("/order/cart/payment", {
             method: "POST",
             body: JSON.stringify({ cardNumber, cardHolder, expirationDate, cvv, paymentMethod, user }),
             headers: { "Content-type": "application/json" },
           });
 
-          //after getting response from the server
+          // Handle the response from the server
           const data = await res.json();
           if (data.status) {
             statusError.textContent = data.status;
           } else {
             alert("Your order has been placed");
-
             window.location.pathname = "/order/cart";
           }
         }
       } else {
-        // Using cash
+        // Set payment method for cash
         var paymentMethod = "cash";
 
-        //api call from frontend to server, sending data from form to server to save in db
+        // API call from frontend to server, sending data from form to server to save in the database
         const res = await fetch("/order/cart/payment", {
           method: "POST",
           body: JSON.stringify({ paymentMethod, user }),
           headers: { "Content-type": "application/json" },
         });
 
-        //after getting response from the server
+        // Handle the response from the server
         const data = await res.json();
         if (data.status) {
           statusError.textContent = data.status;
@@ -96,6 +106,7 @@
       }
     });
 
+    // Function to handle radio button change for payment method
     function radioChange() {
       if (form.paymentMethod.value == "cash") {
         for (let index = 0; index < visaPayment.length; index++) {
