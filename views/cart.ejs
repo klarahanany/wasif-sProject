@@ -3,13 +3,15 @@
 <head>
   <title>Shopping List</title>
 </head>
-<header></header>
+
 <main class="cartContentPage">
   <h2>Shopping List</h2>
   <ul class="cartContent">
     <% if (cartItems.length===0) {%>
+    <!-- Display a message when the cart is empty -->
     <p>Your cart is empty.</p>
     <% } else { %>
+    <!-- Iterate through cart items and display details -->
     <hr />
     <% cartItems.forEach((item)=> { %>
     <li class="cartItem">
@@ -30,18 +32,19 @@
           value="<%= item.quantity %>"
           required
         />
+
         <button class="DeleteFromCart" data-id="<%= item.productId %>" data-userid="<%= userId %>" onclick="removeItem( '<%= item.name %>')">
           <i data-id="<%= item.productId %>" data-userid="<%= userId %>" onclick="removeItem( '<%= item.name %>')" class="fa-solid fa-trash-can"></i>
         </button>
         <!-- Add functionality to remove items from the cart -->
       </div>
       <%if(item.allQuantity==0){%>
+      <!-- Display a sold-out image if the item is not available -->
       <img class="overlay-image" src="/soldOut.png" alt="Your Image" />
       <%}%>
     </li>
     <hr />
     <% }); %>
-
     <p class="total">Total: $<%= total %></p>
     <button id="payButton" herf>Checkout</button>
 
@@ -54,21 +57,29 @@
 <script>
   var cartItems1 = `<%- JSON.stringify(cartItems) %>`;
   var cartItems = JSON.parse(cartItems1);
+
+  // Add an event listener to the checkout button
   document.getElementById("payButton").addEventListener("click", function () {
     window.location.href = "/order/cart/payment"; // Navigate to the desired URL
   });
+
+  // Function to remove an item from the cart
   async function removeItem(nameItem) {
     var ItemId = event.target.getAttribute("data-id");
     var userId = event.target.getAttribute("data-userid");
 
     // Find the index of the item to be removed in the cartItems array
     const itemIndex = cartItems.findIndex((item) => item.name === nameItem);
+
     // If the item was found in the cartItems array, remove it
     if (itemIndex !== -1) {
       cartItems.splice(itemIndex, 1);
     }
+
     console.log(ItemId);
     var body = { itemID: ItemId, userId: userId };
+
+    // Send a POST request to remove the item from the cart
     const rawResponse = await fetch("http://localhost:3000/order/cart/deleteItem", {
       method: "POST",
       headers: {
@@ -77,16 +88,21 @@
       },
       body: JSON.stringify(body),
     });
+
     const content = await rawResponse.json();
+
     // Re-render the cart to reflect the updated cartItems
     renderCart();
   }
+
   // Function to render the cart after an item is removed
   function renderCart() {
     // Select the <ul> element in your HTML where cart items are displayed
     const cartList = document.querySelector(".cartContent");
+
     // Clear the cart items currently displayed
     cartList.innerHTML = "";
+
     // Iterate through the updated cartItems and re-render them
     if (cartItems.length === 0) {
       const p = document.createElement("p");
@@ -113,6 +129,8 @@
                                     onclick="removeItem( '${item.name}')"  class="fa-solid fa-trash-can"></i></button>
                          </div>`;
         } else {
+          // Display item details with sold-out image
+
           listItem.innerHTML = `
                             <div>
                             <img src="/${item.image}" alt="">
@@ -132,6 +150,7 @@
         const hr = document.createElement("hr");
         cartList.appendChild(hr);
       });
+
       const p = document.createElement("p");
       p.className = "total";
       p.textContent = calculateTotal();
@@ -143,9 +162,12 @@
       });
       cartList.appendChild(p);
       cartList.appendChild(checkout);
+
       // Update the total price if needed
       const totalElement = document.querySelector(".total");
       totalElement.textContent = `Total: $${calculateTotal(cartItems)}`;
+
+      // Add event listeners to quantity inputs
       const quantity = document.querySelectorAll(".quantity");
       onchangeQuantity();
     }
@@ -165,14 +187,18 @@
     return total.toFixed(2);
   }
 
+  // Function to handle changes in quantity inputs
   function onchangeQuantity() {
     var userId = "<%= userId %>";
     const quantity = document.querySelectorAll(".quantity");
+
     quantity.forEach((quan) => {
       quan.addEventListener("change", async () => {
         var productId = quan.getAttribute("data-id");
+
         for (let index = 0; index < cartItems.length; index++) {
           const element = cartItems[index];
+
           if (element.productId === productId) {
             if (quan.value > element.allQuantity) {
               console.log(element.allQuantity);
@@ -181,6 +207,8 @@
             } else {
               element.quantity = quan.value;
               var body = { cartItems: cartItems, userId: userId, productId: productId, newQuan: quan.value };
+
+              // Send a POST request to update the quantity of the item in the cart
               const rawResponse = await fetch("http://localhost:3000/order/cart/changeQuan", {
                 method: "POST",
                 headers: {
@@ -189,15 +217,19 @@
                 },
                 body: JSON.stringify(body),
               });
+
               const content = await rawResponse.json();
             }
           }
         }
 
+        // Update the total price in the UI
         const totalElement = document.querySelector(".total");
         totalElement.textContent = `Total: $${calculateTotal()}`;
       });
     });
   }
+
+  // Call the onchangeQuantity function
   onchangeQuantity();
 </script>
