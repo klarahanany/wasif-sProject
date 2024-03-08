@@ -5,13 +5,12 @@ const { requireAuth } = require("../middleware/authMiddware");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
+// GET route to render the user's profile, requiring authentication
 router.get("/", requireAuth, async (req, res) => {
-  // Assuming that res.locals.user contains the authenticated user's information
   const user = res.locals.user;
 
   try {
-    // You don't need to find the user again since you already have their data
-    // Simply pass 'user' to the 'profile' view
+    // Render the 'profile' view, passing the user data
     res.render("profile", { user });
   } catch (error) {
     // Handle any potential errors here
@@ -19,10 +18,14 @@ router.get("/", requireAuth, async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+// POST route to update user information
 router.post("/", async (req, res) => {
   const { username, password, firstname, lastName, birthday, email, phoneNumber } = req.body;
   const currentuser = await userModel.findOne({ username: username });
   var id = currentuser._id;
+
+  // Check if the provided email already exists for another user
   const user = await userModel.findOne({ email: email, _id: { $ne: id } });
   if (user) {
     res.status(400).json({ status: "emailAlreadyExist" });
@@ -46,6 +49,7 @@ router.post("/", async (req, res) => {
       console.log(err);
     }
   } else {
+    // Update user information with a new password
     try {
       const salt = bcrypt.genSaltSync(10);
       // Hash the password with the salt
@@ -69,6 +73,8 @@ router.post("/", async (req, res) => {
     }
   }
 });
+
+// POST route to remove user account
 router.post("/removeaccount", async (req, res) => {
   const { username } = req.body;
 
@@ -88,4 +94,5 @@ router.post("/removeaccount", async (req, res) => {
     console.log(err);
   }
 });
+
 module.exports = router;
