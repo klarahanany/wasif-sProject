@@ -22,12 +22,15 @@
 
     <!-- Review Form -->
     <form id="reviewForm">
+      <!-- Title -->
       <label for="title">Title</label>
       <input type="text" id="title" name="title" required />
 
+      <!-- Rating -->
       <label for="rating">Rating (1-5)</label>
       <input type="number" id="rating" name="rating" min="1" max="5" required />
 
+      <!-- Review -->
       <label for="body">Review</label>
       <textarea id="body" name="body" rows="4" required></textarea>
 
@@ -39,12 +42,14 @@
   <%- include('partials/footer'); -%>
 
   <script>
+    // Get the review form
     const form = document.querySelector("#reviewForm");
 
+    // Add event listener for form submission
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // get values
+      // Get values
       var user1 = `<%- JSON.stringify(user) %>`;
       var user = JSON.parse(user1);
       console.log(user);
@@ -52,17 +57,16 @@
       const body = form.body.value;
       const rating = form.rating.value;
 
-      //api call from frontend to server, sending data from form to server to save in db
+      // API call from frontend to server, sending data from the form to the server to save in the database
       const res = await fetch("/reviews/addReview", {
         method: "POST",
         body: JSON.stringify({ user, title, body, rating }),
         headers: { "Content-type": "application/json" },
       });
 
-      //after getting response from the server
+      // After getting response from the server
       const data = await res.json();
       if (data == "done") {
-        // window.location.reload()
         document.getElementById("status").textContent = "your review has been submited";
         form.title.value = "";
         form.body.value = "";
