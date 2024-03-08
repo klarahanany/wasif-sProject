@@ -8,14 +8,15 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { render } = require("ejs");
 const maxAge = 3 * 24 * 60 * 60;
-//takes user id from database
+
+// Function to create a JWT token with user ID
 const createToken = (id) => {
-  //save user id in the token
   return jwt.sign({ id }, "mysecretcode", {
     expiresIn: maxAge, // 3 days
   });
 };
 
+// Function to check if a user is over 21 based on their birthdate
 function isOver21(birthdate) {
   // Parse the birthdate string into a Date object
   const birthDateObject = new Date(birthdate);
@@ -33,7 +34,7 @@ function isOver21(birthdate) {
   return finalAge >= 21;
 }
 
-// Error handler
+// Function to handle errors during authentication
 const handleErrors = (err, usernameValue, emailValue) => {
   let errors = { username: "", email: "", password: "" };
 
@@ -71,14 +72,17 @@ const handleErrors = (err, usernameValue, emailValue) => {
   return errors;
 };
 
+// Route to render the signup page
 router.get("/signup", (req, res) => {
   res.render("signup");
 });
 
+// Route to render the forgot password page
 router.get("/forgotPass", (req, res) => {
   res.render("forgetPass", { status: "" });
 });
 
+// Route to handle user registration (signup)
 router.post("/signup", async (req, res) => {
   const username = req.body.username;
   const email = req.body.email;
@@ -105,10 +109,12 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+// Route to render the login page
 router.get("/login", (req, res) => {
   res.render("login");
 });
 
+// Route to handle user login
 router.post("/login", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -143,15 +149,18 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Route to handle user logout
 router.get("/logout", async (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 }); //replace the current cookie with empty string
   res.redirect("/");
 });
 
+// Route to render the login error page
 router.get("/loginError", (req, res) => {
   res.render("loginError");
 });
 
+// Route to handle the forgot password functionality
 router.post("/forgotPass", async (req, res) => {
   const email = req.body.email;
   try {
@@ -193,6 +202,7 @@ router.post("/forgotPass", async (req, res) => {
   }
 });
 
+// Route to render the reset password page
 router.get("/resetPass/:id/:token", async (req, res) => {
   const { id, token } = req.params;
 
@@ -209,6 +219,7 @@ router.get("/resetPass/:id/:token", async (req, res) => {
   }
 });
 
+// Route to handle the reset password functionality
 router.post("/resetPass/:id/:token", async (req, res) => {
   const { id, token } = req.params;
   const { password, confirmpassword } = req.body;
@@ -240,4 +251,5 @@ router.post("/resetPass/:id/:token", async (req, res) => {
   }
 });
 
+// Export the router
 module.exports = router;
