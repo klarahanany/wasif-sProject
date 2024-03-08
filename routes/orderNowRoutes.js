@@ -20,6 +20,8 @@ function calculateTotal(cartItems) {
   }, 0);
   return total.toFixed(2);
 }
+
+// Route to render the main order page
 router.get("/", requireAuth, async (req, res) => {
   const user = res.locals.user;
   var userId = user._id;
@@ -27,6 +29,8 @@ router.get("/", requireAuth, async (req, res) => {
   const category = "all";
   res.render("orderNow", { drinks, userId, category });
 });
+
+// Route to render the order page based on the selected category
 router.get("/category/:category", requireAuth, async (req, res) => {
   const user = res.locals.user;
   var userId = user._id;
@@ -34,6 +38,8 @@ router.get("/category/:category", requireAuth, async (req, res) => {
   const category = req.params.category;
   res.render("orderNow", { drinks, userId, category });
 });
+
+// Route to render a specific product page
 router.get("/product/:id", requireAuth, async (req, res) => {
   try {
     const productId = req.params.id;
@@ -47,10 +53,12 @@ router.get("/product/:id", requireAuth, async (req, res) => {
   }
 });
 
+// Route to handle adding items to the cart
 router.post("/add-to-cart", async (req, res) => {
-  const productId = req.body.drinkId.trim(); // Replace with the actual product ID
-  const quantity = req.body.quantity; // Set the quantity as needed
+  const productId = req.body.drinkId.trim();
+  const quantity = req.body.quantity;
   const userId = req.body.userId.trim();
+
   try {
     // Find the user's cart by user ID
     let cart = await cartModel.findOne({ userId: userId });
@@ -61,6 +69,7 @@ router.post("/add-to-cart", async (req, res) => {
         items: [],
       });
     }
+
     // Add the new item to the cart's items array
     var productIndex = -1;
     productIndex = cart.items.findIndex((item) => item.productId.equals(productId));
@@ -72,6 +81,7 @@ router.post("/add-to-cart", async (req, res) => {
         quantity,
       });
     }
+
     // Save the cart with the new item
     const updatedCart = await cart.save();
   } catch (err) {
@@ -82,25 +92,26 @@ router.post("/add-to-cart", async (req, res) => {
   res.json("done");
 });
 
+// Route to render the cart page
 router.get("/cart", requireAuth, async (req, res) => {
   const user = res.locals.user;
   const products = await productModel.find();
   var userId = user._id;
   const currentUserCart = await cartModel.findOne({ userId: user._id });
   var cartItems = [];
+
   if (currentUserCart) {
     var cartData = currentUserCart.items;
+
     cartData.forEach((item) => {
       products.forEach((product) => {
         if (item.productId.equals(product._id)) {
           if (item.quantity > product.quantity) {
             item.quantity = product.quantity;
+
+            // Update the cart with the adjusted quantity
             cartModel
-              .findOneAndUpdate(
-                { userId: user._id },
-                { $set: { items: cartData } },
-                { new: true } // To return the updated document
-              )
+              .findOneAndUpdate({ userId: user._id }, { $set: { items: cartData } }, { new: true })
               .then((updatedProduct) => {
                 if (updatedProduct) {
                   console.log("Product updated successfully:", updatedProduct);
@@ -111,6 +122,8 @@ router.get("/cart", requireAuth, async (req, res) => {
               .catch((error) => {
                 console.error("Error updating product:", error);
               });
+
+            // Add the item to the cartItems array with adjusted quantity
             cartItems.push({
               productId: product._id,
               name: product.name,
@@ -120,6 +133,7 @@ router.get("/cart", requireAuth, async (req, res) => {
               allQuantity: product.quantity,
             });
           } else {
+            // Add the item to the cartItems array with the original quantity
             cartItems.push({
               productId: product._id,
               name: product.name,
@@ -133,18 +147,22 @@ router.get("/cart", requireAuth, async (req, res) => {
       });
     });
   }
+
   var total = calculateTotal(cartItems);
   res.render("cart", { cartItems, total, userId });
 });
+
+// Route to handle deleting an item from the cart
 router.post("/cart/deleteItem", async (req, res) => {
   var productId = req.body.itemID;
   var userId = req.body.userId;
 
   try {
     let cart = await cartModel.findOne({ userId: userId });
-    // .filter(item => item.id !== productId);
     const updatedCartItems = cart.items;
     var newArray = updatedCartItems.filter((item) => item.productId != productId);
+
+    // Update cart in the database with the new items array
     cartModel
       .updateOne({ userId: userId }, { $set: { items: newArray } })
       .then((result) => {
@@ -153,6 +171,7 @@ router.post("/cart/deleteItem", async (req, res) => {
       .catch((error) => {
         console.log("Error updating items:", error);
       });
+
     res.json("Done");
   } catch (err) {
     // Handle any errors
@@ -160,13 +179,17 @@ router.post("/cart/deleteItem", async (req, res) => {
   }
 });
 
+// Route to handle changing the quantity of an item in the cart
 router.post("/cart/changeQuan", async (req, res) => {
   var productId = req.body.productId;
   var newQuantity = req.body.newQuan;
   var userId = req.body.userId;
   var cartItems = req.body.cartItems;
+
   try {
     const updatedCartItems = cartItems;
+
+    // Update cart in the database with the new items array
     cartModel
       .updateOne({ userId: userId }, { $set: { items: updatedCartItems } })
       .then((result) => {
@@ -181,34 +204,48 @@ router.post("/cart/changeQuan", async (req, res) => {
     console.error(err);
   }
 });
+
+// Route to render the payment page
 router.get("/cart/payment", requireAuth, async (req, res) => {
   res.render("payment");
 });
+
+// Route to handle payment processing
 router.post("/cart/payment", async (req, res) => {
+  // Extracting relevant information from the request body
   const { cardNumber, cardHolder, expirationDate, cvv, paymentMethod, user } = req.body;
+
+  // Initializing variables
   var total = 0;
   const cartForCurrentUser = await cartModel.findOne({ userId: user._id });
   var items = cartForCurrentUser.items;
   var itemsWithMoreQuantity = [];
   var orderDetails = "";
 
+  // Loop through items in the user's cart
   for (let index = 0; index < items.length; index++) {
     const element = items[index];
+
+    // Retrieve product details from the database
     const product = await productModel.findOne({ _id: element.productId });
     var num = index + 1;
+
+    // Build order details string for email notification
     orderDetails += num + ") Product name: " + product.name + ", Quantity: " + element.quantity + "\n";
     console.log(product.quantity);
+
+    // Check product availability
     if (product.quantity > 0) {
       itemsWithMoreQuantity.push(element);
       total += product.price * element.quantity;
+
+      // Update product quantity and purchase quantity in the database
       var newQuantity = product.quantity - element.quantity;
       var newPurchaseQuantity = product.purchaseQuantity + element.quantity;
+
+      // Update product information
       await productModel
-        .findOneAndUpdate(
-          { _id: element.productId },
-          { $set: { quantity: newQuantity, purchaseQuantity: newPurchaseQuantity } },
-          { new: true } // To return the updated document
-        )
+        .findOneAndUpdate({ _id: element.productId }, { $set: { quantity: newQuantity, purchaseQuantity: newPurchaseQuantity } }, { new: true })
         .then((updatedProduct) => {
           if (updatedProduct) {
             console.log("Product updated successfully:", updatedProduct);
@@ -221,6 +258,7 @@ router.post("/cart/payment", async (req, res) => {
         });
 
       const productAfter = await productModel.findOne({ _id: element.productId });
+
       // If product qunty less than 10 the main admin will get an email
       if (productAfter.quantity < 10) {
         const mainadmin = await UserModel.findOne({ role: "mainadmin" });
@@ -252,6 +290,8 @@ router.post("/cart/payment", async (req, res) => {
       }
     }
   }
+
+  // Compose email notification for the main admin about the new order
   const mainadmin = await UserModel.findOne({ role: "mainadmin" });
   var text = `Customer's name: ${user.firstname} ${user.lastname} \nOrder Details: \n${orderDetails} `;
   var transporter = nodemailer.createTransport({
@@ -270,6 +310,7 @@ router.post("/cart/payment", async (req, res) => {
     text: text,
   };
 
+  // Validate credit card information
   if (paymentMethod == "creditCard") {
     if (!validatecardNumber(cardNumber)) {
       res.status(400).json({ status: "cardNumber not valid" });
@@ -280,6 +321,7 @@ router.post("/cart/payment", async (req, res) => {
     } else if (!validatecvv(cvv)) {
       res.status(400).json({ status: "cvv not valid" });
     } else {
+      // Send email notification to the main admin about the new order
       transporter.sendMail(mailOptions1, async function (error, info) {
         if (error) {
           console.log(error);
@@ -287,16 +329,18 @@ router.post("/cart/payment", async (req, res) => {
           console.log("Email sent: " + info.response);
         }
       });
+
+      // Create a new order document for credit card payment
       const newOrder = new orderModel({
-        userId: cartForCurrentUser.userId, // Replace with a valid user ID from your UserModel
+        userId: cartForCurrentUser.userId,
         items: itemsWithMoreQuantity,
-        total_amount: total, // Replace with the actual total amount
+        total_amount: total,
         payment: {
-          card_number: cardNumber, // Replace with a valid card number
-          expiration_date: expirationDate, // Replace with a valid expiration date
-          payment_method: "Visa", // Replace with the actual payment method
+          card_number: cardNumber,
+          expiration_date: expirationDate,
+          payment_method: "Visa",
         },
-        status: "pending", // Default status is 'pending', you can change it if needed
+        status: "pending",
       });
 
       // Save the new order to the database
@@ -308,6 +352,8 @@ router.post("/cart/payment", async (req, res) => {
         .catch((error) => {
           console.error("Error saving order:", error);
         });
+
+      // Clear the user's cart after successful order creation
       cartModel
         .updateOne({ userId: cartForCurrentUser.userId }, { $set: { items: [] } })
         .then((result) => {
@@ -320,9 +366,13 @@ router.post("/cart/payment", async (req, res) => {
         .catch((error) => {
           console.error("Error clearing cart:", error);
         });
+
+      // Respond with a success status
       res.status(201).json("done");
     }
   } else {
+    // If payment method is not credit card, proceed with cash payment
+    // Send email notification to the main admin about the new order
     transporter.sendMail(mailOptions1, async function (error, info) {
       if (error) {
         console.log(error);
@@ -330,17 +380,19 @@ router.post("/cart/payment", async (req, res) => {
         console.log("Email sent: " + info.response);
       }
     });
+
+    // Create a new order document for cash payment
     const newOrder = new orderModel({
-      userId: cartForCurrentUser.userId, // Replace with a valid user ID from your UserModel
+      userId: cartForCurrentUser.userId,
       items: itemsWithMoreQuantity,
 
-      total_amount: total, // Replace with the actual total amount
+      total_amount: total,
       payment: {
-        card_number: "", // Replace with a valid card number
-        expiration_date: "", // Replace with a valid expiration date
-        payment_method: "Cash", // Replace with the actual payment method
+        card_number: "",
+        expiration_date: "",
+        payment_method: "Cash",
       },
-      status: "pending", // Default status is 'pending', you can change it if needed
+      status: "pending",
     });
 
     // Save the new order to the database
@@ -352,6 +404,8 @@ router.post("/cart/payment", async (req, res) => {
       .catch((error) => {
         console.error("Error saving order:", error);
       });
+
+    // Clear the user's cart after successful order creation
     cartModel
       .updateOne({ userId: cartForCurrentUser.userId }, { $set: { items: [] } })
       .then((result) => {
@@ -364,6 +418,8 @@ router.post("/cart/payment", async (req, res) => {
       .catch((error) => {
         console.error("Error clearing cart:", error);
       });
+
+    // Respond with a success status
     res.status(201).json("done");
   }
 });
@@ -376,27 +432,27 @@ function validatecardNumber(cardNumber) {
   return true;
 }
 
+// Validate Cardholder Name (Assuming alphabetical characters only for simplicity)
 function validatecardHolder(cardHolder) {
-  // Validate Cardholder Name (Assuming alphabetical characters only for simplicity)
-  const cardHolderRegex = /^[A-Za-z\s]+$/;
+  const cardHolderRegex = /^[A-Za-z\s]+$/; // Regular expression for cardholder name
   if (!cardHolderRegex.test(cardHolder)) {
     return false; // Invalid cardholder name format
   }
   return true;
 }
 
+// Validate CVV (Assuming a 3-digit CVV)
 function validatecvv(cvv) {
-  // Validate CVV (Assuming a 3-digit CVV)
-  const cvvRegex = /^[0-9]{3}$/;
+  const cvvRegex = /^[0-9]{3}$/; // Regular expression for CVV (3 digits)
   if (!cvvRegex.test(cvv)) {
     return false; // Invalid CVV format
   }
   return true;
 }
 
+// Validate Expiration Date (Assuming MM/YY format)
 function validateexpirationDate(expirationDate) {
-  // Validate Expiration Date (Assuming MM/YY format)
-  const expirationDateRegex = /^(0[1-9]|1[0-2])\/[0-9]{2}$/;
+  const expirationDateRegex = /^(0[1-9]|1[0-2])\/[0-9]{2}$/; // Regular expression for MM/YY format
   if (!expirationDateRegex.test(expirationDate)) {
     return false; // Invalid expiration date format
   }
