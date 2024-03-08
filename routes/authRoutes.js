@@ -19,7 +19,6 @@ const createToken = (id) => {
 function isOver21(birthdate) {
   // Parse the birthdate string into a Date object
   const birthDateObject = new Date(birthdate);
-
   // Get the current date
   const currentDate = new Date();
   // Calculate the age
@@ -33,6 +32,7 @@ function isOver21(birthdate) {
   // Check if the age is greater than or equal to 21
   return finalAge >= 21;
 }
+
 // Error handler
 const handleErrors = (err, usernameValue, emailValue) => {
   let errors = { username: "", email: "", password: "" };
@@ -70,9 +70,11 @@ const handleErrors = (err, usernameValue, emailValue) => {
 
   return errors;
 };
+
 router.get("/signup", (req, res) => {
   res.render("signup");
 });
+
 router.get("/forgotPass", (req, res) => {
   res.render("forgetPass", { status: "" });
 });
@@ -149,6 +151,7 @@ router.get("/logout", async (req, res) => {
 router.get("/loginError", (req, res) => {
   res.render("loginError");
 });
+
 router.post("/forgotPass", async (req, res) => {
   const email = req.body.email;
   try {
@@ -189,6 +192,7 @@ router.post("/forgotPass", async (req, res) => {
     console.log(err);
   }
 });
+
 router.get("/resetPass/:id/:token", async (req, res) => {
   const { id, token } = req.params;
 
@@ -203,9 +207,8 @@ router.get("/resetPass/:id/:token", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-
-  // res.send(req.params)
 });
+
 router.post("/resetPass/:id/:token", async (req, res) => {
   const { id, token } = req.params;
   const { password, confirmpassword } = req.body;

@@ -715,6 +715,5 @@ router.get("/profile", requireAuthAdmin, async (req, res) => {
   } catch (err) {
     console.error("Error:", err);
   }
-  // const orders = await orderModel.find()
 });
 module.exports = router;

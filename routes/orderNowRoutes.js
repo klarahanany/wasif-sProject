@@ -270,14 +270,6 @@ router.post("/cart/payment", async (req, res) => {
     text: text,
   };
 
-  // transporter.sendMail(mailOptions1, async function (error, info) {
-  //   if (error) {
-  //     console.log(error);
-  //   } else {
-  //     console.log("Email sent: " + info.response);
-  //   }
-  // });
-
   if (paymentMethod == "creditCard") {
     if (!validatecardNumber(cardNumber)) {
       res.status(400).json({ status: "cardNumber not valid" });
@@ -297,7 +289,6 @@ router.post("/cart/payment", async (req, res) => {
       });
       const newOrder = new orderModel({
         userId: cartForCurrentUser.userId, // Replace with a valid user ID from your UserModel
-        // items: cartForCurrentUser.items,
         items: itemsWithMoreQuantity,
         total_amount: total, // Replace with the actual total amount
         payment: {
@@ -341,7 +332,6 @@ router.post("/cart/payment", async (req, res) => {
     });
     const newOrder = new orderModel({
       userId: cartForCurrentUser.userId, // Replace with a valid user ID from your UserModel
-      //items: cartForCurrentUser.items,
       items: itemsWithMoreQuantity,
 
       total_amount: total, // Replace with the actual total amount
