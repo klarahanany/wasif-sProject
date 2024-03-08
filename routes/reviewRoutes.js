@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Review = require("../models/Review"); // Assuming you have a Review model
+const Review = require("../models/Review");
 const { currentUser, requireAuth } = require("../middleware/authMiddware");
 
 // GET route to display reviews, requiring authentication
@@ -16,9 +16,12 @@ router.get("/", requireAuth, async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+// POST route to add a new review
 router.post("/addReview", async (req, res) => {
   try {
     const { user, title, body, rating } = req.body;
+
     // Create a new review instance
     const newReview = new Review({ title, rating, author: user.firstname + " " + user.lastname, body });
 
